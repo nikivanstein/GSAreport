@@ -33,6 +33,8 @@ def ackley_arg0(sol):
 
 
 
+
+
 def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=""):
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
 
@@ -46,7 +48,7 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
     cols = labels
     rows = ['X{}'.format(row) for row in range(avg_sens.shape[2])]
 
-    fig, axes = plt.subplots(avg_sens.shape[2], avg_sens.shape[1], figsize=[20,4*avg_sens.shape[2]])
+    fig, axes = plt.subplots(avg_sens.shape[2], avg_sens.shape[1], sharey=True, figsize=[20,3*avg_sens.shape[2]])
     fig.suptitle(title)
     
     for j in np.arange(avg_sens.shape[2]):
@@ -54,6 +56,10 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
             axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-avg_conf[:,i,j]), (avg_sens[:,i,j]+avg_conf[:,i,j]), color=conf_colors[i], alpha=0.1 )
             axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-std_sens[:,i,j]), (avg_sens[:,i,j]+std_sens[:,i,j]), color=colors[i], alpha=0.2 )
             axes[j,i].plot(x_samples,avg_sens[:,i,j],color=colors[i], label = labels[i])
+            axes[j,i].set_xticks(x_samples)
+            axes[j,i].set_xscale('log', base=2)
+            #if i > 0:
+            axes[j,i].set_ylim([0.0,1.0])
 
     lines_labels = [ax.get_legend_handles_labels() for ax in axes[0,:]]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
@@ -71,8 +77,8 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
     plt.xlabel("sample size")
     plt.ylabel("sensitivity index")
     plt.savefig(f"{filename}.pdf")
-    plt.show()
     plt.clf()
+    
     
 def runSensitivityExperiment(dim, f, title, filename):
     fun, opt = bn.instantiate(f, iinstance=1)
@@ -81,7 +87,7 @@ def runSensitivityExperiment(dim, f, title, filename):
     'names': ['X'+str(x) for x in range(dim)],
     'bounds': [[-5.0, 5.0]] * dim
     }
-    x_samples = [64,128,256,512,1024,2048,4096] #,8192,16384
+    x_samples = [64,128,256,512] #,1024,2048,4096,8192,8192,16384
     results = []
     conf_results = []
     
@@ -101,8 +107,12 @@ def runSensitivityExperiment(dim, f, title, filename):
                                         num_levels=4,
                                         num_resamples=10,
                                         seed=rep)
-            alg_results.append( np.asarray(res_morris["mu_star"]))
-            alg_conf_results.append( np.asarray(res_morris["mu_star_conf"]))
+
+            mu_star_fixed = np.asarray(res_morris["mu_star"]) / np.sum(res_morris["mu_star"])
+            mu_star_conf_fixed = np.asarray(res_morris["mu_star_conf"]) / np.sum(res_morris["mu_star"])
+
+            alg_results.append( mu_star_fixed)
+            alg_conf_results.append( mu_star_conf_fixed)
 
             #Sobol
             X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
@@ -141,6 +151,7 @@ def runSensitivityExperiment(dim, f, title, filename):
 from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
-for f in fIDs:
-    for dim in tqdm([2,5,10,20], position=0):#
+
+for dim in [2,5,10,20]:
+    for f in tqdm(fIDs, position=0):
         runSensitivityExperiment(dim, f, title=f"Average Sensitivity Scores on F{f} D{dim}", filename=f"f{f}-d{dim}") #maybe add repetitions
