@@ -53,8 +53,8 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
     
     for j in np.arange(avg_sens.shape[2]):
         for i in np.arange(avg_sens.shape[1]):
-            axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-avg_conf[:,i,j]), (avg_sens[:,i,j]+avg_conf[:,i,j]), color=conf_colors[i], alpha=0.1 )
-            axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-std_sens[:,i,j]), (avg_sens[:,i,j]+std_sens[:,i,j]), color=colors[i], alpha=0.2 )
+            axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-std_sens[:,i,j]), (avg_sens[:,i,j]+std_sens[:,i,j]), color=conf_colors[i], alpha=0.2 )
+            axes[j,i].fill_between(x_samples, (avg_sens[:,i,j]-avg_conf[:,i,j]), (avg_sens[:,i,j]+avg_conf[:,i,j]), color=colors[i], alpha=0.1 )
             axes[j,i].plot(x_samples,avg_sens[:,i,j],color=colors[i], label = labels[i])
             axes[j,i].set_xticks(x_samples)
             axes[j,i].set_xscale('log', base=2)
