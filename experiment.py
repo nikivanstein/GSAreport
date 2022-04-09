@@ -23,23 +23,26 @@ import seaborn as sns
 # Apply the default theme
 sns.set_theme()
 
-%matplotlib inline
-
 
 def meanAbsoluteError(sens, f, d):
     #calculate average distance (euclidean) to end result per algorithm (/per dim)
     labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "R2", "Pearson", "RF", "Linear"]
     avg_sens = np.mean(sens, axis=1)
-    for i in np.arange(avg_sens.shape[1]):
-        absolute_errors = []
-        for j in np.arange(avg_sens.shape[2]):
-            #end result (highest sample) (samples, algs, dims)
+    #std_sens = np.std(sens, axis=1) #std sensitivity over all repetitions
+    #for rep in np.arange(sens.shape[1]):
+    for i in np.arange(sens.shape[2]):
+        s_errors = []
+        i_stds = []
+        for j in np.arange(sens.shape[3]):
+            #end result (highest average sample) (samples, algs, dims)
             end_res = avg_sens[-1,i,j]
-            absolute_error_j = np.abs(avg_sens[:-1,i,j] - end_res) / len(avg_sens[:-1,i,j])
-            absolute_errors.append(absolute_error_j)
-        
-        with open('mae.csv', mode='a') as file_:
-            file_.write("{},{},{},{}".format(labels[i], f, d, np.mean(absolute_errors)))
+            squared_error_j = np.square(sens[:-1,:,i,j] - end_res)# / len(avg_sens[:-1,i,j])
+            std_j = sens[:,:-1,i,j]
+            s_errors.append(squared_error_j)
+            i_stds.append(std_j)
+
+        with open('mse-low.csv', mode='a') as file_:
+            file_.write("{},{},{},{},{}".format(labels[i], f, d, np.mean(s_errors), np.mean(i_stds)))
             file_.write("\n")  # Next line.
         #print(f, d, labels[i], np.mean(absolute_errors))
 
@@ -105,14 +108,14 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
     #plt.show()
     plt.clf()
     
-    def runSensitivityExperiment(dim, f, title, filename):
+def runSensitivityExperiment(dim, f, title, filename):
     fun, opt = bn.instantiate(f, iinstance=1)
     problem = {
     'num_vars': dim,
     'names': ['X'+str(x) for x in range(dim)],
     'bounds': [[-5.0, 5.0]] * dim
     }
-    x_samples = [8,16,32,64,128,256,512,1024,2048,4096,8192] #,8192,16384 ,
+    x_samples = [8,16,32,64,8192] #,128,256,512,1024,2048,4096,8192 #,8192,16384 ,
     results = []
     conf_results = []
     
@@ -223,7 +226,7 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
         results.append(np.asarray(rep_results))
         conf_results.append(np.asarray(rep_conf_results))
 
-    plotSensitivity(x_samples, np.asarray(results), np.asarray(conf_results), title=title, filename=filename)
+    #plotSensitivity(x_samples, np.asarray(results), np.asarray(conf_results), title=title, filename=filename)
     meanAbsoluteError(np.asarray(results), f, dim)
 
 from benchmark import bbobbenchmarks as bn
