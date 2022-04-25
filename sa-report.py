@@ -37,7 +37,7 @@ import savvy.network_tools as nt
 #output_notebook()
 
 
-def saReport(problem, sample_size, fun, seed=42):
+def saReport(problem, sample_size, fun, top=50, seed=42):
     # create sobol analysis
     X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
     z_sobol =  np.asarray(list(map(fun, X_sobol)))
@@ -58,7 +58,7 @@ def saReport(problem, sample_size, fun, seed=42):
     #import graph_tool.inference as community
 
     #sa_dict_net = copy.deepcopy(sa_dict)
-    g = nt.build_graph(sa_dict['problem'], sens='ST', top=150, min_sens=0.01,
+    g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
                        edge_cutoff=0.005)
     #nt.plot_network_circle(g, inline=True, scale=200)
 
@@ -70,18 +70,19 @@ def saReport(problem, sample_size, fun, seed=42):
     for i in range(g.num_vertices()):
         g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
 
-    epsens = g.edge_properties['second_sens']
-    for i in g.edges():
-        g.ep['second_sens'][i] =  (g.ep['second_sens'][i]) ** 2
+    #epsens = g.edge_properties['second_sens']
+    #for i in g.edges():
+    #    g.ep['second_sens'][i] =  (g.ep['second_sens'][i])
 
-    filename = "sensivity_network.pdf"
-    state = graph_tool.inference.minimize_nested_blockmodel_dl(g, deg_corr=True)
+    filename = "sensivity_network.png"
+    state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
     draw.draw_hierarchy(state,
                         vertex_text=g.vp['param'],
                         vertex_text_position="centered",
                         layout = "radial",
+                        hide = 2,
                         # vertex_text_color='black',
-                        vertex_font_size=8,
+                        vertex_font_size=12,
                         vertex_size=g.vp['sensitivity'],
                         #vertex_color='#006600',
                         #vertex_fill_color='#008800',
@@ -96,10 +97,11 @@ def saReport(problem, sample_size, fun, seed=42):
                         )
 
 from benchmark import bbobbenchmarks as bn
+dim = 50
 problem = {
-    'num_vars': 5,
-    'names': ['X'+str(x) for x in range(5)],
-    'bounds': [[-5.0, 5.0]] * 5
+    'num_vars': dim,
+    'names': ['X'+str(x) for x in range(dim)],
+    'bounds': [[-5.0, 5.0]] * dim
     }
-fun, opt = bn.instantiate(5, iinstance=1)
+fun, opt = bn.instantiate(22, iinstance=1)
 saReport(problem, 500, fun, seed=42)
