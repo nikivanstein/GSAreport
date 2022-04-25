@@ -41,10 +41,15 @@ def meanAbsoluteError(sens, f, d):
             s_errors.append(squared_error_j)
             i_stds.append(std_j)
 
-        with open('mse-low.csv', mode='a') as file_:
+        with open('mse-all.csv', mode='a') as file_:
             file_.write("{},{},{},{},{}".format(labels[i], f, d, np.mean(s_errors), np.mean(i_stds)))
             file_.write("\n")  # Next line.
         #print(f, d, labels[i], np.mean(absolute_errors))
+
+def storeResults(x_samples, sens, conf, filename):
+    np.save(f"samples{filename}", x_samples)
+    np.save(f"sens{filename}", sens)
+    np.save(f"conf{filename}", conf)
 
 def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=""):
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
@@ -115,7 +120,7 @@ def runSensitivityExperiment(dim, f, title, filename):
     'names': ['X'+str(x) for x in range(dim)],
     'bounds': [[-5.0, 5.0]] * dim
     }
-    x_samples = [8,16,32,64,8192] #,128,256,512,1024,2048,4096,8192 #,8192,16384 ,
+    x_samples = [8,16,32,64,128,256,512,1024,2048,4096,8192] #,128,256,512,1024,2048,4096,8192 #,8192,16384 ,
     results = []
     conf_results = []
     
@@ -226,6 +231,7 @@ def runSensitivityExperiment(dim, f, title, filename):
         results.append(np.asarray(rep_results))
         conf_results.append(np.asarray(rep_conf_results))
 
+    storeResults(x_samples, np.asarray(results), np.asarray(conf_results), filename)
     #plotSensitivity(x_samples, np.asarray(results), np.asarray(conf_results), title=title, filename=filename)
     meanAbsoluteError(np.asarray(results), f, dim)
 
