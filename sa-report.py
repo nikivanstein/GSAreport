@@ -22,7 +22,7 @@ from tqdm import tqdm
 # Import seaborn
 import seaborn as sns
 
-#import warnings; warnings.filterwarnings('ignore')
+import warnings; warnings.filterwarnings('ignore')
 import copy
 from graph_tool.all import *
 from graph_tool import Graph, draw, inference
@@ -41,11 +41,16 @@ def saReport(problem, sample_size, fun, seed=42):
     # create sobol analysis
     X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
     z_sobol =  np.asarray(list(map(fun, X_sobol)))
-    res_sobol = sobol.analyze(problem, z_sobol, print_to_console=False,seed=seed)
 
-    # read the sensitivity analysis files
-    datapath = op.join(os.getcwd(),'resuls/')
-    sa_dict = dp.get_sa_data(datapath)
+    import contextlib
+ 
+    path = 'temp/analysis_temp.txt'
+    with open(path, 'w') as f:
+        with contextlib.redirect_stdout(f):
+            sa = sobol.analyze(problem, z_sobol, print_to_console=True, seed=seed, calc_second_order=True)
+    
+    sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
+    print(sa_dict)
 
     # Apply the default theme
     #sns.set_theme()
@@ -53,7 +58,7 @@ def saReport(problem, sample_size, fun, seed=42):
     #import graph_tool.inference as community
 
     #sa_dict_net = copy.deepcopy(sa_dict)
-    g = nt.build_graph(sa_dict, sens='ST', top=150, min_sens=0.01,
+    g = nt.build_graph(sa_dict['problem'], sens='ST', top=150, min_sens=0.01,
                        edge_cutoff=0.005)
     #nt.plot_network_circle(g, inline=True, scale=200)
 
@@ -89,3 +94,12 @@ def saReport(problem, sample_size, fun, seed=42):
                         inline=inline,
                         output=filename
                         )
+
+from benchmark import bbobbenchmarks as bn
+problem = {
+    'num_vars': 5,
+    'names': ['X'+str(x) for x in range(5)],
+    'bounds': [[-5.0, 5.0]] * 5
+    }
+fun, opt = bn.instantiate(5, iinstance=1)
+saReport(problem, 500, fun, seed=42)
