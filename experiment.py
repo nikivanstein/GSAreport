@@ -7,7 +7,7 @@ from deap import benchmarks
 from sklearn.ensemble import RandomForestRegressor
 
 from SALib.sample import saltelli,finite_diff, fast_sampler, latin
-from SALib.analyze import morris,sobol, dgsm, fast, delta, rbd_fast
+from SALib.analyze import morris,sobol, dgsm, fast, delta, rbd_fast, pawn
 from SALib.util import read_param_file
 from SALib.sample.morris import sample
 from SALib.plotting.morris import horizontal_bar_plot, covariance_plot, sample_histograms
@@ -26,7 +26,7 @@ sns.set_theme()
 
 def meanAbsoluteError(sens, f, d):
     #calculate average distance (euclidean) to end result per algorithm (/per dim)
-    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "R2", "Pearson", "RF", "Linear"]
+    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "pawn", "Pearson", "RF", "Linear"]
     avg_sens = np.mean(sens, axis=1)
     #std_sens = np.std(sens, axis=1) #std sensitivity over all repetitions
     #for rep in np.arange(sens.shape[1]):
@@ -62,7 +62,7 @@ def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=
     LINE_STYLES = ['solid', 'dashed', 'dashdot', 'dotted']
     NUM_STYLES = len(LINE_STYLES)
     colors = sns.color_palette('husl', n_colors=avg_sens.shape[2])
-    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "R2", "Pearson", "RF", "Linear"]
+    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "pawn", "Pearson", "RF", "Linear"]
     cols = labels
     rows = ['X{}'.format(row) for row in range(avg_sens.shape[2])]
 
@@ -190,14 +190,11 @@ def runSensitivityExperiment(dim, f, title, filename):
             alg_conf_results.append( dgsm_conf_fixed)
 
 
-            #R2 score
-            r2s = []
-            for col in range(X_latin.shape[1]):
-                r2 = r2_score(z_latin, X_latin[:,col])
-                r2s.append(r2)
-            r2_fixed = np.asarray(r2s) / np.sum(r2s)
-            alg_results.append(np.array(r2_fixed))
-            alg_conf_results.append(np.zeros(np.array(r2s).shape))
+            #pawn
+            res_pawn = pawn.analyze(problem, X_latin, z_latin, S=10, print_to_console=False,seed=rep)
+            pawn_fixed = np.asarray(res_pawn["median"])
+            alg_results.append(np.array(pawn_fixed))
+            alg_conf_results.append(np.zeros(np.array(pawn_fixed).shape))
 
             #Pearson Correlation
             prs = []

@@ -9,17 +9,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from deap import benchmarks
 from sklearn.ensemble import RandomForestRegressor
-
+import pandas as pd
 from SALib.sample import saltelli,finite_diff, fast_sampler, latin
-from SALib.analyze import morris,sobol, dgsm, fast, delta, rbd_fast
+from SALib.analyze import morris,sobol, dgsm, fast, delta, rbd_fast, pawn
 from SALib.util import read_param_file
 from SALib.sample.morris import sample
 from SALib.plotting.morris import horizontal_bar_plot, covariance_plot, sample_histograms
 from scipy.stats import pearsonr
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
-
-
+from SALib.plotting.bar import plot as barplot
+from SALib.plotting.hdmr import plot as hdmrplot
 from tqdm import tqdm
 
 # Import seaborn
@@ -79,9 +79,41 @@ def improved_covariance_plot(ax, Si, opts=None, unit=""):
     return out
 
 def generate_report(problem, sample_size, fun, top=50, seed=42):
+    if top > problem['num_vars']:
+        top = problem['num_vars']
     #create a sobol analysis
-    morris_plt(problem, sample_size, fun, top=50, num_levels=4)
+    lhs_methods(problem, sample_size, fun, top, seed=seed)
+    #morris_plt(problem, sample_size, fun, top=50, num_levels=4)
     #sobol_plt(problem, sample_size, fun, top, seed=)
+
+def lhs_methods(problem, sample_size, fun, top, seed):
+    X = latin.sample(problem, sample_size, seed=seed)
+    y =  np.asarray(list(map(fun, X)))
+    Si = rbd_fast.analyze(problem, X, y, print_to_console=False)
+    fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
+    df = Si.to_df()
+    df = df.sort_values(by=['S1'], ascending=False)
+    barplot(df.iloc[:top], ax1)
+    plt.tight_layout()
+    plt.savefig("fast.png")
+    plt.clf()
+    
+    Si = delta.analyze(problem, X, y, print_to_console=False)
+    fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
+    df = Si.to_df()
+    df = df.sort_values(by=['S1'], ascending=False)
+    barplot(df.iloc[:top], ax1)
+    plt.tight_layout()
+    plt.savefig("delta.png")
+
+    Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
+    fig, (ax1) = plt.subplots(1, 1, figsize=[1.2*top,6])
+    df = Si.to_df()
+    df = df.sort_values(by=['mean'], ascending=False)
+    barplot(df.iloc[:top], ax1)
+    plt.tight_layout()
+    plt.savefig("pawn.png")
+    
 
 def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     X = sample(problem, N=sample_size, num_levels=num_levels)
@@ -150,4 +182,4 @@ problem = {
     'bounds': [[-5.0, 5.0]] * dim
     }
 fun, opt = bn.instantiate(22, iinstance=1)
-generate_report(problem, 500, fun, seed=42)
+generate_report(problem, 500, fun, 10, seed=42)
