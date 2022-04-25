@@ -2,6 +2,8 @@
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+import matplotlib
+matplotlib.use("macOSX")
 from matplotlib.colors import LogNorm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,6 +18,7 @@ from SALib.plotting.morris import horizontal_bar_plot, covariance_plot, sample_h
 from scipy.stats import pearsonr
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
+
 
 from tqdm import tqdm
 
@@ -36,37 +39,80 @@ import savvy.network_tools as nt
 
 #output_notebook()
 
+def improved_covariance_plot(ax, Si, opts=None, unit=""):
+    '''Plots mu* against sigma or the 95% confidence interval
 
-def saReport(problem, sample_size, fun, top=50, seed=42):
+    '''
+    if opts is None:
+        opts = {}
+
+    if Si['sigma'] is not None:
+        # sigma is not present if using morris groups
+        y = Si['sigma']
+        out = ax.scatter(Si['mu_star'], y, c=u'b', marker=u'o',
+                         **opts)
+        ax.set_ylabel(r'$\sigma$')
+
+        ax.set_xlim(0,)
+        ax.set_ylim(0,)
+
+        x_axis_bounds = np.array(ax.get_xlim())
+
+        line1, = ax.plot(x_axis_bounds, x_axis_bounds, 'k-')
+        line2, = ax.plot(x_axis_bounds, 0.5 * x_axis_bounds, 'y--')
+        line3, = ax.plot(x_axis_bounds, 0.1 * x_axis_bounds, 'r-.')
+
+        ax.legend((line1, line2, line3), (r'$\sigma / \mu^{\star} = 1.0$',
+                                          r'$\sigma / \mu^{\star} = 0.5$',
+                                          r'$\sigma / \mu^{\star} = 0.1$'),
+                  loc='best')
+
+    else:
+        y = Si['mu_star_conf']
+        out = ax.scatter(Si['mu_star'], y, c=u'k', marker=u'o',
+                         **opts)
+        ax.set_ylabel(r'$95\% CI$')
+
+    ax.set_xlabel(r'$\mu^\star$ ' + unit)
+    ax.set_ylim(0-(0.01 * np.array(ax.get_ylim()[1])), )
+
+    return out
+
+def generate_report(problem, sample_size, fun, top=50, seed=42):
+    #create a sobol analysis
+    morris_plt(problem, sample_size, fun, top=50, num_levels=4)
+    #sobol_plt(problem, sample_size, fun, top, seed=)
+
+def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
+    X = sample(problem, N=sample_size, num_levels=num_levels)
+    y =  np.asarray(list(map(fun, X)))
+    sns.set_theme()
+    fig, (ax1) = plt.subplots(1, 1, figsize=[8,problem['num_vars']])
+    Si = morris.analyze(problem, X, y, conf_level=0.95,
+                    print_to_console=False, num_levels=num_levels)
+    horizontal_bar_plot(ax1, Si,{}, sortby='mu_star')
+    plt.tight_layout()
+    plt.savefig("morris.png")
+    plt.clf()
+
+    sns.set_theme()
+    fig, (ax1) = plt.subplots(1, 1, figsize=[8,8])
+    improved_covariance_plot(ax1, Si)
+    plt.tight_layout()
+    plt.savefig("morris2.png")
+
+def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     # create sobol analysis
-    X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
-    z_sobol =  np.asarray(list(map(fun, X_sobol)))
+    X = saltelli.sample(problem, N=sample_size, calc_second_order=True)
+    y =  np.asarray(list(map(fun, X)))
 
-    import contextlib
- 
-    path = 'temp/analysis_temp.txt'
-    with open(path, 'w') as f:
-        with contextlib.redirect_stdout(f):
-            sa = sobol.analyze(problem, z_sobol, print_to_console=True, seed=seed, calc_second_order=True)
+    sa = sobol.analyze(problem, y, print_to_console=False, seed=seed, calc_second_order=True)
     
     sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
-    print(sa_dict)
-
-    # Apply the default theme
-    #sns.set_theme()
-
-    #import graph_tool.inference as community
-
-    #sa_dict_net = copy.deepcopy(sa_dict)
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
                        edge_cutoff=0.005)
-    #nt.plot_network_circle(g, inline=True, scale=200)
-
     inline=True
     scale=200
-    
-    print("Network plot")
-
     for i in range(g.num_vertices()):
         g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
 
@@ -104,4 +150,4 @@ problem = {
     'bounds': [[-5.0, 5.0]] * dim
     }
 fun, opt = bn.instantiate(22, iinstance=1)
-saReport(problem, 500, fun, seed=42)
+generate_report(problem, 500, fun, seed=42)
