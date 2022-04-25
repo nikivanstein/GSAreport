@@ -22,8 +22,70 @@ from tqdm import tqdm
 # Import seaborn
 import seaborn as sns
 
-# Apply the default theme
-sns.set_theme()
+#import warnings; warnings.filterwarnings('ignore')
+import copy
+from graph_tool.all import *
+from graph_tool import Graph, draw, inference
+from bokeh.plotting import show, output_notebook
+import os.path as op
+import os
+import savvy.data_processing as dp
+import savvy.interactive_plots as ip
+from savvy.plotting import make_plot, make_second_order_heatmap
+import savvy.network_tools as nt
 
-def saReport(problem, func):
+#output_notebook()
 
+
+def saReport(problem, sample_size, fun, seed=42):
+    # create sobol analysis
+    X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
+    z_sobol =  np.asarray(list(map(fun, X_sobol)))
+    res_sobol = sobol.analyze(problem, z_sobol, print_to_console=False,seed=seed)
+
+    # read the sensitivity analysis files
+    datapath = op.join(os.getcwd(),'resuls/')
+    sa_dict = dp.get_sa_data(datapath)
+
+    # Apply the default theme
+    #sns.set_theme()
+
+    #import graph_tool.inference as community
+
+    #sa_dict_net = copy.deepcopy(sa_dict)
+    g = nt.build_graph(sa_dict, sens='ST', top=150, min_sens=0.01,
+                       edge_cutoff=0.005)
+    #nt.plot_network_circle(g, inline=True, scale=200)
+
+    inline=True
+    scale=200
+    
+    print("Network plot")
+
+    for i in range(g.num_vertices()):
+        g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
+
+    epsens = g.edge_properties['second_sens']
+    for i in g.edges():
+        g.ep['second_sens'][i] =  (g.ep['second_sens'][i]) ** 2
+
+    filename = "sensivity_network.pdf"
+    state = graph_tool.inference.minimize_nested_blockmodel_dl(g, deg_corr=True)
+    draw.draw_hierarchy(state,
+                        vertex_text=g.vp['param'],
+                        vertex_text_position="centered",
+                        layout = "radial",
+                        # vertex_text_color='black',
+                        vertex_font_size=8,
+                        vertex_size=g.vp['sensitivity'],
+                        #vertex_color='#006600',
+                        #vertex_fill_color='#008800',
+                        vertex_halo=True,
+                        vertex_halo_color='#b3c6ff',
+                        vertex_halo_size=g.vp['confidence'],
+                        edge_pen_width=g.ep['second_sens'],
+                        # subsample_edges=100,
+                        output_size=(1600, 1600),
+                        inline=inline,
+                        output=filename
+                        )
