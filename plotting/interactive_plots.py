@@ -20,6 +20,7 @@ from __future__ import print_function
 
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import show
+from bokeh.io import curdoc
 from ipywidgets import BoundedFloatText, IntText, Checkbox, SelectMultiple
 from IPython.html.widgets import interact, fixed
 
@@ -67,19 +68,17 @@ def interactive_covariance_plot(ax, Si, opts=None, unit=""):
 
     return out
 
-def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
+def plot_dict(sa_df, min_val=0, top=100, stacked=True,
                      error_bars=True, log_axis=True,
                      highlighted_parameters=[]):
     """
-    This function calls plotting.make_plot() for all the sensitivity
-    analysis output files and lets you choose which output to view
-    using tabs.
+    This function calls plotting.make_plot() for one of the sensitivity
+    analysis output files and does not use tabs.
 
     Parameters
     -----------
-    sa_dict                : dict
-                             a dictionary with all the sensitivity analysis
-                             results.
+    sa_df                   : dataframe
+                             a dataframe with one sensitibity analysis result.
     demo                   : bool, optional
                              plot only two outcomes instead of all outcomes
                              for demo purpose.
@@ -107,6 +106,55 @@ def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
     p : bokeh plot
         a Bokeh plot generated with plotting.make_plot() that includes tabs
         for all the possible outputs.
+    """
+
+
+    p = make_plot(sa_df[0],
+                top=top,
+                minvalues=min_val,
+                stacked=stacked,
+                errorbar=error_bars,
+                lgaxis=log_axis,
+                highlight=highlighted_parameters
+                )
+    return p
+
+def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
+                     error_bars=True, log_axis=True,
+                     highlighted_parameters=[]):
+    """
+    This function calls plotting.make_plot() for all the sensitivity
+    analysis output files and lets you choose which output to view
+    using tabs.
+
+    Parameters
+    -----------
+    sa_dict                : dict
+                             a dictionary with all the sensitivity analysis
+                             results.
+    min_val                : float, optional
+                             a float indicating the minimum sensitivity value
+                             to be shown.
+    top                    : int, optional
+                             integer indicating the number of parameters to
+                             display (highest sensitivity values).
+    stacked                : bool, optional
+                             Boolean indicating in bars should be stacked for
+                             each parameter.
+    error_bars             : bool, optional
+                             Boolean indicating if error bars are shown (True)
+                             or are omitted (False).
+    log_axis               : bool, optional
+                             Boolean indicating if log axis should be used
+                             (True) or if a linear axis should be used (False).
+    highlighted_parameters : list, optional
+                             List of strings indicating which parameter wedges
+                             will be highlighted.
+
+    Returns
+    --------
+    p : bokeh plot
+        a Bokeh plot generated with plotting.make_plot() 
     """
 
     tabs_dictionary = {}
@@ -221,6 +269,36 @@ def plot_all_second_order(sa_dict, top=5, mirror=True, include=[]):
 
     tabs = Tabs(tabs=list(tabs_dictionary.values()))
     p = show(tabs)
+
+    return p
+
+def plot_second_order(sa_df, top=5, mirror=True, include=[]):
+    """
+    This function calls plotting.make_second_order_heatmap() for one
+    sensitivity analysis output file.
+
+    Parameters
+    -----------
+    sa_df :   dataframe
+              a dictionary with one of the sensitivity analysis results.
+    top     : int, optional
+              the number of parameters to display
+              (highest sensitivity values).
+    include : list, optional
+              a list of parameters you would like to include even if they
+              are not in the top `top` values.
+
+    Returns
+    --------
+    p : bokeh plot
+    """
+
+
+
+    p = make_second_order_heatmap(sa_df[1],
+                                top=top,
+                                mirror=mirror,
+                                include=include)
 
     return p
 

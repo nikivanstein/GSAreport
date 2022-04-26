@@ -36,7 +36,6 @@ import savvy.data_processing as dp
 import plotting.interactive_plots as ip
 from plotting.plotting import make_plot, make_second_order_heatmap
 import savvy.network_tools as nt
-from plotting.plotting import interactive_covariance_plot
 
 #output_notebook()
 
@@ -92,7 +91,7 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
 
     sns.set_theme()
     fig, (ax1) = plt.subplots(1, 1, figsize=[8,8])
-    interactive_covariance_plot(ax1, Si)
+    ip.interactive_covariance_plot(ax1, Si)
     plt.tight_layout()
     plt.savefig("template/images/morris2.png")
 
@@ -111,12 +110,12 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     output_file(filename="template/interactive1.html", title="Interactive plot of Sobol")
     #ip.interact_with_plot_all_outputs(sa_dict)
     #p = plot_all_outputs_mine(sa_dict, top=top, log_axis=False)
-    p = ip.plot_all_outputs(sa_dict, min_val=0, top=top, log_axis=False)
+    p = ip.plot_dict(sa_dict['problem'], min_val=0, top=top, log_axis=False)
     save(p)
 
     output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
     #ip.interact_with_plot_all_outputs(sa_dict)
-    p = ip.plot_all_second_order(sa_dict, top=top)
+    p = ip.plot_second_order(sa_dict['problem'], top=top)
     save(p)
 
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
@@ -160,4 +159,4 @@ problem = {
     'bounds': [[-5.0, 5.0]] * dim
     }
 fun, opt = bn.instantiate(22, iinstance=1)
-generate_report(problem, 500, fun, 10, seed=42)
+generate_report(problem, 500, fun, 3, seed=42)

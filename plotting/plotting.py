@@ -101,45 +101,12 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
                   True: "#aeaeb8",
                   False: "#e6e6e6",
                  }
+    
     # Switch to bar chart if dataframe shrinks below 5 parameters
     if len(df) <= 5:
         # tools enabled for bokeh figure
-        plottools = "hover, wheel_zoom, save, reset," # , tap"
-        # Initialize figure with tools, coloring, etc.
-        p = figure(plot_width=width, plot_height=height, title="",
-                x_axis_type=None, y_axis_type=None,
-                x_range=(-350, 350), y_range=(-350, 350),
-                min_border=0, outline_line_color="#e6e6e6",
-                background_fill_color="#e6e6e6", border_fill_color="#e6e6e6",
-                tools=plottools)
-        if stacked is False:
-            data = {
-                    'Sensitivity': pd.Series.append(df.ST, df.S1),
-                    'Parameter': pd.Series.append(df.Parameter, df.Parameter),
-                    'Order': np.append(np.array(['ST']*len(df)),
-                                       np.array(['S1']*len(df))),
-                    'Confidence': pd.Series.append(df.ST_conf,
-                                                   df.S1_conf)
-                    }
-            p = df.plot_bokeh.bar(stacked=True, alpha=0.6)
-            #p.vbar(data, values='Sensitivity', label='Parameter',
-            #        group='Order', legend='top_right',
-            #        color=["#31a354", "#a1d99b"], ylabel='Sensitivity Indices')
-        else:
-            data = {
-                    'Sensitivity': pd.Series.append(df.S1, (df.ST-df.S1)),
-                    'Parameter': pd.Series.append(df.Parameter, df.Parameter),
-                    'Order': np.append(np.array(['S1']*len(df)),
-                                       np.array(['ST']*len(df))),
-                    'Confidence': pd.Series.append(df.S1_conf,
-                                                   df.ST_conf)
-                    }
-            p = df.plot_bokeh.bar(stacked=True, alpha=0.6)
-            #p.vbar(x=data['Parameter'], values='Sensitivity', label='Parameter',
-            #        color='Order', legend='top_right',
-            #        stack='Order', palette=["#31a354", "#a1d99b"],
-            #        ylabel='Sensitivity Indices')
-
+        p = df.plot_bokeh.bar(x="Parameter", stacked=stacked, alpha=0.6, show_figure=False)
+        
         return p
 
     # Create Dictionary of colors
