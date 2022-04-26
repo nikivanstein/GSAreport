@@ -30,13 +30,14 @@ import copy
 from graph_tool.all import *
 from graph_tool import Graph, draw, inference
 from bokeh.plotting import output_file, save
+
 import os.path as op
 import os
 import savvy.data_processing as dp
 import plotting.interactive_plots as ip
 from plotting.plotting import make_plot, make_second_order_heatmap
 import savvy.network_tools as nt
-
+from bokeh.plotting import figure
 #output_notebook()
 
 
@@ -45,8 +46,8 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
         top = problem['num_vars']
 
     #lhs_methods(problem, sample_size, fun, top, seed=seed)
-    #morris_plt(problem, sample_size, fun, top=50, num_levels=4)
-    sobol_plt(problem, sample_size, fun, top, seed=seed)
+    morris_plt(problem, sample_size, fun, top=50, num_levels=4)
+    #sobol_plt(problem, sample_size, fun, top, seed=seed)
 
 def lhs_methods(problem, sample_size, fun, top, seed):
     X = latin.sample(problem, sample_size, seed=seed)
@@ -80,20 +81,21 @@ def lhs_methods(problem, sample_size, fun, top, seed):
 def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     X = sample(problem, N=sample_size, num_levels=num_levels)
     y =  np.asarray(list(map(fun, X)))
-    sns.set_theme()
-    fig, (ax1) = plt.subplots(1, 1, figsize=[8,problem['num_vars']])
     Si = morris.analyze(problem, X, y, conf_level=0.95,
                     print_to_console=False, num_levels=num_levels)
-    horizontal_bar_plot(ax1, Si,{}, sortby='mu_star')
-    plt.tight_layout()
-    plt.savefig("template/images/morris.png")
-    plt.clf()
+    df = Si.to_df()
+    df.reset_index(inplace=True)
+    df = df.sort_values(by=['mu_star'], ascending=False)
+    dftop = df.iloc[:top]
 
-    sns.set_theme()
-    fig, (ax1) = plt.subplots(1, 1, figsize=[8,8])
-    ip.interactive_covariance_plot(ax1, Si)
-    plt.tight_layout()
-    plt.savefig("template/images/morris2.png")
+    output_file(filename="template/morris1.html", title="Interactive plot of Morris")
+    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="Morris mu_star")
+    p = ip.plot_errorbar(dftop, p, base_col="mu_star", error_col="mu_star_conf")
+    save(p)
+
+    output_file(filename="template/morris2.html", title="Covariance plot of Morris")
+    p = ip.interactive_covariance_plot(df, top=top)
+    save(p)
 
 
 

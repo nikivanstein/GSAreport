@@ -23,11 +23,29 @@ from bokeh.plotting import show
 from bokeh.io import curdoc
 from ipywidgets import BoundedFloatText, IntText, Checkbox, SelectMultiple
 from IPython.html.widgets import interact, fixed
-
+from bokeh.models import Whisker
+from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
-
+from bokeh.transform import factor_cmap
 import warnings; warnings.filterwarnings('ignore')
 import numpy as np
+
+def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf"):
+    #plot an errorbar using the figure
+    upper = df[base_col] + df[error_col]
+    lower = df[base_col] - df[error_col]
+
+    source = ColumnDataSource(data=dict(groups=df['index'], counts=df[base_col], upper=upper, lower=lower))
+    p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white')
+
+    p.add_layout(
+        Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
+    )
+    #p.xaxis.ticker = df.index
+    p.legend.visible = False
+    p.toolbar.autohide = True
+    return p
+
 
 def interactive_covariance_plot(ax, Si, opts=None, unit=""):
     '''Plots mu* against sigma or the 95% confidence interval
