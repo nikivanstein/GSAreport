@@ -47,10 +47,17 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
         top = problem['num_vars']
 
     #lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
-    morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
-    #sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
-    for script in morris_scripts:
-        print(script)
+    #morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
+    sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
+    file = open('template/index.html', mode='r')
+    html_template = file.read()
+    html_template = html_template.replace("#SOBOL1#", sobol_divs[0])
+    html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
+    html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
+    html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
+    with open('template/report.html', 'w') as f:
+        f.write(html_template)
+    
 
 def lhs_methods(problem, sample_size, fun, top, seed):
     plottools = "hover, wheel_zoom, save, reset," # , tap"
@@ -138,18 +145,21 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
 
     #try interactive plot
-    output_file(filename="template/interactive1.html", title="Interactive plot of Sobol")
+    #output_file(filename="template/interactive1.html", title="Interactive plot of Sobol")
     #ip.interact_with_plot_all_outputs(sa_dict)
     #p = plot_all_outputs_mine(sa_dict, top=top, log_axis=False)
     p = ip.plot_dict(sa_dict['problem'], min_val=0, top=top, log_axis=True)
+    p.sizing_mode = "scale_width"
+    p.title="First order and total sensitivity"
     script1, div1 = components(p)
-    save(p)
+    #save(p)
 
-    output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
+    #output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
     #ip.interact_with_plot_all_outputs(sa_dict)
     p = ip.plot_second_order(sa_dict['problem'], top=top)
+    p.sizing_mode = "scale_width"
     script2, div2 = components(p)
-    save(p)
+    #save(p)
 
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
                        edge_cutoff=0.005)

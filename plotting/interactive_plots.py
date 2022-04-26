@@ -61,8 +61,14 @@ def plot_pawn(df, p):
 
 
 def interactive_covariance_plot(df, top=10):
-    '''Plots mu* against sigma or the 95% confidence interval
+    '''Plots mu* against sigma
 
+    Parameters
+    -----------
+    df                   : dataframe
+                             a dataframe with one sensitibity analysis result.
+    top                   : integer, optional
+                             highlight the top highest mu_star parameters
     '''
 
     hover = HoverTool(tooltips=[
