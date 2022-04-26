@@ -45,37 +45,57 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
     if top > problem['num_vars']:
         top = problem['num_vars']
 
-    #lhs_methods(problem, sample_size, fun, top, seed=seed)
+    lhs_methods(problem, sample_size, fun, top, seed=seed)
     morris_plt(problem, sample_size, fun, top=50, num_levels=4)
     #sobol_plt(problem, sample_size, fun, top, seed=seed)
 
 def lhs_methods(problem, sample_size, fun, top, seed):
+    plottools = "hover, wheel_zoom, save, reset," # , tap"
     X = latin.sample(problem, sample_size, seed=seed)
     y =  np.asarray(list(map(fun, X)))
     Si = rbd_fast.analyze(problem, X, y, print_to_console=False)
     fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
     df = Si.to_df()
+    df.reset_index(inplace=True)
     df = df.sort_values(by=['S1'], ascending=False)
-    barplot(df.iloc[:top], ax1)
-    plt.tight_layout()
-    plt.savefig("template/images/fast.png")
-    plt.clf()
+    dftop = df.iloc[:top]
+    output_file(filename="template/fast.html", title="RDB Fast")
+    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="RDB Fast", tools=plottools)
+    p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    save(p)
     
     Si = delta.analyze(problem, X, y, print_to_console=False)
     fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
     df = Si.to_df()
+    df.reset_index(inplace=True)
     df = df.sort_values(by=['S1'], ascending=False)
-    barplot(df.iloc[:top], ax1)
-    plt.tight_layout()
-    plt.savefig("template/images/delta.png")
+    dftop = df.iloc[:top]
+    output_file(filename="template/delta.html", title="Delta")
+    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="S1", tools=plottools)
+    p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    save(p)
+
+    df = df.sort_values(by=['delta'], ascending=False)
+    dftop = df.iloc[:top]
+    output_file(filename="template/delta2.html", title="Delta")
+
+    
+    # Initialize figure with tools, coloring, etc.
+    p = figure(x_range=dftop['index'], plot_width=350, plot_height=100*top, title="Delta",
+               toolbar_location="right",
+               tools=plottools)
+    p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf")
+    save(p)
 
     Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
-    fig, (ax1) = plt.subplots(1, 1, figsize=[1.2*top,6])
     df = Si.to_df()
     df = df.sort_values(by=['mean'], ascending=False)
-    barplot(df.iloc[:top], ax1)
-    plt.tight_layout()
-    plt.savefig("template/images/pawn.png")
+    df.reset_index(inplace=True)
+    dftop = df.iloc[:top]
+    output_file(filename="template/pawn.html", title="Pawn")
+    p = figure(x_range=dftop['index'], plot_height=350, plot_width=200*top, toolbar_location="right", title="Pawn", tools=plottools)
+    p = ip.plot_pawn(dftop, p)
+    save(p)
     
 
 def morris_plt(problem, sample_size, fun, top=50, num_levels=4):

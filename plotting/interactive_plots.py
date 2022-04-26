@@ -29,6 +29,7 @@ from .plotting import make_plot, make_second_order_heatmap
 from bokeh.transform import factor_cmap
 import warnings; warnings.filterwarnings('ignore')
 import numpy as np
+import pandas as pd
 
 def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf"):
     #plot an errorbar using the figure
@@ -43,6 +44,17 @@ def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf"):
     )
     #p.xaxis.ticker = df.index
     p.legend.visible = False
+    p.toolbar.autohide = True
+    return p
+
+def plot_pawn(df, p):
+    #plot the pawn analysis
+
+    colors = [ "#4292c6", "#2171b5", "#08306b"]
+    p.vbar_stack(['minimum', 'median', 'maximum'], x="index", source = df, line_color='white', color=colors ,width = 0.5)
+
+    #p.xaxis.ticker = df.index
+    #p.legend.visible = False
     p.toolbar.autohide = True
     return p
 
