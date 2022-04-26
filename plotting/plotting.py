@@ -85,11 +85,15 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
     df = df.reset_index(drop=True)
 
     # Create arrays of colors and order labels for plotting
-    colors = ["#a1d99b", "#31a354", "#546775", "#225ea8"]
-    s1color = np.array(["#31a354"]*df.S1.size)
-    sTcolor = np.array(["#a1d99b"]*df.ST.size)
-    errs1color = np.array(["#225ea8"]*df.S1.size)
-    errsTcolor = np.array(["#546775"]*df.ST.size)
+    colors = ["#c6dbef", "#4292c6", "#2171b5", "#08306b"]
+
+    #colors = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6",
+    #          "#4292c6", "#2171b5", "#08519c", "#08306b"]
+
+    s1color = np.array(["#c6dbef"]*df.S1.size)
+    sTcolor = np.array(["#4292c6"]*df.ST.size)
+    errs1color = np.array(["#2171b5"]*df.S1.size)
+    errsTcolor = np.array(["#08306b"]*df.ST.size)
     firstorder = np.array(["1st (S1)"]*df.S1.size)
     totalorder = np.array(["Total (ST)"]*df.S1.size)
 
@@ -99,7 +103,7 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
 
     back_color = {
                   True: "#aeaeb8",
-                  False: "#e6e6e6",
+                  False: "#ffffff",
                  }
     
     # Switch to bar chart if dataframe shrinks below 5 parameters
@@ -138,9 +142,11 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
     p = figure(plot_width=width, plot_height=height, title="",
                x_axis_type=None, y_axis_type=None,
                x_range=(-350, 350), y_range=(-350, 350),
-               min_border=0, outline_line_color="#e6e6e6",
-               background_fill_color="#e6e6e6", border_fill_color="#e6e6e6",
+               min_border=0, outline_line_color="#ffffff",
+               background_fill_color="#ffffff", border_fill_color="#ffffff",
+               toolbar_location="right",
                tools=plottools)
+    p.toolbar.autohide = True
     # Specify labels for hover tool
     hover = p.select(dict(type=HoverTool))
     hover.tooltips = [("Order", "@Order"), ("Parameter", "@Param"),
@@ -159,7 +165,7 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
     angles = np.pi/2 - big_angle/2 - df.index.to_series()*big_angle
 
     # circular axes and labels
-    minlabel = min(round(np.log10(min(df.ST))), round(np.log10(min(df.S1))))
+    minlabel = min(round(np.log10(max(min(df.ST),0.0000001))), round(np.log10(max(0.00000001,min(df.S1)))))
     labels = np.power(10.0, np.arange(0, minlabel-1, -1))
 
     # Set max radial line to correspond to 1.1 * maximum value + error
@@ -296,7 +302,7 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
                     angles, color=colors,
                     )
     # Adding axis lines and labels
-    p.circle(0, 0, radius=radii, fill_color=None, line_color="white")
+    p.circle(0, 0, radius=radii, fill_color=None, line_color="#e6e6e6")
     p.text(0, radii[:], [str(r) for r in labels[:]],
            text_font_size="8pt", text_align="center", text_baseline="middle")
 
@@ -465,6 +471,7 @@ def make_second_order_heatmap(df, top=10, name='', mirror=True, include=[]):
                x_range=list(reversed(labels)), y_range=labels,
                x_axis_location="above", plot_width=700, plot_height=700,
                toolbar_location="right", tools=plottools)
+    p.toolbar.autohide = True
     p.grid.grid_line_color = None
     p.axis.axis_line_color = None
     p.axis.major_tick_line_color = None
