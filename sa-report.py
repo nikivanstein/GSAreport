@@ -24,67 +24,30 @@ from tqdm import tqdm
 
 # Import seaborn
 import seaborn as sns
-
+import pandas_bokeh
 import warnings; warnings.filterwarnings('ignore')
 import copy
 from graph_tool.all import *
 from graph_tool import Graph, draw, inference
-from bokeh.plotting import show, output_notebook
+from bokeh.plotting import output_file, save
 import os.path as op
 import os
 import savvy.data_processing as dp
-import savvy.interactive_plots as ip
-from savvy.plotting import make_plot, make_second_order_heatmap
+import plotting.interactive_plots as ip
+from plotting.plotting import make_plot, make_second_order_heatmap
 import savvy.network_tools as nt
+from plotting.plotting import interactive_covariance_plot
 
 #output_notebook()
 
-def improved_covariance_plot(ax, Si, opts=None, unit=""):
-    '''Plots mu* against sigma or the 95% confidence interval
-
-    '''
-    if opts is None:
-        opts = {}
-
-    if Si['sigma'] is not None:
-        # sigma is not present if using morris groups
-        y = Si['sigma']
-        out = ax.scatter(Si['mu_star'], y, c=u'b', marker=u'o',
-                         **opts)
-        ax.set_ylabel(r'$\sigma$')
-
-        ax.set_xlim(0,)
-        ax.set_ylim(0,)
-
-        x_axis_bounds = np.array(ax.get_xlim())
-
-        line1, = ax.plot(x_axis_bounds, x_axis_bounds, 'k-')
-        line2, = ax.plot(x_axis_bounds, 0.5 * x_axis_bounds, 'y--')
-        line3, = ax.plot(x_axis_bounds, 0.1 * x_axis_bounds, 'r-.')
-
-        ax.legend((line1, line2, line3), (r'$\sigma / \mu^{\star} = 1.0$',
-                                          r'$\sigma / \mu^{\star} = 0.5$',
-                                          r'$\sigma / \mu^{\star} = 0.1$'),
-                  loc='best')
-
-    else:
-        y = Si['mu_star_conf']
-        out = ax.scatter(Si['mu_star'], y, c=u'k', marker=u'o',
-                         **opts)
-        ax.set_ylabel(r'$95\% CI$')
-
-    ax.set_xlabel(r'$\mu^\star$ ' + unit)
-    ax.set_ylim(0-(0.01 * np.array(ax.get_ylim()[1])), )
-
-    return out
 
 def generate_report(problem, sample_size, fun, top=50, seed=42):
     if top > problem['num_vars']:
         top = problem['num_vars']
-    #create a sobol analysis
-    lhs_methods(problem, sample_size, fun, top, seed=seed)
+
+    #lhs_methods(problem, sample_size, fun, top, seed=seed)
     #morris_plt(problem, sample_size, fun, top=50, num_levels=4)
-    #sobol_plt(problem, sample_size, fun, top, seed=)
+    sobol_plt(problem, sample_size, fun, top, seed=seed)
 
 def lhs_methods(problem, sample_size, fun, top, seed):
     X = latin.sample(problem, sample_size, seed=seed)
@@ -95,7 +58,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     df = df.sort_values(by=['S1'], ascending=False)
     barplot(df.iloc[:top], ax1)
     plt.tight_layout()
-    plt.savefig("fast.png")
+    plt.savefig("template/images/fast.png")
     plt.clf()
     
     Si = delta.analyze(problem, X, y, print_to_console=False)
@@ -104,7 +67,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     df = df.sort_values(by=['S1'], ascending=False)
     barplot(df.iloc[:top], ax1)
     plt.tight_layout()
-    plt.savefig("delta.png")
+    plt.savefig("template/images/delta.png")
 
     Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
     fig, (ax1) = plt.subplots(1, 1, figsize=[1.2*top,6])
@@ -112,7 +75,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     df = df.sort_values(by=['mean'], ascending=False)
     barplot(df.iloc[:top], ax1)
     plt.tight_layout()
-    plt.savefig("pawn.png")
+    plt.savefig("template/images/pawn.png")
     
 
 def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
@@ -124,14 +87,16 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
                     print_to_console=False, num_levels=num_levels)
     horizontal_bar_plot(ax1, Si,{}, sortby='mu_star')
     plt.tight_layout()
-    plt.savefig("morris.png")
+    plt.savefig("template/images/morris.png")
     plt.clf()
 
     sns.set_theme()
     fig, (ax1) = plt.subplots(1, 1, figsize=[8,8])
-    improved_covariance_plot(ax1, Si)
+    interactive_covariance_plot(ax1, Si)
     plt.tight_layout()
-    plt.savefig("morris2.png")
+    plt.savefig("template/images/morris2.png")
+
+
 
 def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     # create sobol analysis
@@ -141,6 +106,19 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     sa = sobol.analyze(problem, y, print_to_console=False, seed=seed, calc_second_order=True)
     
     sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
+
+    #try interactive plot
+    output_file(filename="template/interactive1.html", title="Interactive plot of Sobol")
+    #ip.interact_with_plot_all_outputs(sa_dict)
+    #p = plot_all_outputs_mine(sa_dict, top=top, log_axis=False)
+    p = ip.plot_all_outputs(sa_dict, min_val=0, top=top, log_axis=False)
+    save(p)
+
+    output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
+    #ip.interact_with_plot_all_outputs(sa_dict)
+    p = ip.plot_all_second_order(sa_dict, top=top)
+    save(p)
+
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
                        edge_cutoff=0.005)
     inline=True
@@ -152,7 +130,7 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     #for i in g.edges():
     #    g.ep['second_sens'][i] =  (g.ep['second_sens'][i])
 
-    filename = "sensivity_network.png"
+    filename = "template/images/sobol.png"
     state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
     draw.draw_hierarchy(state,
                         vertex_text=g.vp['param'],
