@@ -28,6 +28,7 @@ from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
 from bokeh.transform import factor_cmap
 import warnings; warnings.filterwarnings('ignore')
+from bokeh.models import HoverTool, VBar
 import numpy as np
 import pandas as pd
 
@@ -59,44 +60,36 @@ def plot_pawn(df, p):
     return p
 
 
-def interactive_covariance_plot(ax, Si, opts=None, unit=""):
+def interactive_covariance_plot(df, top=10):
     '''Plots mu* against sigma or the 95% confidence interval
 
     '''
-    if opts is None:
-        opts = {}
 
-    if Si['sigma'] is not None:
-        # sigma is not present if using morris groups
-        y = Si['sigma']
-        out = ax.scatter(Si['mu_star'], y, c=u'b', marker=u'o',
-                         **opts)
-        ax.set_ylabel(r'$\sigma$')
+    hover = HoverTool(tooltips=[
+            ('','@desc'),
+            ('σ', "@x"),
+            ('μ*', "@y"),
+        ])
+    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover],
+        x_axis_label="σ",
+        y_axis_label="μ*")
 
-        ax.set_xlim(0,)
-        ax.set_ylim(0,)
+    source = ColumnDataSource(data=dict(x=df['mu_star'].values, y=df['sigma'].values, desc=df['index'].values))
+    p.circle('x', 'y', size=6, color="#c6dbef", source=source)
 
-        x_axis_bounds = np.array(ax.get_xlim())
+    #highlight the top x
+    dftop = df.iloc[:top]
+    sourceTop = ColumnDataSource(data=dict(x=dftop['mu_star'].values, y=dftop['sigma'].values, desc=dftop['index'].values))
+    p.circle('x', 'y', size=8, color="#2171b5", source=sourceTop)
+    
 
-        line1, = ax.plot(x_axis_bounds, x_axis_bounds, 'k-')
-        line2, = ax.plot(x_axis_bounds, 0.5 * x_axis_bounds, 'y--')
-        line3, = ax.plot(x_axis_bounds, 0.1 * x_axis_bounds, 'r-.')
-
-        ax.legend((line1, line2, line3), (r'$\sigma / \mu^{\star} = 1.0$',
-                                          r'$\sigma / \mu^{\star} = 0.5$',
-                                          r'$\sigma / \mu^{\star} = 0.1$'),
-                  loc='best')
-
-    else:
-        y = Si['mu_star_conf']
-        out = ax.scatter(Si['mu_star'], y, c=u'k', marker=u'o',
-                         **opts)
-        ax.set_ylabel(r'$95\% CI$')
-
-    ax.set_xlabel(r'$\mu^\star$ ' + unit)
-    ax.set_ylim(0-(0.01 * np.array(ax.get_ylim()[1])), )
-
-    return out
+    x_axis_bounds = np.array([0, max(dftop['mu_star'].values)+0.002])
+    p.line(x_axis_bounds, x_axis_bounds, legend_label="σ / μ* = 1.0", line_width=2, color="black")
+    p.line(x_axis_bounds, 0.5*x_axis_bounds, legend_label="σ / μ* = 0.5", line_width=1, color="orange")
+    p.line(x_axis_bounds, 0.1*x_axis_bounds, legend_label="σ / μ* = 0.1", line_width=1, color="red")
+    p.legend.location = "top_left"
+    p.toolbar.autohide = True
+    return p
 
 def plot_dict(sa_df, min_val=0, top=100, stacked=True,
                      error_bars=True, log_axis=True,

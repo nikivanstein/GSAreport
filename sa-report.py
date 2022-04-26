@@ -21,6 +21,7 @@ from sklearn.linear_model import LinearRegression
 from SALib.plotting.bar import plot as barplot
 from SALib.plotting.hdmr import plot as hdmrplot
 from tqdm import tqdm
+from bokeh.embed import components
 
 # Import seaborn
 import seaborn as sns
@@ -45,9 +46,11 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
     if top > problem['num_vars']:
         top = problem['num_vars']
 
-    lhs_methods(problem, sample_size, fun, top, seed=seed)
-    morris_plt(problem, sample_size, fun, top=50, num_levels=4)
-    #sobol_plt(problem, sample_size, fun, top, seed=seed)
+    #lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
+    morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
+    #sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
+    for script in morris_scripts:
+        print(script)
 
 def lhs_methods(problem, sample_size, fun, top, seed):
     plottools = "hover, wheel_zoom, save, reset," # , tap"
@@ -62,6 +65,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     output_file(filename="template/fast.html", title="RDB Fast")
     p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="RDB Fast", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    script1, div1 = components(p)
     save(p)
     
     Si = delta.analyze(problem, X, y, print_to_console=False)
@@ -73,18 +77,18 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     output_file(filename="template/delta.html", title="Delta")
     p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="S1", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    script2, div2 = components(p)
     save(p)
 
     df = df.sort_values(by=['delta'], ascending=False)
     dftop = df.iloc[:top]
     output_file(filename="template/delta2.html", title="Delta")
-
-    
     # Initialize figure with tools, coloring, etc.
     p = figure(x_range=dftop['index'], plot_width=350, plot_height=100*top, title="Delta",
                toolbar_location="right",
                tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf")
+    script3, div3 = components(p)
     save(p)
 
     Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
@@ -95,7 +99,10 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     output_file(filename="template/pawn.html", title="Pawn")
     p = figure(x_range=dftop['index'], plot_height=350, plot_width=200*top, toolbar_location="right", title="Pawn", tools=plottools)
     p = ip.plot_pawn(dftop, p)
+    script4, div4 = components(p)
     save(p)
+
+    return ([script1,script2,script3,script4], [div1,div2,div3,div4])
     
 
 def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
@@ -109,13 +116,16 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     dftop = df.iloc[:top]
 
     output_file(filename="template/morris1.html", title="Interactive plot of Morris")
-    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="Morris mu_star")
+    p = figure(x_range=dftop['index'], plot_height=350, plot_width=20*top, toolbar_location="right", title="Morris mu_star")
     p = ip.plot_errorbar(dftop, p, base_col="mu_star", error_col="mu_star_conf")
+    script1, div1 = components(p)
     save(p)
 
     output_file(filename="template/morris2.html", title="Covariance plot of Morris")
     p = ip.interactive_covariance_plot(df, top=top)
+    script2, div2 = components(p)
     save(p)
+    return ([script1,script2],[div1,div2])
 
 
 
@@ -125,7 +135,6 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     y =  np.asarray(list(map(fun, X)))
 
     sa = sobol.analyze(problem, y, print_to_console=False, seed=seed, calc_second_order=True)
-    
     sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
 
     #try interactive plot
@@ -133,11 +142,13 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     #ip.interact_with_plot_all_outputs(sa_dict)
     #p = plot_all_outputs_mine(sa_dict, top=top, log_axis=False)
     p = ip.plot_dict(sa_dict['problem'], min_val=0, top=top, log_axis=True)
+    script1, div1 = components(p)
     save(p)
 
     output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
     #ip.interact_with_plot_all_outputs(sa_dict)
     p = ip.plot_second_order(sa_dict['problem'], top=top)
+    script2, div2 = components(p)
     save(p)
 
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
@@ -172,6 +183,7 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
                         inline=inline,
                         output=filename
                         )
+    return ([script1,script2],[div1,div2])
 
 from benchmark import bbobbenchmarks as bn
 dim = 50
