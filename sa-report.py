@@ -85,6 +85,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     dftop = df.iloc[:top]
     p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="RDB Fast", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    p.sizing_mode = "scale_width"
     script1, div1 = components(p)
     
     Si = delta.analyze(problem, X, y, print_to_console=False)
@@ -94,14 +95,16 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     dftop = df.iloc[:top]
     p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="S1", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+    p.sizing_mode = "scale_width"
     script2, div2 = components(p)
 
     df = df.sort_values(by=['delta'], ascending=False)
     dftop = df.iloc[:top]
-    p = figure(x_range=dftop['index'], plot_width=300, plot_height=20*top, title="Delta",
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, title="Delta",
                toolbar_location="right",
                tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf")
+    p.sizing_mode = "scale_width"
     script3, div3 = components(p)
 
     Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
@@ -111,6 +114,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     dftop = df.iloc[:top]
     p = figure(x_range=dftop['index'], plot_height=300, plot_width=80*top, toolbar_location="right", title="Pawn", tools=plottools)
     p = ip.plot_pawn(dftop, p)
+    p.sizing_mode = "scale_width"
     script4, div4 = components(p)
 
     return ([script1,script2,script3,script4], [div1,div2,div3,div4])
