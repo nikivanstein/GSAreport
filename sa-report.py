@@ -46,8 +46,8 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
     if top > problem['num_vars']:
         top = problem['num_vars']
 
-    #lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
-    #morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
+    lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
+    morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
     sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
     file = open('template/index.html', mode='r')
     html_template = file.read()
@@ -55,6 +55,20 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
     html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
     html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
     html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
+
+    html_template = html_template.replace("#MORRIS1#", morris_divs[0])
+    html_template = html_template.replace("#MORRIS2#", morris_divs[1])
+    html_template = html_template.replace("#MORRIS_SCRIPT1#", morris_scripts[0])
+    html_template = html_template.replace("#MORRIS_SCRIPT2#", morris_scripts[1])
+
+    html_template = html_template.replace("#FAST#", lhs_divs[0])
+    html_template = html_template.replace("#DELTA1#", lhs_divs[1])
+    html_template = html_template.replace("#DELTA2#", lhs_divs[2])
+    html_template = html_template.replace("#PAWN#", lhs_divs[3])
+    html_template = html_template.replace("#FAST_SCRIPT#", lhs_scripts[0])
+    html_template = html_template.replace("#DELTA_SCRIPT1#", lhs_scripts[1])
+    html_template = html_template.replace("#DELTA_SCRIPT2#", lhs_scripts[2])
+    html_template = html_template.replace("#PAWN_SCRIPT#", lhs_scripts[3])
     with open('template/report.html', 'w') as f:
         f.write(html_template)
     
@@ -64,50 +78,40 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     X = latin.sample(problem, sample_size, seed=seed)
     y =  np.asarray(list(map(fun, X)))
     Si = rbd_fast.analyze(problem, X, y, print_to_console=False)
-    fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
+
     df = Si.to_df()
     df.reset_index(inplace=True)
     df = df.sort_values(by=['S1'], ascending=False)
     dftop = df.iloc[:top]
-    output_file(filename="template/fast.html", title="RDB Fast")
-    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="RDB Fast", tools=plottools)
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="RDB Fast", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
     script1, div1 = components(p)
-    save(p)
     
     Si = delta.analyze(problem, X, y, print_to_console=False)
-    fig, (ax1) = plt.subplots(1, 1, figsize=[0.3*top,6])
     df = Si.to_df()
     df.reset_index(inplace=True)
     df = df.sort_values(by=['S1'], ascending=False)
     dftop = df.iloc[:top]
-    output_file(filename="template/delta.html", title="Delta")
-    p = figure(x_range=dftop['index'], plot_height=350, plot_width=100*top, toolbar_location="right", title="S1", tools=plottools)
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="S1", tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
     script2, div2 = components(p)
-    save(p)
 
     df = df.sort_values(by=['delta'], ascending=False)
     dftop = df.iloc[:top]
-    output_file(filename="template/delta2.html", title="Delta")
-    # Initialize figure with tools, coloring, etc.
-    p = figure(x_range=dftop['index'], plot_width=350, plot_height=100*top, title="Delta",
+    p = figure(x_range=dftop['index'], plot_width=300, plot_height=20*top, title="Delta",
                toolbar_location="right",
                tools=plottools)
     p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf")
     script3, div3 = components(p)
-    save(p)
 
     Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=seed)
     df = Si.to_df()
     df = df.sort_values(by=['mean'], ascending=False)
     df.reset_index(inplace=True)
     dftop = df.iloc[:top]
-    output_file(filename="template/pawn.html", title="Pawn")
-    p = figure(x_range=dftop['index'], plot_height=350, plot_width=200*top, toolbar_location="right", title="Pawn", tools=plottools)
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=80*top, toolbar_location="right", title="Pawn", tools=plottools)
     p = ip.plot_pawn(dftop, p)
     script4, div4 = components(p)
-    save(p)
 
     return ([script1,script2,script3,script4], [div1,div2,div3,div4])
     
@@ -122,16 +126,18 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     df = df.sort_values(by=['mu_star'], ascending=False)
     dftop = df.iloc[:top]
 
-    output_file(filename="template/morris1.html", title="Interactive plot of Morris")
-    p = figure(x_range=dftop['index'], plot_height=350, plot_width=20*top, toolbar_location="right", title="Morris mu_star")
+    #output_file(filename="template/morris1.html", title="Interactive plot of Morris")
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="Morris mu_star")
     p = ip.plot_errorbar(dftop, p, base_col="mu_star", error_col="mu_star_conf")
+    p.sizing_mode = "scale_width"
     script1, div1 = components(p)
-    save(p)
+    #save(p)
 
-    output_file(filename="template/morris2.html", title="Covariance plot of Morris")
+    #output_file(filename="template/morris2.html", title="Covariance plot of Morris")
     p = ip.interactive_covariance_plot(df, top=top)
+    p.sizing_mode = "scale_width"
     script2, div2 = components(p)
-    save(p)
+    #save(p)
     return ([script1,script2],[div1,div2])
 
 
@@ -174,6 +180,26 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
 
     filename = "template/images/sobol.png"
     state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
+    draw.draw_hierarchy(state,
+                        vertex_text=g.vp['param'],
+                        vertex_text_position="centered",
+                        layout = "radial",
+                        hide = 2,
+                        # vertex_text_color='black',
+                        vertex_font_size=12,
+                        vertex_size=g.vp['sensitivity'],
+                        #vertex_color='#006600',
+                        #vertex_fill_color='#008800',
+                        vertex_halo=True,
+                        vertex_halo_color='#b3c6ff',
+                        vertex_halo_size=g.vp['confidence'],
+                        edge_pen_width=g.ep['second_sens'],
+                        # subsample_edges=100,
+                        output_size=(600, 600),
+                        inline=inline,
+                        output=filename
+                        )
+    filename = "template/images/sobol_full.png"
     draw.draw_hierarchy(state,
                         vertex_text=g.vp['param'],
                         vertex_text_position="centered",
