@@ -112,7 +112,7 @@ def lhs_methods(problem, sample_size, fun, top, seed):
     df = df.sort_values(by=['mean'], ascending=False)
     df.reset_index(inplace=True)
     dftop = df.iloc[:top]
-    p = figure(x_range=dftop['index'], plot_height=300, plot_width=80*top, toolbar_location="right", title="Pawn", tools=plottools)
+    p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="Pawn", tools=plottools)
     p = ip.plot_pawn(dftop, p)
     p.sizing_mode = "scale_width"
     script4, div4 = components(p)
