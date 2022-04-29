@@ -71,9 +71,26 @@ def surface3dplot(problem, fun, x_i, y_i):
     xx, yy = np.meshgrid(x, y)
     xx = xx.ravel()
     yy = yy.ravel()
-    
-    z =  np.asarray(list(map(fun, np.column_stack((xx,yy)))))
-    print(len(xx), len(yy), len(z))
+
+    X = None
+    #create correct shape
+    for i in range(len(problem['bounds'])):
+        mid = ((problem['bounds'][i][0] + problem['bounds'][i][1])/2)
+        if X is None:
+            if i == x_i:
+                X = xx
+            elif i == y_i:
+                X = yy
+            else:
+                X = np.ones(xx.shape) * mid
+        else:
+            if i == x_i:
+                X = np.column_stack((X,xx))
+            elif i == y_i:
+                X = np.column_stack((X,yy))
+            else:
+                X = np.column_stack((X, np.ones(xx.shape) * mid))
+    z =  fun(X)
     data = dict(x= xx, y= yy, z= z)
     source = ColumnDataSource(data=data)
 

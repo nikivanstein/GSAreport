@@ -369,9 +369,9 @@ if __name__ == "__main__":
         'bounds': [[-5.0, 5.0]] * dim
         }
     fun, opt = bn.instantiate(16, iinstance=1)
-    report = SAReport(problem, name="F16")
-    X, _, _ = report.generateSamples()
+    report = SAReport(problem, top=10, name="F16")
+    X, _, _ = report.generateSamples(10000)
     y =  np.asarray(list(map(fun, X)))
 
-    report.trainModel(X, y)
+    report.trainModel(X, y, 5000)
     report.analyse()
