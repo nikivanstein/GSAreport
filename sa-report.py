@@ -22,24 +22,16 @@ from SALib.plotting.bar import plot as barplot
 from SALib.plotting.hdmr import plot as hdmrplot
 from tqdm import tqdm
 from bokeh.embed import components
-
-# Import seaborn
 import seaborn as sns
-import pandas_bokeh
 import warnings; warnings.filterwarnings('ignore')
-import copy
 from graph_tool.all import *
-from graph_tool import Graph, draw, inference
+from graph_tool import draw
 from bokeh.plotting import output_file, save
-
-import os.path as op
-import os
 import savvy.data_processing as dp
 import plotting.interactive_plots as ip
 from plotting.plotting import make_plot, make_second_order_heatmap, TS_CODE
 import savvy.network_tools as nt
 from bokeh.plotting import figure
-#output_notebook()
 
 
 def generate_report(problem, sample_size, fun, top=50, seed=42):
@@ -141,18 +133,14 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     df = df.sort_values(by=['mu_star'], ascending=False)
     dftop = df.iloc[:top]
 
-    #output_file(filename="template/morris1.html", title="Interactive plot of Morris")
     p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="Morris mu_star")
     p = ip.plot_errorbar(dftop, p, base_col="mu_star", error_col="mu_star_conf")
     p.sizing_mode = "scale_width"
     script1, div1 = components(p)
-    #save(p)
 
-    #output_file(filename="template/morris2.html", title="Covariance plot of Morris")
     p = ip.interactive_covariance_plot(df, top=top)
     p.sizing_mode = "scale_width"
     script2, div2 = components(p)
-    #save(p)
     return ([script1,script2],[div1,div2], dftop)
 
 
@@ -165,22 +153,14 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     sa = sobol.analyze(problem, y, print_to_console=False, seed=seed, calc_second_order=True)
     sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
 
-    #try interactive plot
-    #output_file(filename="template/interactive1.html", title="Interactive plot of Sobol")
-    #ip.interact_with_plot_all_outputs(sa_dict)
-    #p = plot_all_outputs_mine(sa_dict, top=top, log_axis=False)
     p = ip.plot_dict(sa_dict['problem'], min_val=0, top=top, log_axis=True)
     p.sizing_mode = "scale_width"
     p.title="First order and total sensitivity"
     script1, div1 = components(p)
-    #save(p)
 
-    #output_file(filename="template/interactive2.html", title="Interactive plot of Sobol")
-    #ip.interact_with_plot_all_outputs(sa_dict)
     p = ip.plot_second_order(sa_dict['problem'], top=top)
     p.sizing_mode = "scale_width"
     script2, div2 = components(p)
-    #save(p)
 
     g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
                        edge_cutoff=0.005)
@@ -188,10 +168,6 @@ def sobol_plt(problem, sample_size, fun, top=50, seed=42):
     scale=200
     for i in range(g.num_vertices()):
         g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
-
-    #epsens = g.edge_properties['second_sens']
-    #for i in g.edges():
-    #    g.ep['second_sens'][i] =  (g.ep['second_sens'][i])
 
     filename = "template/images/sobol.png"
     state = graph_tool.inference.minimize_nested_blockmodel_dl(g)

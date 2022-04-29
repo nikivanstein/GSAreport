@@ -68,10 +68,6 @@ def surface3dplot(problem, fun, x_i, y_i):
     y_name = problem['names'][y_i]
     x = np.linspace(x_bound[0], x_bound[1], 50)
     y = np.linspace(y_bound[0], y_bound[1], 50)
-    #print(x_bound)
-    #print(y_bound)
-    #x = np.arange(0, 300, 10)
-    #y = np.arange(0, 300, 10)
     xx, yy = np.meshgrid(x, y)
     xx = xx.ravel()
     yy = yy.ravel()
