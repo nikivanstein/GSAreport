@@ -103,7 +103,7 @@ class SAReport():
         np.savetxt(f"{outputdir}/x_morris.csv", self.x_morris)
         np.savetxt(f"{outputdir}/x_sobol.csv", self.x_sobol)
 
-    def trainModel(self, X, y, sample_size=10000):
+    def trainModel(self, X, y):
         """Tran a Random Forest regressor on real world data to generate different samples.
         Parameters
         ----------
@@ -122,13 +122,18 @@ class SAReport():
         self.regr = RandomForestRegressor(max_depth=2, random_state=self.seed, n_estimators=100)
         self.model_score = cross_val_score(self.regr, X, y, cv=3)
         self.regr.fit(X, y)
-        self.x_lhs,self.x_morris,self.x_sobol = self.generateSamples(sample_size)
-        self.y_lhs = self.regr.predict(self.x_lhs)
-        self.y_morris = self.regr.predict(self.x_morris)
-        self.y_sobol = self.regr.predict(self.x_sobol)
-        self.morris = self.sobol = self.lhs = True
         self.model = True
         return self.model_score
+
+    def sampleUsingModel(self, sample_size=1000):
+        '''use the trained model to generate the samples for each SA method
+        '''
+        if self.model:
+            self.x_lhs,self.x_morris,self.x_sobol = self.generateSamples(sample_size)
+            self.y_lhs = self.regr.predict(self.x_lhs)
+            self.y_morris = self.regr.predict(self.x_morris)
+            self.y_sobol = self.regr.predict(self.x_sobol)
+            self.morris = self.sobol = self.lhs = True
 
 
     def loadData(self, dir="data"):
@@ -138,6 +143,12 @@ class SAReport():
         ----------
         dir: string
             The location to load the csv files from.
+            It expects the following combinations of csv files: 
+                x.csv y.csv
+                x_lhs.csv y_lhs.csv
+                x_morris.csv y_morris.csv
+                x_sobol.csv y_sobol.csv
+            At least one of these file pairs should be present.
         Examples
         --------
             >>> report.loadData("data")
@@ -146,6 +157,7 @@ class SAReport():
             X = np.loadtxt(f"{dir}/x.csv")
             y = np.loadtxt(f"{dir}/y.csv")
             self.trainModel(X,y)
+            self.sampleUsingModel()
         else:
             if (os.path.exists(f"{dir}/y_lhs.csv") and os.path.exists(f"{dir}/x_lhs.csv")):
                 self.x_lhs = np.loadtxt(f"{dir}/x_lhs.csv")
@@ -159,7 +171,14 @@ class SAReport():
                 self.x_morris = np.loadtxt(f"{dir}/x_morris.csv")
                 self.y_morris = np.loadtxt(f"{dir}/y_morris.csv")
                 self.morris = True
-
+            if (self.lhs):
+                self.trainModel(self.x_lhs, self.y_lhs)
+            elif (self.sobol):
+                self.trainModel(self.x_sobol, self.y_sobol)
+            elif (self.morris):
+                self.trainModel(self.x_morris, self.y_morris)
+            else:
+                raise Exception("Pleaase provide at least one x and y csv file")
         
 
     def analyse(self):
@@ -368,10 +387,11 @@ if __name__ == "__main__":
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(16, iinstance=1)
-    report = SAReport(problem, top=10, name="F16")
+    fun, opt = bn.instantiate(12, iinstance=1)
+    report = SAReport(problem, top=10, name="F12")
     X, _, _ = report.generateSamples(10000)
     y =  np.asarray(list(map(fun, X)))
 
-    report.trainModel(X, y, 5000)
+    report.trainModel(X, y)
+    report.sampleUsingModel(5000)
     report.analyse()
