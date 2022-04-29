@@ -64,6 +64,8 @@ def surface3dplot(problem, fun, x_i, y_i):
     #Plots an interactive 3d plot using fun.
     x_bound = problem['bounds'][x_i]
     y_bound = problem['bounds'][y_i]
+    x_name = problem['names'][x_i]
+    y_name = problem['names'][y_i]
     x = np.linspace(x_bound[0], x_bound[1], 50)
     y = np.linspace(y_bound[0], y_bound[1], 50)
     #print(x_bound)
@@ -73,14 +75,14 @@ def surface3dplot(problem, fun, x_i, y_i):
     xx, yy = np.meshgrid(x, y)
     xx = xx.ravel()
     yy = yy.ravel()
-    value = np.sin(xx / 50) * np.cos(yy / 50) * 50 + 50
     
     z =  np.asarray(list(map(fun, np.column_stack((xx,yy)))))
     print(len(xx), len(yy), len(z))
-    source = ColumnDataSource(data=dict(x=xx, y=yy, z=z))
+    data = dict(x= xx, y= yy, z= z)
+    source = ColumnDataSource(data=data)
 
-    surface = Surface3d(x="x", y="y", z="z", data_source=source, width=600, height=600)
-    return surface
+    p = Surface3d(x="x", y="y", z="z", data_source=source, width=800, height=600, xLabel=x_name, yLabel=y_name)
+    return p
 
 def interactive_covariance_plot(df, top=10):
     '''Plots mu* against sigma

@@ -525,24 +525,26 @@ declare namespace vis {
 // See: http://visjs.org/graph3d_examples.html for more details.
 const OPTIONS = {
   width: '100%',
-  height: '400px',
+  height: '600px',
   style: 'surface',
   showPerspective: true,
   showGrid: true,
+  showSurfaceGrid: false,
+  tooltip: true,
+  showShadow: false,
   keepAspectRatio: true,
-  verticalRatio: 0.5,
+  verticalRatio: 0.6,
   legendLabel: '',
+  xLabel: 'x',
+  yLabel: 'y',
   cameraPosition: {
     horizontal: -0.35,
     vertical: 0.22,
     distance: 1.8,
   },
-  colormap: [
-    '#000000',
-    '#6A0DAD',
-    '#FFFFFF',
-    ]
-}
+  colormap: ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6",
+              "#4292c6", "#2171b5", "#08519c", "#08306b"],
+};
 // To create custom model extensions that will render on to the HTML canvas
 // or into the DOM, we must create a View subclass for the model.
 //
@@ -555,7 +557,7 @@ export class Surface3dView extends LayoutDOMView {
   initialize(): void {
     super.initialize()
 
-    const url = "https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"
+    const url = "https://unpkg.com/vis-graph3d@latest/dist/vis-graph3d.min.js"
     const script = document.createElement("script")
     script.onload = () => this._init()
     script.async = false
@@ -572,6 +574,8 @@ export class Surface3dView extends LayoutDOMView {
     // Many Bokeh views ignore this default <div>, and instead do things like
     // draw to the HTML canvas. In this case though, we use the <div> to attach
     // a Graph3d to the DOM.
+    OPTIONS.xLabel = this.model.xLabel
+    OPTIONS.yLabel = this.model.yLabel
     this._graph = new vis.Graph3d(this.el, this.get_data(), OPTIONS)
 
     // Set a listener so that when the Bokeh data source has a change
@@ -618,6 +622,8 @@ export namespace Surface3d {
     y: p.Property<string>
     z: p.Property<string>
     data_source: p.Property<ColumnDataSource>
+    xLabel: p.Property<string>
+    yLabel: p.Property<string>
   }
 }
 
@@ -652,6 +658,8 @@ export class Surface3d extends LayoutDOM {
       y:            [ String ],
       z:            [ String ],
       data_source:  [ Ref(ColumnDataSource) ],
+      xLabel:       [ String ],
+      yLabel:       [ String ],
     }))
   }
 }
@@ -677,6 +685,9 @@ class Surface3d(LayoutDOM):
     # This is a Bokeh ColumnDataSource that can be updated in the Bokeh
     # server by Python code
     data_source = Instance(ColumnDataSource)
+
+    xLabel = String()
+    yLabel = String()
 
     # The vis.js library that we are wrapping expects data for x, y, and z.
     # The data will actually be stored in the ColumnDataSource, but these

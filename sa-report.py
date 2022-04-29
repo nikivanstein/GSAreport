@@ -46,40 +46,42 @@ def generate_report(problem, sample_size, fun, top=50, seed=42):
     if top > problem['num_vars']:
         top = problem['num_vars']
 
-    surface_script, surface_div = surface_plot(problem, fun, 0,1)
-    if False:
-        lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
-        morris_scripts, morris_divs = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
-        sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
+    
+
+    lhs_scripts, lhs_divs = lhs_methods(problem, sample_size, fun, top, seed=seed)
+    morris_scripts, morris_divs, df = morris_plt(problem, sample_size, fun, top=top, num_levels=4)
+    surface_script, surface_div = surface_plot(problem, fun, df.index[0], df.index[1])
+    sobol_scripts, sobol_divs = sobol_plt(problem, sample_size, fun, top, seed=seed)
     file = open('template/index.html', mode='r')
     html_template = file.read()
     html_template = html_template.replace("#SURFACE#", surface_div)
     html_template = html_template.replace("#SURFACE_SCRIPT#", surface_script)
-    if False:
-        html_template = html_template.replace("#SOBOL1#", sobol_divs[0])
-        html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
-        html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
-        html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
 
-        html_template = html_template.replace("#MORRIS1#", morris_divs[0])
-        html_template = html_template.replace("#MORRIS2#", morris_divs[1])
-        html_template = html_template.replace("#MORRIS_SCRIPT1#", morris_scripts[0])
-        html_template = html_template.replace("#MORRIS_SCRIPT2#", morris_scripts[1])
+    html_template = html_template.replace("#SOBOL1#", sobol_divs[0])
+    html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
+    html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
+    html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
 
-        html_template = html_template.replace("#FAST#", lhs_divs[0])
-        html_template = html_template.replace("#DELTA1#", lhs_divs[1])
-        html_template = html_template.replace("#DELTA2#", lhs_divs[2])
-        html_template = html_template.replace("#PAWN#", lhs_divs[3])
-        html_template = html_template.replace("#FAST_SCRIPT#", lhs_scripts[0])
-        html_template = html_template.replace("#DELTA_SCRIPT1#", lhs_scripts[1])
-        html_template = html_template.replace("#DELTA_SCRIPT2#", lhs_scripts[2])
-        html_template = html_template.replace("#PAWN_SCRIPT#", lhs_scripts[3])
+    html_template = html_template.replace("#MORRIS1#", morris_divs[0])
+    html_template = html_template.replace("#MORRIS2#", morris_divs[1])
+    html_template = html_template.replace("#MORRIS_SCRIPT1#", morris_scripts[0])
+    html_template = html_template.replace("#MORRIS_SCRIPT2#", morris_scripts[1])
+
+    html_template = html_template.replace("#FAST#", lhs_divs[0])
+    html_template = html_template.replace("#DELTA1#", lhs_divs[1])
+    html_template = html_template.replace("#DELTA2#", lhs_divs[2])
+    html_template = html_template.replace("#PAWN#", lhs_divs[3])
+    html_template = html_template.replace("#FAST_SCRIPT#", lhs_scripts[0])
+    html_template = html_template.replace("#DELTA_SCRIPT1#", lhs_scripts[1])
+    html_template = html_template.replace("#DELTA_SCRIPT2#", lhs_scripts[2])
+    html_template = html_template.replace("#PAWN_SCRIPT#", lhs_scripts[3])
     with open('template/report.html', 'w') as f:
         f.write(html_template)
     
 
 def surface_plot(problem, fun, x_i=0, y_i=0):
     p = ip.surface3dplot(problem, fun, x_i, y_i)
+    p.sizing_mode = "scale_width"
     return components(p)
 
 def lhs_methods(problem, sample_size, fun, top, seed):
@@ -151,7 +153,7 @@ def morris_plt(problem, sample_size, fun, top=50, num_levels=4):
     p.sizing_mode = "scale_width"
     script2, div2 = components(p)
     #save(p)
-    return ([script1,script2],[div1,div2])
+    return ([script1,script2],[div1,div2], dftop)
 
 
 
