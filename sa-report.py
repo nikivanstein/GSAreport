@@ -387,11 +387,19 @@ if __name__ == "__main__":
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(12, iinstance=1)
+    fun, opt = bn.instantiate(8, iinstance=1)
     report = SAReport(problem, top=10, name="F12")
-    X, _, _ = report.generateSamples(10000)
-    y =  np.asarray(list(map(fun, X)))
+    X_lhs, X_morris, X_sobol = report.generateSamples(1000)
+    
+    outputdir = "data"
+    if not os.path.exists(f"{outputdir}/y_lhs.csv"):
+        report.storeSamples("data")
+        y_lhs =  np.asarray(list(map(fun, X_lhs)))
+        y_morris =  np.asarray(list(map(fun, X_morris)))
+        y_sobol =  np.asarray(list(map(fun, X_sobol)))
+        np.savetxt(f"{outputdir}/y_lhs.csv", y_lhs)
+        np.savetxt(f"{outputdir}/y_morris.csv", y_morris)
+        np.savetxt(f"{outputdir}/y_sobol.csv", y_sobol)
 
-    report.trainModel(X, y)
-    report.sampleUsingModel(5000)
+    report.loadData("data")
     report.analyse()
