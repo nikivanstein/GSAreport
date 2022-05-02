@@ -30,6 +30,10 @@ from bokeh.plotting import figure
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 import webbrowser
+import shutil
+import textwrap
+import json
+from datetime import datetime
 
 class SAReport():
 
@@ -75,6 +79,9 @@ class SAReport():
         self.morris = False
         self.output_dir = output_dir
         self.data_dir = data_dir
+        now = datetime.now()
+        self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.tag = now.strftime("%Y-%m-%dT%H-%M")
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
@@ -208,7 +215,19 @@ class SAReport():
             surface_div = ""
             surface_script = ""
 
-
+        #copy js template files
+        src = 'template/js'
+        files=os.listdir(src)
+        dest = os.path.join(self.output_dir,'js')
+        for fname in files:
+            shutil.copy2(os.path.join(src,fname), dest)
+        
+        #copy images (like logo etc)
+        src = 'template/images'
+        files=os.listdir(src)
+        dest = os.path.join(self.output_dir,'images')
+        for fname in files:
+            shutil.copy2(os.path.join(src,fname), dest)
 
         file = open('template/index.html', mode='r')
         html_template = file.read()
@@ -233,7 +252,7 @@ class SAReport():
         html_template = html_template.replace("#DELTA_SCRIPT1#", lhs_scripts[1])
         html_template = html_template.replace("#DELTA_SCRIPT2#", lhs_scripts[2])
         html_template = html_template.replace("#PAWN_SCRIPT#", lhs_scripts[3])
-        with open(f'{self.output_dir}/report.html', 'w') as f:
+        with open(f'{self.output_dir}/{self.tag}-{self.name}-report.html', 'w') as f:
             f.write(html_template)
         #webbrowser.open('file://' + os.path.realpath('template/report.html'))
         
@@ -385,16 +404,54 @@ class SAReport():
 
 
 import argparse
-parser = argparse.ArgumentParser(prog='GSAreport', description='Generate a global sensitivity analysis report for a given data set or function.')
-parser.add_argument('--data', type=str, default='/data/', help='Directory where the intermediate data is stored. (defaults to /data)') # will be accesible under args.data
-parser.add_argument('--output', type=str, default='/output/', help='Directory where the output report is stored. (defaults to /output/)') # will be accesible under args.output
-parser.add_argument('--model', help='Use a RandomForest model to interpolate the real world data given in x.csv and y.csv', action='store_true')
+parser = argparse.ArgumentParser(prog='GSAreport', formatter_class=argparse.RawDescriptionHelpFormatter, 
+    description=textwrap.dedent('''\
+        Generate a global sensitivity analysis report for a given data set or function.
+        Common uses cases:
+        --------------------------------
+        Generate samples for evaluation by a real world function / simulator
+            > python GSAreport.py -p problem.json -d data_dir --sample --samplesize 1000
+        Analyse the samples with their output stored in the data folder
+            > python GSAreport.py -p problem.json -d data_dir -o output_dir
+        Analyse a real-world data set and use a Random Forest model to interpolate (data_dir contains x.csv and y.csv)
+            > python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
+        '''))
+parser.add_argument('--problem', '-p', default='problem.json', type=str, help='File path to the problem definition in json format.')
+parser.add_argument('--data', '-d', type=str, default='/data/', help='Directory where the intermediate data is stored. (defaults to /data)') # will be accesible under args.data
+parser.add_argument('--output', '-o', type=str, default='/output/', help='Directory where the output report is stored. (defaults to /output/)') # will be accesible under args.output
+parser.add_argument('--name', type=str, default='SA', help='Name of the experiment, will be used in the report output.')
+parser.add_argument('--top', type=int, default=10, help='The number of important features to focus on, default is 10.')
+parser.add_argument('--sample', action='store_true', help='When you use this flag, only the samples are generated to be used in the analyse phase.')
+parser.add_argument('--samplesize', '-n', type=int, help='Number of samples to generate.', default=1000)
+parser.add_argument('--demo', help='Demo mode, uses a BBOB function as test function.', action='store_true')
 args = parser.parse_args()
 
 output_dir = args.output
 data_dir = args.data
+top = args.top
 
-if __name__ == "__main__":
+problem = {}
+if not args.demo:
+    with open(args.problem) as json_file:
+        problem = json.load(json_file)
+        print("loaded problem definition")
+    with tqdm(total=100) as pbar:
+        report = SAReport(problem, top=top, name=args.name, output_dir=output_dir, data_dir=data_dir)
+        pbar.update(10)
+        if args.sample:
+            #generate only samples
+            report.generateSamples(args.samplesize)
+            pbar.update(40)
+            report.storeSamples()
+            pbar.update(40)
+            pbar.close()
+        else:
+            report.loadData()
+            pbar.update(50)
+            report.analyse()
+            pbar.update(40)
+            pbar.close()
+else:
     from benchmark import bbobbenchmarks as bn
     dim = 50
     problem = {
@@ -402,8 +459,8 @@ if __name__ == "__main__":
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(8, iinstance=1)
-    report = SAReport(problem, top=10, name="F12", output_dir=output_dir, data_dir=data_dir)
+    fun, opt = bn.instantiate(19, iinstance=1)
+    report = SAReport(problem, top=10, name="F19", output_dir=output_dir, data_dir=data_dir)
     X_lhs, X_morris, X_sobol = report.generateSamples(1000)
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
