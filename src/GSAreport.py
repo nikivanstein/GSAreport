@@ -1,18 +1,12 @@
-##important for dockerizing later on: https://git.skewed.de/count0/graph-tool/-/wikis/installation-instructions#installing-using-docker
-
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-import matplotlib
-#matplotlib.use("macOSX")
 from matplotlib.colors import LogNorm
 import matplotlib.pyplot as plt
 import numpy as np
-from deap import benchmarks
 from sklearn.ensemble import RandomForestRegressor
-import pandas as pd
 import os
 import os.path
-from SALib.sample import saltelli,finite_diff, fast_sampler, latin
+from SALib.sample import saltelli, latin
 from SALib.analyze import morris,sobol, dgsm, fast, delta, rbd_fast, pawn
 from SALib.util import read_param_file
 from SALib.sample.morris import sample
@@ -214,7 +208,7 @@ class SAReport():
             surface_div = ""
             surface_script = ""
 
-        
+
 
         file = open('template/index.html', mode='r')
         html_template = file.read()
