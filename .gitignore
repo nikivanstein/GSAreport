@@ -2,3 +2,9 @@ env/
 env9/
 savvy/
 *.pyc
+paper experiments/new plots/
+paper experiments/plots/
+paper experiments/env/
+paper experiments/d2/
+paper experiments/compact plots/
+paper experiments/pdfresults/
