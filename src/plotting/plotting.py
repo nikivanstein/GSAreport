@@ -525,7 +525,7 @@ declare namespace vis {
 // See: http://visjs.org/graph3d_examples.html for more details.
 const OPTIONS = {
   width: '100%',
-  height: '600px',
+  height: '400px',
   style: 'surface',
   showPerspective: true,
   showGrid: true,

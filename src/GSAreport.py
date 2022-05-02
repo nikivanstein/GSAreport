@@ -37,7 +37,7 @@ from datetime import datetime
 
 class SAReport():
 
-    def __init__(self, problem, top=20, name="SA experiment", output_dir="output/", data_dir="data/", seed=42):
+    def __init__(self, problem, top=20, name="SA experiment", output_dir="output/", data_dir="data/", model_samples=1000, seed=42):
         """Initialises the SAReport object.
         Parameters
         ----------
@@ -57,6 +57,8 @@ class SAReport():
                 x_morris.csv y_morris.csv
                 x_sobol.csv y_sobol.csv
             At least one of these file pairs should be present.
+         model_samples: integer
+            Number of samples for the surface plot
         seed : integer
             The random seed.
         Examples
@@ -82,6 +84,7 @@ class SAReport():
         now = datetime.now()
         self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.tag = now.strftime("%Y-%m-%dT%H-%M")
+        self.model_samples = model_samples
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
@@ -145,11 +148,11 @@ class SAReport():
         self.model = True
         return self.model_score
 
-    def sampleUsingModel(self, sample_size=1000):
+    def sampleUsingModel(self):
         '''use the trained model to generate the samples for each SA method
         '''
         if self.model:
-            self.x_lhs,self.x_morris,self.x_sobol = self.generateSamples(sample_size)
+            self.x_lhs,self.x_morris,self.x_sobol = self.generateSamples(self.model_samples)
             self.y_lhs = self.regr.predict(self.x_lhs)
             self.y_morris = self.regr.predict(self.x_morris)
             self.y_sobol = self.regr.predict(self.x_sobol)
@@ -226,16 +229,23 @@ class SAReport():
 
         file = open('template/index.html', mode='r')
 
+        name1 = self.problem['names'][df.index[0]]
+        name2 = self.problem['names'][df.index[1]]
         report_div = f'''
-        Experiment: {self.name}<br/>
-        Started: {self.start_time}<br/><br/>
+        Experiment: <strong>{self.name}</strong><br/>
+        Started: <strong>{self.start_time}</strong><br/><br/>
         <hr>
-        
+        Number of parameters: {self.problem['num_vars']} <br/>
+        Showing the top {self.top} parameters  <br/>
+        Random Forest R2 score: {np.mean(self.model_score)} <br/>
+        <hr>
+        Showing on the right an intersection with {name1} on the X axis and {name2} on the Y axis. All other parameters are set to the center of their range.
         '''
 
         html_template = file.read()
         html_template = html_template.replace("#EXPERIMENT_REPORT#", report_div)
-        
+        html_template = html_template.replace("#NAME#", self.name)
+
         html_template = html_template.replace("#SURFACE#", surface_div)
         html_template = html_template.replace("#SURFACE_SCRIPT#", surface_script)
 
@@ -428,6 +438,7 @@ parser.add_argument('--name', type=str, default='SA', help='Name of the experime
 parser.add_argument('--top', type=int, default=10, help='The number of important features to focus on, default is 10.')
 parser.add_argument('--sample', action='store_true', help='When you use this flag, only the samples are generated to be used in the analyse phase.')
 parser.add_argument('--samplesize', '-n', type=int, help='Number of samples to generate.', default=1000)
+parser.add_argument('--modelsize', type=int, help='Number of samples for the model.', default=1000)
 parser.add_argument('--demo', help='Demo mode, uses a BBOB function as test function.', action='store_true')
 args = parser.parse_args()
 
@@ -441,7 +452,7 @@ if not args.demo:
         problem = json.load(json_file)
         print("loaded problem definition")
     with tqdm(total=100) as pbar:
-        report = SAReport(problem, top=top, name=args.name, output_dir=output_dir, data_dir=data_dir)
+        report = SAReport(problem, top=top, name=args.name, output_dir=output_dir, data_dir=data_dir, model_samples=args.modelsize)
         pbar.update(10)
         if args.sample:
             #generate only samples

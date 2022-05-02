@@ -94,7 +94,7 @@ def surface3dplot(problem, fun, x_i, y_i):
     data = dict(x= xx, y= yy, z= z)
     source = ColumnDataSource(data=data)
 
-    p = Surface3d(x="x", y="y", z="z", data_source=source, width=800, height=600, xLabel=x_name, yLabel=y_name)
+    p = Surface3d(x="x", y="y", z="z", data_source=source, width=600, height=400, xLabel=x_name, yLabel=y_name)
     return p
 
 def interactive_covariance_plot(df, top=10):
