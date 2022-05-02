@@ -1,5 +1,6 @@
 env/
 env9/
+src/savvy/
 *.pyc
 paper experiments/new plots/
 paper experiments/plots/

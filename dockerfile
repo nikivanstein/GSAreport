@@ -9,6 +9,8 @@ WORKDIR /home/user
 #RUN pacman -S sudo
 RUN pacman --noconfirm -S python-pip
 RUN pacman --noconfirm -S nodejs npm
+RUN pacman --noconfirm -S git
+RUN git clone https://github.com/houghb/savvy.git
 RUN cd savvy \
     && python setup.py install \
     && cd ..
