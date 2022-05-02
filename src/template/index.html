@@ -1,212 +1,393 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="A sensitivity analysis reporting tool.">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>Global Sensitivity Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <!-- Add to homescreen for Chrome on Android -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="includes/android-desktop.png">
+    <title>SB Admin 2 - Dashboard</title>
 
-    <!-- Add to homescreen for Safari on iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="GSA Report">
-    <link rel="apple-touch-icon-precomposed" href="includes/ios-desktop.png">
+    <!-- Custom fonts for this template-->
+    <link
+        href="includes/nunito.css"
+        rel="stylesheet">
 
-    <!-- Tile icon for Win8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="includesh/ms-touch-icon-144x144-precomposed.png">
-    <meta name="msapplication-TileColor" content="#3372DF">
+    <!-- Custom styles for this template-->
+    <link href="includes/sb-admin-2.min.css" rel="stylesheet">
 
-    <link rel="shortcut icon" href="includes/favicon.png">
-    <link rel="stylesheet" href="includes/roboto.css">
-    <link rel="stylesheet" href="includes/material-icons.css">
-    <link rel="stylesheet" href="includes/material.cyan-light_blue.min.css">
-    <link rel="stylesheet" href="includes/styles.css">
-    <style>
-    #view-source {
-      position: fixed;
-      display: block;
-      right: 0;
-      bottom: 0;
-      margin-right: 40px;
-      margin-bottom: 40px;
-      z-index: 900;
-    }
-    </style>
     <script type="text/javascript" src="includes/bokeh-2.4.2.min.js"></script>
     <script type="text/javascript">
         Bokeh.set_log_level("info");
     </script>
-  </head>
-  <body>
-    <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
-      <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
-        <div class="mdl-layout__header-row">
-          <span class="mdl-layout-title">GSA Report: #NAME#</span>
-          <div class="mdl-layout-spacer"></div>
-          <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-            <i class="material-icons">more_vert</i>
-          </button>
-          <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-            <li class="mdl-menu__item">About</li>
-            <li class="mdl-menu__item">Contact</li>
-          </ul>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <h1 class="h3 mb-0 text-gray-800">GSA Report #NAME#</h1>
+                    
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Print Report</a>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row" style="display: none;">
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Earnings (Monthly)</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Earnings (Annual)</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                                            </div>
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="progress progress-sm mr-2">
+                                                        <div class="progress-bar bg-info" role="progressbar"
+                                                            style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                                            aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Pending Requests</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+
+                    <div class="row">
+
+                        <!-- Area Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Global Sensitivity Analysis Report</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    #EXPERIMENT_REPORT#
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Function Landscape</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    #SURFACE#
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <!-- Area Chart -->
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Morris analysis results</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    The elementary effects calculated by the Morris <a href="#1">[1]</a> algorithm. 
+                                    On the left the covariance plot with <i>mu_star</i>, the absolute of the mean elementary effect, against <i>sigma</i>, the standard deviation of the elementary effect.
+                                    Points highlighted are the parameters with the highest mu_star and these are also shown on the right with the confidence of the algorithm.
+                                    <br/> <br/>
+                                    <div class="row">
+                                        <div class="col-sm-7">
+                                            #MORRIS2#
+                                        </div>
+                                        <div class="col-sm-5">
+                                            #MORRIS1#
+                                        </div>
+                                    </div>
+    
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+
+                        <!-- Area Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Sobol analysis results</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    Sobol <a href="#2">[2]</a> total and first order sensitivity indexes on the left for the top parameters.
+                                    The second order sensitivity indexes are shown on the right for each pear of parameters. Both total and second order sensitivities are visualized in the network plot on the right.
+                                    <br/> <br/>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            #SOBOL1#
+                                        </div>
+                                        <div class="col-sm-6">
+                                            #SOBOL2#
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Sobol Network Plot</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    
+                                    A visualisation of both first and second order sensitivities using Sobol analysis.
+                                    The size of each node is the total sensitivity, the blue halo is the confidence and the edges between the nodes display the second order sensitivities.
+                                </div>
+                                <img src="images/sobol.png" style="max-width:100%;" alt="SOBOL network plot"/>
+                                <div class="card-body">
+                                    <a href="images/sobol_full.png" class="card-link">View full resolution</a>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DELTA-->
+                    <div class="row">
+
+                        <!-- Area Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Delta</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    The Delta Moment-Independent Measure <a href="#3">[3]</a> uses a Latin Hypercube sampling to calculate the <i>delta</i> and <i>S1</i> (first order sensitivity) for each parameter.
+                                    <br/> <br/>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            #DELTA1#
+                                        </div>
+                                        <div class="col-sm-6">
+                                            #DELTA2#
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <img src="includes/github.png" class="card-img-top"/>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <h5 class="card-title">Cite our paper</h5>
+                                    <p class="card-text">Checkout our Github page for more information.</p>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <a href="https://github.com/Basvanstein/XAI" class="card-link">Read More</a>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--RBD FAST AND PAWN-->
+                    <!-- DELTA-->
+                    <div class="row">
+
+                        <!-- Area Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">RBD Fast and Pawn</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    Below is shown the S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.
+                                    <br/> <br/>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            #FAST#
+                                        </div>
+                                    </div>
+                                    Below is shown, the minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            #PAWN#
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <h5 class="card-title">References</h5>
+                                    <p id="1">[1] Morris, M.D., 1991. Factorial Sampling Plans for Preliminary Computational Experiments. Technometrics 33, 161–174. https://doi.org/10.1080/00401706.1991.10484804</p>
+                                    <p id="2">[2] Campolongo, F., Saltelli, A., Cariboni, J., 2011. From screening to quantitative sensitivity analysis. A unified approach. Computer Physics Communications 182, 978–988. https://doi.org/10.1016/j.cpc.2010.12.039</p>
+                                    <p id="3">[3] Borgonovo, E. (2007). “A new uncertainty importance measure.” Reliability Engineering & System Safety, 92(6):771-784, doi:10.1016/j.ress.2006.04.015.</p>
+                                    <p id="4">[4] S. Tarantola, D. Gatelli and T. Mara (2006) “Random Balance Designs for the Estimation of First Order Global Sensitivity Indices”, Reliability Engineering and System Safety, 91:6, 717-727 https://doi.org/10.1016/j.ress.2005.06.003</p>
+                                    <p id="5">[5] Pianosi, F., Wagener, T., 2015. A simple and efficient method for global sensitivity analysis based on cumulative distribution functions. Environmental Modelling & Software 67, 1–11. https://doi.org/10.1016/j.envsoft.2015.01.004</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Bas van Stein</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
         </div>
-      </header>
-      
-      <main class="mdl-layout__content mdl-color--grey-100">
-        <div class="mdl-grid demo-content">
-          <div class="mdl-card mdl-color--white mdl-shadow--2dp mdl-cell mdl-grid--no-spacing mdl-cell--12-col-desktop ">
-            <div class="mdl-card__title mdl-color--teal-500">
-              <h2 class="mdl-card__title-text mdl-color-text--white">Global Sensitivity Report</h2>
-            </div>
-            <div class="mdl-cell--12-col mdl-grid">
-              <div class="mdl-cell--5-col">
-                <div class="mdl-card__supporting-text mdl-color-text--grey-600 ">#EXPERIMENT_REPORT#</div>
-              </div>
-              <div class="mdl-cell--7-col">
-                #SURFACE#
-              </div>
-            </div>
-          </div>
-          <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
-            <div class="mdl-card__title">
-              <h2 class="mdl-card__title-text">Morris analysis results</h2>
-            </div>
-            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-              The elementary effects calculated by the Morris <a href="#1">[1]</a> algorithm. 
-              On the left the covariance plot with <i>mu_star</i>, the absolute of the mean elementary effect, against <i>sigma</i>, the standard deviation of the elementary effect.
-              Points highlighted are the parameters with the highest mu_star and these are also shown on the right with the confidence of the algorithm.
-            </div>
+        <!-- End of Content Wrapper -->
 
-            <div class="mdl-cell--7-col" style="margin-left: 16px;">
-              #MORRIS2#
-            </div>
-            <div class="mdl-cell--5-col">
-              #MORRIS1#
-            </div>
-          </div>
-
-          <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-grid">
-            <div class="mdl-card__title">
-              <h2 class="mdl-card__title-text">Sobol analysis results</h2>
-            </div>
-            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-              Sobol <a href="#2">[2]</a> total and first order sensitivity indexes on the left for the top parameters.
-              The second order sensitivity indexes are shown on the right for each pear of parameters. Both total and second order sensitivities are visualized in the network plot on the right.
-            </div>
-
-            <div class="mdl-cell--6-col" style="margin-left: 16px;">
-              #SOBOL1#
-            </div>
-            <div class="mdl-cell--6-col">
-              #SOBOL2#
-            </div>
-          </div>
-
-          <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
-              <div class="mdl-card__title mdl-color--teal-500">
-                <h2 class="mdl-card__title-text">Sobol network plot</h2>
-              </div>
-              <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-                A visualisation of both first and second order sensitivities using Sobol analysis.
-                The size of each node is the total sensitivity, the blue halo is the confidence and the edges between the nodes display the second order sensitivities.
-                <img src="images/sobol.png" style="max-width:100%;" alt="SOBOL network plot"/>
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-                <a href="images/sobol_full.png" class="mdl-button mdl-js-button mdl-js-ripple-effect">View full resolution</a>
-              </div>
-            </div>
-            <div class="demo-separator mdl-cell--1-col"></div>
-          </div>
-
-          <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-grid">
-            <div class="mdl-card__title">
-              <h2 class="mdl-card__title-text">Delta</h2>
-            </div>
-            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-              The Delta Moment-Independent Measure <a href="#3">[3]</a> uses a Latin Hypercube sampling to calculate the <i>delta</i> and <i>S1</i> (first order sensitivity) for each parameter.
-            </div>
-
-            <div class="mdl-cell--6-col" style="margin-left: 16px;">
-              #DELTA1#
-            </div>
-            <div class="mdl-cell--6-col">
-              #DELTA2#
-            </div>
-          </div>
-
-          <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
-            <div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
-              <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
-                <h2 class="mdl-card__title-text">Cite our paper</h2>
-              </div>
-              <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-                Checkout our Github page for more information.
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-                <a href="https://github.com/Basvanstein/XAI" class="mdl-button mdl-js-button mdl-js-ripple-effect">Read More</a>
-              </div>
-            </div>
-            <div class="demo-separator mdl-cell--1-col"></div>
-          </div>
-          
-          <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-grid">
-            <div class="mdl-card__title">
-              <h2 class="mdl-card__title-text">RBD Fast and Pawn</h2>
-            </div>
-            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-              Below is shown the S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.
-            </div>
-            <div class="mdl-cell--12-col" style="margin-left: 16px;">
-              #FAST#
-            </div>
-            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-              Below is shown, the minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
-            </div>
-            <div class="mdl-cell--12-col" style="margin-left: 16px;">
-              #PAWN#
-            </div>
-          </div>
-
-          <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
-              <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
-                <h2 class="mdl-card__title-text">References</h2>
-              </div>
-              <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-                <p id="1">[1] Morris, M.D., 1991. Factorial Sampling Plans for Preliminary Computational Experiments. Technometrics 33, 161–174. https://doi.org/10.1080/00401706.1991.10484804</p>
-                <p id="2">[2] Campolongo, F., Saltelli, A., Cariboni, J., 2011. From screening to quantitative sensitivity analysis. A unified approach. Computer Physics Communications 182, 978–988. https://doi.org/10.1016/j.cpc.2010.12.039</p>
-                <p id="3">[3] Borgonovo, E. (2007). “A new uncertainty importance measure.” Reliability Engineering & System Safety, 92(6):771-784, doi:10.1016/j.ress.2006.04.015.</p>
-                <p id="4">[4] S. Tarantola, D. Gatelli and T. Mara (2006) “Random Balance Designs for the Estimation of First Order Global Sensitivity Indices”, Reliability Engineering and System Safety, 91:6, 717-727 https://doi.org/10.1016/j.ress.2005.06.003</p>
-                <p id="5">[5] Pianosi, F., Wagener, T., 2015. A simple and efficient method for global sensitivity analysis based on cumulative distribution functions. Environmental Modelling & Software 67, 1–11. https://doi.org/10.1016/j.envsoft.2015.01.004</p>
-
-              </div>
-            </div>
-            <div class="demo-separator mdl-cell--1-col"></div>
-          </div>
-          
-
-         
-
-        </div>
-      </main>
     </div>
-     
-      <script src="includes/material.min.js"></script>
-      #SOBOL_SCRIPT1#
-      #SOBOL_SCRIPT2#
-      #MORRIS_SCRIPT1#
-      #MORRIS_SCRIPT2#
-      #DELTA_SCRIPT1#
-      #DELTA_SCRIPT2#
-      #FAST_SCRIPT#
-      #PAWN_SCRIPT#
-      #SURFACE_SCRIPT#
-  </body>
+    <!-- End of Page Wrapper -->
+    #SOBOL_SCRIPT1#
+    #SOBOL_SCRIPT2#
+    #MORRIS_SCRIPT1#
+    #MORRIS_SCRIPT2#
+    #DELTA_SCRIPT1#
+    #DELTA_SCRIPT2#
+    #FAST_SCRIPT#
+    #PAWN_SCRIPT#
+    #SURFACE_SCRIPT#
+</body>
+
 </html>
