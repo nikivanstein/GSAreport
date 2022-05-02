@@ -556,8 +556,7 @@ export class Surface3dView extends LayoutDOMView {
 
   initialize(): void {
     super.initialize()
-
-    const url = "https://unpkg.com/vis-graph3d@latest/dist/vis-graph3d.min.js"
+    const url = "includes/vis-graph3d.min.js"
     const script = document.createElement("script")
     script.onload = () => this._init()
     script.async = false

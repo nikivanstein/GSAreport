@@ -86,6 +86,8 @@ class SAReport():
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
+        if not os.path.exists(os.path.join(output_dir,"includes")):
+            os.makedirs(os.path.join(output_dir,"includes"))
         if not os.path.exists(os.path.join(output_dir,"images")):
             os.makedirs(os.path.join(output_dir,"images"))
     
@@ -215,22 +217,25 @@ class SAReport():
             surface_div = ""
             surface_script = ""
 
-        #copy js template files
-        src = 'template/js'
-        files=os.listdir(src)
-        dest = os.path.join(self.output_dir,'js')
-        for fname in files:
-            shutil.copy2(os.path.join(src,fname), dest)
-        
-        #copy images (like logo etc)
-        src = 'template/images'
-        files=os.listdir(src)
-        dest = os.path.join(self.output_dir,'images')
+        #copy js/css/images template files
+        src = os.path.join('template','includes')
+        files = os.listdir(src)
+        dest = os.path.join(self.output_dir,'includes')
         for fname in files:
             shutil.copy2(os.path.join(src,fname), dest)
 
         file = open('template/index.html', mode='r')
+
+        report_div = f'''
+        Experiment: {self.name}<br/>
+        Started: {self.start_time}<br/><br/>
+        <hr>
+        
+        '''
+
         html_template = file.read()
+        html_template = html_template.replace("#EXPERIMENT_REPORT#", report_div)
+        
         html_template = html_template.replace("#SURFACE#", surface_div)
         html_template = html_template.replace("#SURFACE_SCRIPT#", surface_script)
 
