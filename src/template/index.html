@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    <title>GSA Report</title>
 
     <!-- Custom fonts for this template-->
     <link
@@ -53,10 +53,8 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="display: none;">
                         
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Print Report</a>
                     </div>
 
                     <!-- Content Row -->
@@ -151,7 +149,7 @@
                     <div class="row">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
+                        <div class="col-xl-7 col-lg-6">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -166,7 +164,7 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
+                        <div class="col-xl-5 col-lg-6">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -175,6 +173,7 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
+                                    <p>#SURFACETEXT#</p>
                                     #SURFACE#
                                 </div>
                             </div>
@@ -198,10 +197,10 @@
                                     Points highlighted are the parameters with the highest mu_star and these are also shown on the right with the confidence of the algorithm.
                                     <br/> <br/>
                                     <div class="row">
-                                        <div class="col-sm-7">
+                                        <div class="col-sm-12 col-md-3">
                                             #MORRIS2#
                                         </div>
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-12 col-md-9">
                                             #MORRIS1#
                                         </div>
                                     </div>
@@ -210,6 +209,8 @@
                                 
                             </div>
                         </div>
+
+                        
                     </div>
 
                     
@@ -291,22 +292,22 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <img src="includes/github.png" class="card-img-top"/>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <h5 class="card-title">Cite our paper</h5>
-                                    <p class="card-text">Checkout our Github page for more information.</p>
-                                </div>
-                                
-                                <div class="card-body">
-                                    <a href="https://github.com/Basvanstein/XAI" class="card-link">Read More</a>
-                                </div>
-                                
-                            </div>
-                        </div>
+                      <div class="col-xl-4 col-lg-5">
+                          <div class="card shadow mb-4">
+                              <!-- Card Header - Dropdown -->
+                              <div
+                                  class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                  <h6 class="m-0 font-weight-bold text-primary">RBD Fast</h6>
+                              </div>
+                              <!-- Card Body -->
+                              <div class="card-body">
+                                Below the S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.<br/>
+                                <br/><br/>
+                                #FAST#
+                              </div>
+                          </div>
+                      </div>
+                        
                     </div>
 
                     <!--RBD FAST AND PAWN-->
@@ -319,23 +320,13 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">RBD Fast and Pawn</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Pawn</h6>
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    Below is shown the S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.
+                                    On the right is shown, the minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
                                     <br/> <br/>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            #FAST#
-                                        </div>
-                                    </div>
-                                    Below is shown, the minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            #PAWN#
-                                        </div>
-                                    </div>
+                                    #PAWN#
                                 </div>
                             </div>
                         </div>
@@ -357,6 +348,26 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                      <!-- Pie Chart -->
+                      <div class="col-xl-3 col-lg-4">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header - Dropdown -->
+                            <img src="includes/github.png" class="card-img-top"/>
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <h5 class="card-title">Cite our paper</h5>
+                                <p class="card-text">Checkout our Github page for more information.</p>
+                            </div>
+                            
+                            <div class="card-body">
+                                <a href="https://github.com/Basvanstein/XAI" class="card-link">Read More</a>
+                            </div>
+                            
+                        </div>
+                      </div>
+                    </div>
+                    
 
                 </div>
                 <!-- /.container-fluid -->

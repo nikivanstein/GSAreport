@@ -1,3 +1,4 @@
+from cProfile import label
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.colors import LogNorm
@@ -232,21 +233,24 @@ class SAReport():
         name1 = self.problem['names'][df.index[0]]
         name2 = self.problem['names'][df.index[1]]
         report_div = f'''
+        Sensitivity analysis is the study of how the uncertainty in the output of a mathematical model or system (numerical or otherwise) can be divided and allocated to different sources of uncertainty in its inputs.
+        This experiments shows the first, second and total order sensitivities of the provided features (input) and visualises them in an interactive way. The different sensitivity algorithms can provide additional insight and information in the underlying process.<br/>
+        <hr>
         Experiment: <strong>{self.name}</strong><br/>
         Started: <strong>{self.start_time}</strong><br/><br/>
         <hr>
         Number of parameters: {self.problem['num_vars']} <br/>
         Showing the top {self.top} parameters  <br/>
-        Random Forest R2 score: {np.mean(self.model_score)} <br/>
-        <hr>
-        Showing on the right an intersection with {name1} on the X axis and {name2} on the Y axis. All other parameters are set to the center of their range.
+        Random Forest mean R<sup>2</sup> score over 3 folds: {np.mean(self.model_score)} <br/>
         '''
-
+        surface_text = f'Interactive surface plot of a slice (using a Random Forest model) with {name1} on the X axis and {name2} on the Y axis. All other parameters are set to the center of their range.'
         html_template = file.read()
         html_template = html_template.replace("#EXPERIMENT_REPORT#", report_div)
         html_template = html_template.replace("#NAME#", self.name)
 
         html_template = html_template.replace("#SURFACE#", surface_div)
+        html_template = html_template.replace("#SURFACETEXT#", surface_text)
+        
         html_template = html_template.replace("#SURFACE_SCRIPT#", surface_script)
 
         html_template = html_template.replace("#SOBOL1#", sobol_divs[0])
@@ -280,7 +284,7 @@ class SAReport():
         return components(p)
 
     def _lhs_methods(self):
-        plottools = "hover, wheel_zoom, save, reset," # , tap"
+        plottools = "wheel_zoom, save, reset, tap," # , tap"
         X = self.x_lhs
         y =  self.y_lhs
         Si = rbd_fast.analyze(self.problem, X, y, print_to_console=False)
@@ -289,8 +293,8 @@ class SAReport():
         df.reset_index(inplace=True)
         df = df.sort_values(by=['S1'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="RDB Fast", tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="RDB Fast", tools=plottools)
+        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
         p.sizing_mode = "scale_width"
         script1, div1 = components(p)
         
@@ -299,26 +303,26 @@ class SAReport():
         df.reset_index(inplace=True)
         df = df.sort_values(by=['S1'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="S1", tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf")
+        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="S1", tools=plottools)
+        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
         p.sizing_mode = "scale_width"
         script2, div2 = components(p)
 
         df = df.sort_values(by=['delta'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, title="Delta",
+        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, title="Delta",
                 toolbar_location="right",
                 tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf")
+        p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf", label_x="Delta", label_y="Delta conf.")
         p.sizing_mode = "scale_width"
         script3, div3 = components(p)
 
         Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=self.seed)
         df = Si.to_df()
-        df = df.sort_values(by=['mean'], ascending=False)
+        df = df.sort_values(by=['median'], ascending=False)
         df.reset_index(inplace=True)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="Pawn", tools=plottools)
+        #p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="Pawn", tools=plottools)
         p = ip.plot_pawn(dftop, p)
         p.sizing_mode = "scale_width"
         script4, div4 = components(p)
@@ -337,8 +341,8 @@ class SAReport():
         df = df.sort_values(by=['mu_star'], ascending=False)
         dftop = df.iloc[:top]
 
-        p = figure(x_range=dftop['index'], plot_height=300, plot_width=20*top, toolbar_location="right", title="Morris mu_star")
-        p = ip.plot_errorbar(dftop, p, base_col="mu_star", error_col="mu_star_conf")
+        p = figure(x_range=df['index'], plot_height=150, plot_width=20*len(df), toolbar_location="right", title="Morris mu_star")
+        p = ip.plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", top=top)
         p.sizing_mode = "scale_width"
         script1, div1 = components(p)
 

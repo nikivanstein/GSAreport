@@ -27,22 +27,50 @@ from bokeh.models import Whisker
 from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
 from bokeh.transform import factor_cmap
+from bokeh.palettes import GnBu3, OrRd3
 import warnings; warnings.filterwarnings('ignore')
-from bokeh.models import HoverTool, VBar
+from bokeh.models import HoverTool, VBar, FactorRange
 import numpy as np
 import pandas as pd
 
-def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf"):
+def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf", label_x="ST", label_y="ST conf"):
     #plot an errorbar using the figure
     upper = df[base_col] + df[error_col]
     lower = df[base_col] - df[error_col]
 
-    source = ColumnDataSource(data=dict(groups=df['index'], counts=df[base_col], upper=upper, lower=lower))
+    source = ColumnDataSource(data=dict(groups=df['index'], counts=df[base_col], muconf=df[error_col], upper=upper, lower=lower))
     p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white')
 
     p.add_layout(
         Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
     )
+    p.add_tools(HoverTool(tooltips=[("Parameter", "@groups"), (label_x, "@counts"), (label_y, "@counts")]))
+
+    #p.xaxis.ticker = df.index
+    p.legend.visible = False
+    p.toolbar.autohide = True
+    return p
+
+def plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", top=10):
+    #plot an errorbar using the figure
+    upper = df[base_col] + df[error_col]
+    lower = df[base_col] - df[error_col]
+
+    color_list = []
+    for i in range(len(df)):
+        if i < top:
+            color_list.append("#2171b5")
+        else:
+            color_list.append("#c6dbef")
+    
+    source = ColumnDataSource(data=dict(groups=df['index'], color=color_list, counts=df[base_col], muconf=df[error_col], sigma=df['sigma'], upper=upper, lower=lower))
+    p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white', color='color')
+
+    p.add_layout(
+        Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
+    )
+    p.add_tools(HoverTool(tooltips=[("", "@groups"), ("μ*", "@counts"), ("μ* conf", "@muconf"), ("σ", "@sigma")]))
+
     #p.xaxis.ticker = df.index
     p.legend.visible = False
     p.toolbar.autohide = True
@@ -51,9 +79,28 @@ def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf"):
 def plot_pawn(df, p):
     #plot the pawn analysis
 
-    colors = [ "#4292c6", "#2171b5", "#08306b"]
-    p.vbar_stack(['minimum', 'median', 'maximum'], x="index", source = df, line_color='white', color=colors ,width = 0.5)
+    #colors = [ "#4292c6", "#2171b5", "#08306b"]
+    #p.vbar_stack(['minimum', 'median', 'maximum'], x="index", source = df, line_color='white', color=colors ,width = 0.5)
 
+    parameters = df['index'].values
+    groups = ['min', 'med', 'max']
+    x = [ (param, group) for param in parameters for group in groups ]
+    counts = sum(zip(df['minimum'], df['median'], df['maximum']), ()) # like an hstack
+    source = ColumnDataSource(data=dict(x=x, counts=counts))
+
+    p = figure(x_range=FactorRange(*x), height=200, title="PAWN Analysis",
+           toolbar_location=None, tools="")
+
+    p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
+       # use the palette to colormap based on the the x[1:2] values
+       fill_color=factor_cmap('x', palette=GnBu3, factors=groups, start=1, end=2))
+
+    p.y_range.start = 0
+    p.x_range.range_padding = 0.1
+    p.xaxis.major_label_orientation = 1
+    p.xgrid.grid_line_color = None
+
+    p.add_tools(HoverTool(tooltips="@x: @counts"))
     #p.xaxis.ticker = df.index
     #p.legend.visible = False
     p.toolbar.autohide = True
