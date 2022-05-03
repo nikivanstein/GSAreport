@@ -13,11 +13,15 @@
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
+  .card img {
+    max-width:100%;
+  }
 }
 @page {
-  size: A4 landscape;
+  size: A4;
+  margin: 2mm;
 }
-.row {
+.pagebreak {
   page-break-before: always;
 }
 @media print {

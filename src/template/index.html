@@ -50,7 +50,7 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div class="container-fluid" id="printContent">
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4" style="display: none;">
@@ -149,7 +149,7 @@
                     <div class="row">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-7 col-lg-6">
+                        <div class="col-xl-7 col-lg-6 col-print-6">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -159,12 +159,23 @@
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     #EXPERIMENT_REPORT#
+                                    <br/>
+                                    <hr>
+                                    <a href="#" class="card-link" onclick="printDivContent()">Print report</a>
                                 </div>
                             </div>
                         </div>
+                        <script>
+                          function printDivContent() {
+                            document.body.style.zoom = 595.0 / window.innerWidth;
+                            window.print();
+                            document.body.style.zoom = 1;
+                          }
+
+                        </script>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-5 col-lg-6">
+                        <div class="col-xl-5 col-lg-6 col-print-6">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -172,7 +183,7 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Function Landscape</h6>
                                 </div>
                                 <!-- Card Body -->
-                                <div class="card-body">
+                                <div class="card-body" style="height:500px">
                                     <p>#SURFACETEXT#</p>
                                     #SURFACE#
                                 </div>
@@ -183,7 +194,7 @@
                     <div class="row">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-12 col-lg-12">
+                        <div class="col-xl-12 col-lg-12 col-print-12">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -192,17 +203,18 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    The elementary effects calculated by the Morris <a href="#1">[1]</a> algorithm. 
-                                    On the left the covariance plot with <i>mu_star</i>, the absolute of the mean elementary effect, against <i>sigma</i>, the standard deviation of the elementary effect.
-                                    Points highlighted are the parameters with the highest mu_star and these are also shown on the right with the confidence of the algorithm.
-                                    <br/> <br/>
                                     <div class="row">
-                                        <div class="col-sm-12 col-md-3">
+                                        <div class="col-sm-12 col-lg-3 col-md-4 col-print-5">
                                             #MORRIS2#
                                         </div>
-                                        <div class="col-sm-12 col-md-9">
-                                            #MORRIS1#
+                                        <div class="col-sm-12 col-lg-5 col-md-7 col-print-5">
+                                          <br/><br/>
+                                          The elementary effects calculated by the Morris <a href="#1">[1]</a> algorithm. 
+                                          On the left the covariance plot with <i>mu_star</i>, the absolute of the mean elementary effect, against <i>sigma</i>, the standard deviation of the elementary effect.
+                                          Points highlighted are the parameters with the highest mu_star and these are also shown below with the confidence of the algorithm.
                                         </div>
+                                        <div class="col-sm-12 col-md-12 col-print-12">#MORRIS1#</div>
+                                        
                                     </div>
     
                                 </div>
@@ -217,7 +229,7 @@
                     <div class="row">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
+                        <div class="col-xl-8 col-lg-7 col-print-7">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -227,13 +239,13 @@
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     Sobol <a href="#2">[2]</a> total and first order sensitivity indexes on the left for the top parameters.
-                                    The second order sensitivity indexes are shown on the right for each pear of parameters. Both total and second order sensitivities are visualized in the network plot on the right.
+                                    The second order sensitivity indexes are shown on the right for each pair of parameters. Both total and second order sensitivities are visualized in the network plot on the right.
                                     <br/> <br/>
                                     <div class="row">
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6 col-print-6">
                                             #SOBOL1#
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6 col-print-6">
                                             #SOBOL2#
                                         </div>
                                     </div>
@@ -242,7 +254,7 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
+                        <div class="col-xl-4 col-lg-5 col-print-5">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -265,10 +277,10 @@
                     </div>
 
                     <!-- DELTA-->
-                    <div class="row">
+                    <div class="row pagebreak">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
+                        <div class="col-xl-8 col-lg-7 col-print-7">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -280,10 +292,10 @@
                                     The Delta Moment-Independent Measure <a href="#3">[3]</a> uses a Latin Hypercube sampling to calculate the <i>delta</i> and <i>S1</i> (first order sensitivity) for each parameter.
                                     <br/> <br/>
                                     <div class="row">
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6 col-print-6">
                                             #DELTA1#
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6 col-print-6">
                                             #DELTA2#
                                         </div>
                                     </div>
@@ -292,7 +304,7 @@
                         </div>
 
                         <!-- Pie Chart -->
-                      <div class="col-xl-4 col-lg-5">
+                      <div class="col-xl-4 col-lg-5 col-print-5">
                           <div class="card shadow mb-4">
                               <!-- Card Header - Dropdown -->
                               <div
@@ -301,7 +313,7 @@
                               </div>
                               <!-- Card Body -->
                               <div class="card-body">
-                                Below the S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.<br/>
+                                The S1 results of the RBD-FAST - Random Balance Designs Fourier Amplitude Sensitivity Test <a href="#4">[4]</a>.<br/>
                                 <br/><br/>
                                 #FAST#
                               </div>
@@ -315,7 +327,7 @@
                     <div class="row">
 
                         <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
+                        <div class="col-xl-8 col-lg-7 col-print-12">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -324,7 +336,7 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    On the right is shown, the minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
+                                    The minimum, median and maximum results from the PAWN method <a href="#5">[5]</a>. The PAWN method is a moment-independent approach to GSA. It is described as producing robust results at relatively low sample sizes.
                                     <br/> <br/>
                                     #PAWN#
                                 </div>
@@ -332,7 +344,7 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
+                        <div class="col-xl-4 col-lg-5 col-print-12">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <!-- Card Body -->
@@ -350,7 +362,10 @@
                     </div>
                     <div class="row">
                       <!-- Pie Chart -->
-                      <div class="col-xl-3 col-lg-4">
+                      <div class="col-xl-4 col-md-offset-4 col-md-4 col-print-4">
+                        
+                      </div>
+                      <div class="col-xl-4 col-md-4 col-print-4">
                         <div class="card shadow mb-4">
                             <!-- Card Header - Dropdown -->
                             <img src="includes/github.png" class="card-img-top"/>
@@ -376,7 +391,7 @@
             <!-- End of Main Content -->
 
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer bg-white" style="display: none;">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
                         <span>Copyright &copy; Bas van Stein</span>
