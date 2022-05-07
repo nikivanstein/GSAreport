@@ -64,15 +64,15 @@ You can also use the tool to first generate the `x_*.csv` files, then use these 
 ### Common uses cases using Docker
 Generate samples for evaluation by a real world function / simulator  
     
-    > docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize 1000
+    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize 1000
 
 Analyse the samples with their output stored in the data folder  
 
-    > docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output
+    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output
 
 Analyse a real-world data set and use a Random Forest model to interpolate (data folder should contain x.csv and y.csv) 
  
-    > docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output --samplesize 10000
+    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output --samplesize 10000
 
 ### Common uses cases using Python
 Generate samples for evaluation by a real world function / simulator  
