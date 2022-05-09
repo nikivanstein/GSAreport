@@ -22,9 +22,8 @@ Sensitivity Analysis is a great way of getting a better understanding of how mac
 ### Using Docker (Recommended)
 The easiest way to use the GSAreport application is directly using docker. This way you do not need to install any third party software.
 
-1. Install docker
-2. (optional) open a terminal and build the docker file with `docker build -t emeraldit/gsareport .`
-3. Run the docker file with a volume for your data and for the output
+1. Install docker (https://docs.docker.com/get-docker/)
+2. Run the image `emeraldit/gsareport` as container with a volume for your data and for the output generated.
 
 Example to show help text:  
 
@@ -43,14 +42,14 @@ You can also use the package by installing the dependencies to your own system.
 1. Install graph-tool (https://graph-tool.skewed.de/)
 2. Install python 3.7+
 3. Install node (v14+)
-4. Clone the repository
-5. Install all python requirements (pip install -r src/requirements.txt)
+4. Clone the repository with git or download the zip
+5. Install all python requirements (`pip install -r src/requirements.txt`)
 6. Run `python src/GSAreport.py -h`
 
 ## How to use
 Generate a global sensitivity analysis report for a given data set or function with the simple Docker or python command options.
 
-You always need to provide the program with a `problem` definition. This definition can be supplied as json file.
+You always need to provide the program with a `problem` definition. This definition can be supplied as json file, see also `data/problem.json` for an example.
     
     #Example problem definition in python (you can store this dict using json.dump to a json file)
     problem = {
@@ -59,7 +58,7 @@ You always need to provide the program with a `problem` definition. This definit
         'bounds': [[-5.0, 5.0]] * dim
     }
 
-Once you have the problem definition you can directly load a pair of input and output files for analysis by passing the path to the directory in which these files are stored. The application searches for the following csv files:
+Once you have the problem definition you can directly load a pair of input and output files for analysis by passing the path to the directory (with `-d <path>`) in which these files are stored. The application searches for the following csv files:
 
 - x.csv, y.csv
 - x_sobol.csv, y_sobol.csv
@@ -70,49 +69,42 @@ When you have your own design of experiments you can store these in x and y.csv 
 
 You can also use the tool to first generate the `x_*.csv` files, then use these samples to collect and store the `y_*.csv` files using your own code or program, and finally run the tool to analyse these results.
 
-### Common uses cases using Docker
+### Common use cases using Docker
 Generate samples for evaluation by a real world function / simulator  
     
-    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize 1000
+    docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize 1000
 
 Analyse the samples with their output stored in the data folder  
 
-    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output
+    docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output
 
 Analyse a real-world data set and use a Random Forest model to interpolate (data folder should contain x.csv and y.csv) 
  
-    > docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output --samplesize 10000
+    docker run --rm -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -p /data/problem.json -d /data -o /output --samplesize 10000
 
-### Common uses cases using Python
+### Common use cases using Python
 Generate samples for evaluation by a real world function / simulator  
 
-    > python GSAreport.py -p problem.json -d data_dir --sample --samplesize 1000
+    python GSAreport.py -p problem.json -d data_dir --sample --samplesize 1000
 
 Analyse the samples with their output stored in the data folder  
 
-    > python GSAreport.py -p problem.json -d data_dir -o output_dir
+    python GSAreport.py -p problem.json -d data_dir -o output_dir
 
 Analyse a real-world data set and use a Random Forest model to interpolate (data_dir contains x.csv and y.csv) 
 
-    > python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
+    python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
 
 
-## Building binaries
-
+## Building binaries (for developers)
 If you want to build the executables yourself you can use the following commands. We use pyinstaller to package the executables.
-Make sure you have pyinstaller installed with `pip install pyinstaller`.
+Make sure you have pyinstaller installed using `pip install pyinstaller`.
 
-On MAC, building Mac OS exe:
+On your operating system, build the exe once you have the python source code up and running:
 
     pyinstaller --distpath dist/darwin/ GSAreport.spec
 
-Build windows exe via docker:
-
-    docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows
-
-Build linux exe via docker:
-
-    docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux
+We provide binaries for Linux and Mac-OS in the releases section.
 
 ## References
 This tool uses Savvy [1] and SALib [2].
