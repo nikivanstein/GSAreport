@@ -87,6 +87,21 @@ Analyse a real-world data set and use a Random Forest model to interpolate (data
 
     > python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
 
+
+## Building binaries
+
+On MAC, building Mac OS exe:
+
+    pyinstaller --distpath dist/darwin/ GSAreport.spec
+
+Build windows exe:
+
+    docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows
+
+Build linux exe:
+
+    docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux
+
 ## References
 This tool uses Savvy [1] and SALib [2].
 
