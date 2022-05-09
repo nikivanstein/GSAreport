@@ -1,6 +1,8 @@
 # Global Sensitivity Analysis Reporting
 --------------------------------
 
+![GSA logo](src/gsa-logo.png)
+
 GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
 
 Global Sensitivity Analysis is one of the tools to better understand your machine learning models or get an understanding in real-world processes.
@@ -27,6 +29,13 @@ The easiest way to use the GSAreport application is directly using docker. This 
 Example to show help text:  
 
     > docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
+
+
+## Using executables
+If you cannot or do not want to install Docker, you can also use the pre-compiled executables from the Releases section.
+The executables do not contain graph-tool support and will not generate a sobol network plot, all other functionality is included. 
+
+You can use the executables from the command line with the same parameters as explained below for using the tool via python.
 
 ### Using python source
 You can also use the package by installing the dependencies to your own system.
@@ -90,15 +99,18 @@ Analyse a real-world data set and use a Random Forest model to interpolate (data
 
 ## Building binaries
 
+If you want to build the executables yourself you can use the following commands. We use pyinstaller to package the executables.
+Make sure you have pyinstaller installed with `pip install pyinstaller`.
+
 On MAC, building Mac OS exe:
 
     pyinstaller --distpath dist/darwin/ GSAreport.spec
 
-Build windows exe:
+Build windows exe via docker:
 
     docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows
 
-Build linux exe:
+Build linux exe via docker:
 
     docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux
 
