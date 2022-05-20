@@ -25,10 +25,10 @@ The easiest way to use the GSAreport application is directly using docker. This 
 
 Example to show help text:  
 
-    > docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
+    docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
 
 
-## Using executables
+### Using executables
 If you cannot or do not want to install Docker, you can also use the pre-compiled executables from the Releases section.
 The executables do not contain graph-tool support and will not generate a sobol network plot, all other functionality is included. 
 
