@@ -1,8 +1,4 @@
 from cProfile import label
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.colors import LogNorm
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 import os
@@ -20,17 +16,25 @@ from SALib.plotting.hdmr import plot as hdmrplot
 from tqdm import tqdm
 from bokeh.embed import components
 import warnings; warnings.filterwarnings('ignore')
-from graph_tool.all import *
-from graph_tool import draw
+use_graph_tool = False
+try:
+    from graph_tool.all import *
+    from graph_tool import draw
+    import plotting.network_tools as nt
+    use_graph_tool = True
+except ModuleNotFoundError:
+    # Error handling (ignore and do not use)
+    pass
+except ImportError:
+    pass
+
 from bokeh.plotting import output_file, save
-import savvy.data_processing as dp
+import plotting.data_processing as dp
 import plotting.interactive_plots as ip
 from plotting.plotting import make_plot, make_second_order_heatmap, TS_CODE
-import savvy.network_tools as nt
 from bokeh.plotting import figure
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
-import webbrowser
 import shutil
 import textwrap
 import json
@@ -257,6 +261,10 @@ class SAReport():
         html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
         html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
         html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
+        if (use_graph_tool):
+            html_template = html_template.replace("#SOBOL_NETWORK_SUPPORT#", '')
+        else:
+            html_template = html_template.replace("#SOBOL_NETWORK_SUPPORT#", 'style="display:none;"')
 
         html_template = html_template.replace("#MORRIS1#", morris_divs[0])
         html_template = html_template.replace("#MORRIS2#", morris_divs[1])
@@ -354,6 +362,7 @@ class SAReport():
 
 
     def _sobol_plt(self):
+        global use_graph_tool
         # create sobol analysis
         X = self.x_sobol
         y = self.y_sobol
@@ -370,55 +379,55 @@ class SAReport():
         p = ip.plot_second_order(sa_dict['problem'], top=top)
         p.sizing_mode = "scale_width"
         script2, div2 = components(p)
+        if use_graph_tool:
+            g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
+                            edge_cutoff=0.005)
+            inline=True
+            scale=200
+            for i in range(g.num_vertices()):
+                g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
 
-        g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
-                        edge_cutoff=0.005)
-        inline=True
-        scale=200
-        for i in range(g.num_vertices()):
-            g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
-
-        filename = f"{self.output_dir}/images/sobol.png"
-        state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
-        draw.draw_hierarchy(state,
-                            vertex_text=g.vp['param'],
-                            vertex_text_position="centered",
-                            layout = "radial",
-                            hide = 2,
-                            # vertex_text_color='black',
-                            vertex_font_size=12,
-                            vertex_size=g.vp['sensitivity'],
-                            #vertex_color='#006600',
-                            #vertex_fill_color='#008800',
-                            vertex_halo=True,
-                            vertex_halo_color='#b3c6ff',
-                            vertex_halo_size=g.vp['confidence'],
-                            edge_pen_width=g.ep['second_sens'],
-                            # subsample_edges=100,
-                            output_size=(600, 600),
-                            inline=inline,
-                            output=filename
-                            )
-        filename = f"{self.output_dir}/images/sobol_full.png"
-        draw.draw_hierarchy(state,
-                            vertex_text=g.vp['param'],
-                            vertex_text_position="centered",
-                            layout = "radial",
-                            hide = 2,
-                            # vertex_text_color='black',
-                            vertex_font_size=12,
-                            vertex_size=g.vp['sensitivity'],
-                            #vertex_color='#006600',
-                            #vertex_fill_color='#008800',
-                            vertex_halo=True,
-                            vertex_halo_color='#b3c6ff',
-                            vertex_halo_size=g.vp['confidence'],
-                            edge_pen_width=g.ep['second_sens'],
-                            # subsample_edges=100,
-                            output_size=(1600, 1600),
-                            inline=inline,
-                            output=filename
-                            )
+            filename = f"{self.output_dir}/images/sobol.png"
+            state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
+            draw.draw_hierarchy(state,
+                                vertex_text=g.vp['param'],
+                                vertex_text_position="centered",
+                                layout = "radial",
+                                hide = 2,
+                                # vertex_text_color='black',
+                                vertex_font_size=12,
+                                vertex_size=g.vp['sensitivity'],
+                                #vertex_color='#006600',
+                                #vertex_fill_color='#008800',
+                                vertex_halo=True,
+                                vertex_halo_color='#b3c6ff',
+                                vertex_halo_size=g.vp['confidence'],
+                                edge_pen_width=g.ep['second_sens'],
+                                # subsample_edges=100,
+                                output_size=(600, 600),
+                                inline=inline,
+                                output=filename
+                                )
+            filename = f"{self.output_dir}/images/sobol_full.png"
+            draw.draw_hierarchy(state,
+                                vertex_text=g.vp['param'],
+                                vertex_text_position="centered",
+                                layout = "radial",
+                                hide = 2,
+                                # vertex_text_color='black',
+                                vertex_font_size=12,
+                                vertex_size=g.vp['sensitivity'],
+                                #vertex_color='#006600',
+                                #vertex_fill_color='#008800',
+                                vertex_halo=True,
+                                vertex_halo_color='#b3c6ff',
+                                vertex_halo_size=g.vp['confidence'],
+                                edge_pen_width=g.ep['second_sens'],
+                                # subsample_edges=100,
+                                output_size=(1600, 1600),
+                                inline=inline,
+                                output=filename
+                                )
         return ([script1,script2],[div1,div2])
 
 
@@ -473,14 +482,14 @@ if not args.demo:
             pbar.close()
 else:
     from benchmark import bbobbenchmarks as bn
-    dim = 50
+    dim = 5
     problem = {
         'num_vars': dim,
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(19, iinstance=1)
-    report = SAReport(problem, top=10, name="F19", output_dir=output_dir, data_dir=data_dir)
+    fun, opt = bn.instantiate(2, iinstance=1)
+    report = SAReport(problem, top=80, name="F18", output_dir=output_dir, data_dir=data_dir, model_samples=5000)
     X_lhs, X_morris, X_sobol = report.generateSamples(1000)
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
