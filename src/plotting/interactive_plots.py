@@ -88,7 +88,7 @@ def plot_pawn(df, p):
     source = ColumnDataSource(data=dict(x=x, counts=counts))
 
     p = figure(x_range=FactorRange(*x), height=200, title="PAWN Analysis",
-           toolbar_location=None, tools="")
+           toolbar_location="right", tools="save,reset")
 
     p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
        # use the palette to colormap based on the the x[1:2] values
@@ -159,7 +159,7 @@ def interactive_covariance_plot(df, top=10):
             ('σ', "@x"),
             ('μ*', "@y"),
         ])
-    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover],
+    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover, "save", "pan"],
         x_axis_label="σ",
         y_axis_label="μ*")
 
