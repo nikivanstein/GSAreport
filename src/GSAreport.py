@@ -380,8 +380,7 @@ class SAReport():
         p.sizing_mode = "scale_width"
         script2, div2 = components(p)
         if use_graph_tool:
-            g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
-                            edge_cutoff=0.005)
+            g = nt.build_graph(sa_dict['problem'], sens='ST', top=top)
             inline=True
             scale=200
             for i in range(g.num_vertices()):
@@ -488,8 +487,8 @@ else:
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(2, iinstance=1)
-    report = SAReport(problem, top=80, name="F18", output_dir=output_dir, data_dir=data_dir, model_samples=5000)
+    fun, opt = bn.instantiate(3, iinstance=1)
+    report = SAReport(problem, top=5, name="F3", output_dir=output_dir, data_dir=data_dir, model_samples=5000)
     X_lhs, X_morris, X_sobol = report.generateSamples(1000)
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
