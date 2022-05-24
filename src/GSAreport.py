@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+"""GSA report.
+
+This software can be used to automatically apply different global sensitivity analysis methods
+to an existing data set, model or real-world process. 
+GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
+
+Global Sensitivity Analysis is one of the tools to better understand your machine learning models or get an understanding in real-world processes.
+
+Example:
+    Define a problem definition, initialize the SAreport class, load the data and perform the analysis::
+
+        $ problem = {
+                'num_vars': 3,
+                'names': ['x1', 'x2', 'x3'],
+                'bounds': [[-np.pi, np.pi]]*3
+                }
+        $ report = SAReport(problem, "Test problem")
+        $ report.loadData()
+        $ report.analyse()
+"""
 from cProfile import label
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
@@ -41,40 +62,25 @@ import json
 from datetime import datetime
 
 class SAReport():
+    """SAReport object to generate samples, load samples and generate the sensitivity analysis report.
+
+    Args:
+        problem (dict): The problem definition.
+        top (int): The number of important features we are interested in.
+        name (str): The name of the experiment.
+        output_dir (str): The location where the report will be written to.
+        data_dir (str): The directory path where the data can be loaded from.
+            It expects the following combinations of csv files: 
+            either x.csv and y.csv or, 
+            x_lhs.csvm y_lhs.csv and
+            x_morris.csv, y_morris.csv and 
+            x_sobol.csv, y_sobol.csv.  
+            At least one of these file pairs should be present.
+        model_samples (int): The number of samples to generated using the Random Forest model.
+        seed (int): random seed.
+    """
 
     def __init__(self, problem, top=20, name="SA experiment", output_dir="output/", data_dir="data/", model_samples=1000, seed=42):
-        """Initialises the SAReport object.
-        Parameters
-        ----------
-        problem : dict
-            The problem definition
-        top: integer
-            The number of important features we are interested in
-        name: string
-            A name for the analysis experiment (used in the report)
-        output_dir: string
-            The location where the report is generated.
-        data_dir: string
-            The location to load the csv files from.
-            It expects the following combinations of csv files: 
-                x.csv y.csv
-                x_lhs.csv y_lhs.csv
-                x_morris.csv y_morris.csv
-                x_sobol.csv y_sobol.csv
-            At least one of these file pairs should be present.
-         model_samples: integer
-            Number of samples for the surface plot
-        seed : integer
-            The random seed.
-        Examples
-        --------
-            >>> problem = {
-                'num_vars': 3,
-                'names': ['x1', 'x2', 'x3'],
-                'bounds': [[-np.pi, np.pi]]*3
-                }
-            >>> report = SAReport(problem, "Test problem")
-        """
         if top > problem['num_vars']:
             top = problem['num_vars']
         self.problem = problem
@@ -101,14 +107,18 @@ class SAReport():
     
     def generateSamples(self, sample_size=10000):
         """Generate samples for the different SA techniques.
-        Parameters
-        ----------
-        sample_size : integer
-            The number of samples you want to perform.
-        Examples
-        --------
-            >>> report = SAReport(problem, "Test problem")
-            >>> lhs,morris,sobol = report.generateSamples(500)
+
+        Args:
+            sample_size (int): The number of samples to generate for each design of experiments.
+
+        Returns:
+            list: A list containing the 3 design of experiments (3 times sample_size samples).
+
+        Example:
+            Generate 500 samples per DOE.
+
+                $ report = SAReport(problem, "Test problem")
+                $ lhs,morris,sobol = report.generateSamples(500)
         """
         self.x_lhs = latin.sample(self.problem, sample_size, seed=self.seed)
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
@@ -116,36 +126,34 @@ class SAReport():
         return (self.x_lhs, self.x_morris, self.x_sobol)
 
     def storeSamples(self):
-        """Stores the generated samples
-        Parameters
-        ----------
-        outputdir: string
-            The location to store the csv files.
-        Examples
-        --------
-            >>> report = SAReport(problem, "Test problem")
-            >>> report.generateSamples(500)
-            >>> report.storeSamples("data")
+        """Store the generated samples to csv files in the data dir.
+
+        Example:
+            Generate 500 samples per DOE and store them in the data directory.
+
+                $ report = SAReport(problem, "Test problem")
+                $ report.generateSamples(500)
+                $ report.storeSamples("data")
         """
         np.savetxt(f"{self.data_dir}/x_lhs.csv", self.x_lhs)
         np.savetxt(f"{self.data_dir}/x_morris.csv", self.x_morris)
         np.savetxt(f"{self.data_dir}/x_sobol.csv", self.x_sobol)
 
     def trainModel(self, X, y):
-        """Tran a Random Forest regressor on real world data to generate different samples.
-        Parameters
-        ----------
-        X: np.array
-            Array with shape (instances, features)
-        y: np.array
-            Array with target values
-        sample_size: integer
-            Number of samples to take from the trained regressor.
-        Examples
-        --------
-            >>> report = SAReport(problem, "Test problem")
-            >>> r2 = report.trainModel(X,y)
-            >>> print(r2)
+        """Train a Random Forest regressor on provided data to generate different samples.
+
+        Args:
+            X (array): Two dimensional array of instances and features.
+            y (list): List with target values for X.
+
+        Returns:
+            float: The cross validation score of the RF model.
+
+        Example:
+            Train a model for a given input and output.
+
+                $ report = SAReport(problem, "Test problem")
+                $ r2 = report.trainModel(X,y)
         """
         self.regr = RandomForestRegressor(max_depth=2, random_state=self.seed, n_estimators=100)
         self.model_score = cross_val_score(self.regr, X, y, cv=3)
@@ -154,7 +162,7 @@ class SAReport():
         return self.model_score
 
     def sampleUsingModel(self):
-        '''use the trained model to generate the samples for each SA method
+        '''Use the trained model to generate the samples for each SA method.
         '''
         if self.model:
             self.x_lhs,self.x_morris,self.x_sobol = self.generateSamples(self.model_samples)
@@ -165,11 +173,12 @@ class SAReport():
 
 
     def loadData(self):
-        """Loads the X and y data generated by the sampling and by an external evaluation.
+        """Loads the X and y data csv files generated by the sampling and by an external evaluation function.
 
-        Examples
-        --------
-            >>> report.loadData()
+        Example:
+            Load the csv files from the data folder.
+
+                $ report.loadData()
         """
         dir = self.data_dir
         if (os.path.exists(f"{dir}/y.csv") and os.path.exists(f"{dir}/x.csv")):

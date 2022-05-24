@@ -1,0 +1,16 @@
+site_name: GSA Report
+
+
+# Repository
+repo_name: XAI
+repo: https://github.com/Basvanstein/XAI/
+# Copyright
+copyright: Bas van Stein
+
+#This specifies the autogeneration portion
+pages:
+  - page: "gsareport/gsareport.md"
+    source: "src/gsareport.py"
+    classes:
+      - SAReport
+

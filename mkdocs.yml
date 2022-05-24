@@ -1,0 +1,44 @@
+site_name: GSA Report
+
+
+# Repository
+repo_name: GSAreport
+repo_url: https://github.com/Basvanstein/GSAreport
+edit_uri: ""
+# Copyright
+copyright: Bas van Stein
+
+docs_dir: "docs/sources"
+
+plugins:
+  - search
+
+theme:
+  name: 'material'
+  custom_dir: 'docs'
+  palette:
+    primary: 'white'
+  #logo: 'src/gsa-logo.png'
+  #favicon: 'src/gsa-logo.png'
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - instant
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+nav:
+  - Home: 
+    - GSA report: index.md
+    - Installation: installation.md
+    - Quick start: usecases.md
+    - How to contribute: contributing.md
+    - References: references.md
+  - Class reference: gsareport/gsareport.md
