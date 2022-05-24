@@ -16,8 +16,18 @@ plugins:
 theme:
   name: 'material'
   custom_dir: 'docs'
-  palette:
-    primary: 'white'
+  palette: 
+    - scheme: default
+      primary: 'teal'
+      accent: green
+      toggle:
+        icon: material/toggle-switch 
+        name: Switch to dark mode
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+  
   #logo: 'src/gsa-logo.png'
   #favicon: 'src/gsa-logo.png'
   features:
@@ -42,3 +52,6 @@ nav:
     - How to contribute: contributing.md
     - References: references.md
   - Class reference: gsareport/gsareport.md
+extra:
+  version:
+    provider: mike
