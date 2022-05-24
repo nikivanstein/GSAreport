@@ -9,3 +9,6 @@ paper experiments/d2/
 paper experiments/compact plots/
 paper experiments/pdfresults/
 src/build
+img/
+npy_files.zip
+plots.zip
