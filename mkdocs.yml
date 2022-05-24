@@ -28,8 +28,9 @@ theme:
         icon: material/toggle-switch-off-outline
         name: Switch to light mode
   
-  #logo: 'src/gsa-logo.png'
-  #favicon: 'src/gsa-logo.png'
+  
+  logo: 'logo.png'
+  favicon: 'favicon.png'
   features:
     - content.tabs.link
     - content.code.annotate
@@ -37,7 +38,10 @@ theme:
     - navigation.tabs.sticky
     - instant
 markdown_extensions:
+  - admonition
+  - pymdownx.details
   - pymdownx.superfences
+  - md_in_html
   - pymdownx.tabbed:
       alternate_style: true 
   - attr_list

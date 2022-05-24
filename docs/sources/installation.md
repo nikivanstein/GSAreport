@@ -15,7 +15,11 @@ docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
 If you cannot or do not want to install Docker, you can also use the pre-compiled executables from the Releases section.
 The executables do not contain graph-tool support and will not generate a sobol network plot, all other functionality is included. 
 
-You can use the executables from the command line with the same console parameters as explained below in the section <a href="#Howtouse">How to use</a>.
+You can use the executables from the command line with the same console parameters as explained in the Quick start section.
+
+!!! important "Graph tool support"
+    Note that when using the precompiled executables the Sobol network plots are not included in the reports. 
+    The executables do not have support for the graph-tool package. 
 
 ### Using python source
 You can also use the package by installing the dependencies to your own system.
