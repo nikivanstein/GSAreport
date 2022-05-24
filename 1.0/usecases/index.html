@@ -219,6 +219,18 @@
   </li>
 
       
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="https://basvanstein.github.io/GSAreport/example-report/example.html" class="md-tabs__link">
+      Example report
+    </a>
+  </li>
+
+      
     </ul>
   </div>
 </nav>
@@ -427,6 +439,21 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://basvanstein.github.io/GSAreport/example-report/example.html" class="md-nav__link">
+        Example report
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -492,7 +519,7 @@
 <li>x_lhs.csv, y_lhs.csv</li>
 </ul>
 <p>When you have your own design of experiments you can store these in x and y.csv (space delimited). The Sobol, Morris and LHS (Latin Hypercube Sampling) files can be used when you have samples and results from a specific sampling technique which can be used for different Sensitivity analysis algorithms. The GSA report application can generate the <code>x_</code> version of these files (the input). Using the input files you can then evaluate the data points and store the target values <code>y</code> in the csv file with the same name convention. If you only provide an x.csv and y.csv file, a machine learning algorithm will be used to interpolate the remaining samples to generate the appropriate design of experiments required for the sensitivity analysis.</p>
-<p>A python example to read the <code>x_*.csv</code> files  and produce the correspondig <code>y_*.csv</code> files using your own objective function is provided in the <code>examples</code> directory.</p>
+<p>A python example to read the <code>x_*.csv</code> files  and produce the correspondig <code>y_*.csv</code> files using your own objective function is provided in the next section.</p>
 <h3 id="common-use-cases">Common use cases</h3>
 <p>There are three main steps in using the GSA report application, first to generate designs of experiments (the input files), second to evaluate these design of experiments and store them as <code>y_*.csv</code> files (using your own logic / simulators / real world experiments), and last but not least to load the data and perform the sensitivity analysis.</p>
 <p>To generate the samples for evaluation by your own code / simulator you can run the following docker command:</p>
