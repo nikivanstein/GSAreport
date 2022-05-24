@@ -26,7 +26,7 @@ sns.set_theme()
 
 def meanAbsoluteError(sens, f, d):
     #calculate average distance (euclidean) to end result per algorithm (/per dim)
-    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "pawn", "Pearson", "RF", "Linear"]
+    labels = ['Morris','Sobol','Fast', "RDB-Fast", "Delta", "DGSM", "Pawn", "Pearson", "RF", "Linear"]
     avg_sens = np.mean(sens, axis=1)
     #std_sens = np.std(sens, axis=1) #std sensitivity over all repetitions
     #for rep in np.arange(sens.shape[1]):
@@ -47,9 +47,9 @@ def meanAbsoluteError(sens, f, d):
         #print(f, d, labels[i], np.mean(absolute_errors))
 
 def storeResults(x_samples, sens, conf, filename):
-    np.save(f"samples{filename}", x_samples)
-    np.save(f"sens{filename}", sens)
-    np.save(f"conf{filename}", conf)
+    np.save(f"npy/samples{filename}", x_samples)
+    np.save(f"npy/sens{filename}", sens)
+    np.save(f"npy/conf{filename}", conf)
 
 def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=""):
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
@@ -184,9 +184,9 @@ def runSensitivityExperiment(dim, f, title, filename):
             z_dgsm =  np.asarray(list(map(fun, X_dgsm)))
             res_dgsm = dgsm.analyze(problem, X_dgsm, z_dgsm, print_to_console=False)
             
-            dgsm_fixed = np.asarray(res_dgsm["dgsm"]) / np.sum(res_dgsm["dgsm"])
+            dgsm_fixed = np.asarray(res_dgsm["vi"]) / np.sum(res_dgsm["vi"])
             alg_results.append( dgsm_fixed)
-            dgsm_conf_fixed = np.asarray(res_dgsm["dgsm_conf"]) / np.sum(res_dgsm["dgsm"])
+            dgsm_conf_fixed = np.asarray(res_dgsm["vi_std"]) / np.sum(res_dgsm["vi"])
             alg_conf_results.append( dgsm_conf_fixed)
 
 
@@ -236,6 +236,6 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-for dim in [2,5,10,20]:
+for dim in [2,5,10,20,100]:
     for f in tqdm(fIDs, position=0):
         runSensitivityExperiment(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") #maybe add repetitions

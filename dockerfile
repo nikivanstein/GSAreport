@@ -10,11 +10,9 @@ WORKDIR /home/user
 RUN pacman --noconfirm -S python-pip
 RUN pacman --noconfirm -S nodejs npm
 RUN pacman --noconfirm -S git
-RUN git clone https://github.com/houghb/savvy.git
-RUN cd savvy \
-    && python setup.py install \
-    && cd ..
+RUN pacman --noconfirm -S binutils
 
 RUN pip install -r requirements.txt
+RUN pip install pyinstaller
 
 ENTRYPOINT ["python","./GSAreport.py"]

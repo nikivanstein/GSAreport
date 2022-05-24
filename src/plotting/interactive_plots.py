@@ -22,7 +22,6 @@ from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import show
 from bokeh.io import curdoc
 from ipywidgets import BoundedFloatText, IntText, Checkbox, SelectMultiple
-from IPython.html.widgets import interact, fixed
 from bokeh.models import Whisker
 from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
@@ -89,7 +88,7 @@ def plot_pawn(df, p):
     source = ColumnDataSource(data=dict(x=x, counts=counts))
 
     p = figure(x_range=FactorRange(*x), height=200, title="PAWN Analysis",
-           toolbar_location=None, tools="")
+           toolbar_location="right", tools="save,reset")
 
     p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
        # use the palette to colormap based on the the x[1:2] values
@@ -160,7 +159,7 @@ def interactive_covariance_plot(df, top=10):
             ('σ', "@x"),
             ('μ*', "@y"),
         ])
-    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover],
+    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover, "save", "pan"],
         x_axis_label="σ",
         y_axis_label="μ*")
 
@@ -294,54 +293,6 @@ def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
     p = show(tabs)
 
     return p
-
-
-def interact_with_plot_all_outputs(sa_dict, demo=False, manual=True):
-    """
-    This function adds the ability to interactively adjust all of the
-    plotting.make_plot() arguments.
-
-    Parameters
-    ----------
-    sa_dict : dict
-              a dictionary with all the sensitivity analysis results.
-    demo    : bool, optional
-              plot only few outcomes for demo purpose.
-
-    Returns
-    -------
-    Interactive widgets to control plot
-    """
-    min_val_box = BoundedFloatText(value=0.01, min=0, max=1,
-                                   description='Min value:')
-    top_box = IntText(value=20, description='Show top:')
-    stacks = Checkbox(description='Show stacked plots:', value=True,)
-    error_bars = Checkbox(description='Show error bars:', value=True)
-    log_axis = Checkbox(description='Use log axis:', value=True)
-
-    # get a list of all the parameter options
-    key = list(sa_dict.keys())[0]
-
-    # get a list of the options (supports old and new salib format)
-    try:
-        param_options = list(sa_dict[key][0].Parameter.values)
-    except AttributeError:
-        param_options = list(sa_dict[key][0].index.values)
-
-    highlighted = SelectMultiple(description="Choose parameters to highlight",
-                                 options=param_options, value=[])
-
-    return interact(plot_all_outputs,
-                    sa_dict=fixed(sa_dict),
-                    demo = fixed(demo),
-                    min_val=min_val_box,
-                    top=top_box,
-                    stacked=stacks,
-                    error_bars=error_bars,
-                    log_axis=log_axis,
-                    highlighted_parameters=highlighted,
-                    __manual=manual
-                    )
 
 
 def plot_all_second_order(sa_dict, top=5, mirror=True, include=[]):

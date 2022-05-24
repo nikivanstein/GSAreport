@@ -466,7 +466,7 @@ def make_second_order_heatmap(df, top=10, name='', mirror=True, include=[]):
                               s2_conf=s2_conf, color=color))
 
     # Initialize the plot
-    plottools = "hover, save, pan, box_zoom, wheel_zoom, reset"
+    plottools = "hover, save, box_zoom, wheel_zoom, reset"
     p = figure(title="Sobol second order sensitivities",
                x_range=list(reversed(labels)), y_range=labels,
                x_axis_location="above", plot_width=700, plot_height=700,

@@ -1,8 +1,4 @@
 from cProfile import label
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.colors import LogNorm
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 import os
@@ -20,17 +16,25 @@ from SALib.plotting.hdmr import plot as hdmrplot
 from tqdm import tqdm
 from bokeh.embed import components
 import warnings; warnings.filterwarnings('ignore')
-from graph_tool.all import *
-from graph_tool import draw
+use_graph_tool = False
+try:
+    from graph_tool.all import *
+    from graph_tool import draw
+    import plotting.network_tools as nt
+    use_graph_tool = True
+except ModuleNotFoundError:
+    # Error handling (ignore and do not use)
+    pass
+except ImportError:
+    pass
+
 from bokeh.plotting import output_file, save
-import savvy.data_processing as dp
+import plotting.data_processing as dp
 import plotting.interactive_plots as ip
 from plotting.plotting import make_plot, make_second_order_heatmap, TS_CODE
-import savvy.network_tools as nt
 from bokeh.plotting import figure
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
-import webbrowser
 import shutil
 import textwrap
 import json
@@ -257,6 +261,10 @@ class SAReport():
         html_template = html_template.replace("#SOBOL2#", sobol_divs[1])
         html_template = html_template.replace("#SOBOL_SCRIPT1#", sobol_scripts[0])
         html_template = html_template.replace("#SOBOL_SCRIPT2#", sobol_scripts[1])
+        if (use_graph_tool):
+            html_template = html_template.replace("#SOBOL_NETWORK_SUPPORT#", '')
+        else:
+            html_template = html_template.replace("#SOBOL_NETWORK_SUPPORT#", 'style="display:none;"')
 
         html_template = html_template.replace("#MORRIS1#", morris_divs[0])
         html_template = html_template.replace("#MORRIS2#", morris_divs[1])
@@ -287,13 +295,17 @@ class SAReport():
         plottools = "wheel_zoom, save, reset, tap," # , tap"
         X = self.x_lhs
         y =  self.y_lhs
-        Si = rbd_fast.analyze(self.problem, X, y, print_to_console=False)
         top = self.top
+        plot_width = max(200,20*top)
+        plot_height = 200
+        if (top < 10):
+            plot_height = 100
+        Si = rbd_fast.analyze(self.problem, X, y, print_to_console=False)
         df = Si.to_df()
         df.reset_index(inplace=True)
         df = df.sort_values(by=['S1'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="RDB Fast", tools=plottools)
+        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="RDB Fast", tools=plottools)
         p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
         p.sizing_mode = "scale_width"
         script1, div1 = components(p)
@@ -303,14 +315,14 @@ class SAReport():
         df.reset_index(inplace=True)
         df = df.sort_values(by=['S1'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="S1", tools=plottools)
+        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="S1", tools=plottools)
         p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
         p.sizing_mode = "scale_width"
         script2, div2 = components(p)
 
         df = df.sort_values(by=['delta'], ascending=False)
         dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, title="Delta",
+        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, title="Delta",
                 toolbar_location="right",
                 tools=plottools)
         p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf", label_x="Delta", label_y="Delta conf.")
@@ -341,7 +353,11 @@ class SAReport():
         df = df.sort_values(by=['mu_star'], ascending=False)
         dftop = df.iloc[:top]
 
-        p = figure(x_range=df['index'], plot_height=150, plot_width=20*len(df), toolbar_location="right", title="Morris mu_star")
+        plot_width = max(400,20*len(df))
+        plot_height = 150
+        if (len(df) < 10):
+            plot_height = 100
+        p = figure(x_range=df['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="Morris mu_star")
         p = ip.plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", top=top)
         p.sizing_mode = "scale_width"
         script1, div1 = components(p)
@@ -354,6 +370,7 @@ class SAReport():
 
 
     def _sobol_plt(self):
+        global use_graph_tool
         # create sobol analysis
         X = self.x_sobol
         y = self.y_sobol
@@ -370,55 +387,54 @@ class SAReport():
         p = ip.plot_second_order(sa_dict['problem'], top=top)
         p.sizing_mode = "scale_width"
         script2, div2 = components(p)
+        if use_graph_tool:
+            g = nt.build_graph(sa_dict['problem'], sens='ST', top=top)
+            inline=True
+            scale=200
+            for i in range(g.num_vertices()):
+                g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
 
-        g = nt.build_graph(sa_dict['problem'], sens='ST', top=top, min_sens=0.01,
-                        edge_cutoff=0.005)
-        inline=True
-        scale=200
-        for i in range(g.num_vertices()):
-            g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
-
-        filename = f"{self.output_dir}/images/sobol.png"
-        state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
-        draw.draw_hierarchy(state,
-                            vertex_text=g.vp['param'],
-                            vertex_text_position="centered",
-                            layout = "radial",
-                            hide = 2,
-                            # vertex_text_color='black',
-                            vertex_font_size=12,
-                            vertex_size=g.vp['sensitivity'],
-                            #vertex_color='#006600',
-                            #vertex_fill_color='#008800',
-                            vertex_halo=True,
-                            vertex_halo_color='#b3c6ff',
-                            vertex_halo_size=g.vp['confidence'],
-                            edge_pen_width=g.ep['second_sens'],
-                            # subsample_edges=100,
-                            output_size=(600, 600),
-                            inline=inline,
-                            output=filename
-                            )
-        filename = f"{self.output_dir}/images/sobol_full.png"
-        draw.draw_hierarchy(state,
-                            vertex_text=g.vp['param'],
-                            vertex_text_position="centered",
-                            layout = "radial",
-                            hide = 2,
-                            # vertex_text_color='black',
-                            vertex_font_size=12,
-                            vertex_size=g.vp['sensitivity'],
-                            #vertex_color='#006600',
-                            #vertex_fill_color='#008800',
-                            vertex_halo=True,
-                            vertex_halo_color='#b3c6ff',
-                            vertex_halo_size=g.vp['confidence'],
-                            edge_pen_width=g.ep['second_sens'],
-                            # subsample_edges=100,
-                            output_size=(1600, 1600),
-                            inline=inline,
-                            output=filename
-                            )
+            filename = f"{self.output_dir}/images/sobol.png"
+            state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
+            draw.draw_hierarchy(state,
+                                vertex_text=g.vp['param'],
+                                vertex_text_position="centered",
+                                layout = "radial",
+                                hide = 2,
+                                # vertex_text_color='black',
+                                vertex_font_size=12,
+                                vertex_size=g.vp['sensitivity'],
+                                #vertex_color='#006600',
+                                #vertex_fill_color='#008800',
+                                vertex_halo=True,
+                                vertex_halo_color='#b3c6ff',
+                                vertex_halo_size=g.vp['confidence'],
+                                edge_pen_width=g.ep['second_sens'],
+                                # subsample_edges=100,
+                                output_size=(600, 600),
+                                inline=inline,
+                                output=filename
+                                )
+            filename = f"{self.output_dir}/images/sobol_full.png"
+            draw.draw_hierarchy(state,
+                                vertex_text=g.vp['param'],
+                                vertex_text_position="centered",
+                                layout = "radial",
+                                hide = 2,
+                                # vertex_text_color='black',
+                                vertex_font_size=12,
+                                vertex_size=g.vp['sensitivity'],
+                                #vertex_color='#006600',
+                                #vertex_fill_color='#008800',
+                                vertex_halo=True,
+                                vertex_halo_color='#b3c6ff',
+                                vertex_halo_size=g.vp['confidence'],
+                                edge_pen_width=g.ep['second_sens'],
+                                # subsample_edges=100,
+                                output_size=(1600, 1600),
+                                inline=inline,
+                                output=filename
+                                )
         return ([script1,script2],[div1,div2])
 
 
@@ -473,14 +489,14 @@ if not args.demo:
             pbar.close()
 else:
     from benchmark import bbobbenchmarks as bn
-    dim = 50
+    dim = 5
     problem = {
         'num_vars': dim,
         'names': ['X'+str(x) for x in range(dim)],
         'bounds': [[-5.0, 5.0]] * dim
         }
-    fun, opt = bn.instantiate(19, iinstance=1)
-    report = SAReport(problem, top=10, name="F19", output_dir=output_dir, data_dir=data_dir)
+    fun, opt = bn.instantiate(3, iinstance=1)
+    report = SAReport(problem, top=5, name="F3", output_dir=output_dir, data_dir=data_dir, model_samples=5000)
     X_lhs, X_morris, X_sobol = report.generateSamples(1000)
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
