@@ -52,6 +52,7 @@ nav:
     - How to contribute: contributing.md
     - References: references.md
   - Class reference: gsareport/gsareport.md
+  - Example report: 'https://basvanstein.github.io/GSAreport/example-report/example.html'
 extra:
   version:
     provider: mike
