@@ -161,6 +161,8 @@ pyinstaller --distpath dist/darwin/ GSAreport.spec
 
 We provide binaries for Linux and Mac-OS in the releases section.
 
+To generate a new version of the documentation run `mike deploy --push --update-aliases <version> latest`
+
 ## References
 This tool uses Savvy [1] and SALib [2].
 
