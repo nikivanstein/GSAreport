@@ -22,7 +22,7 @@ Once you have the problem definition (specify it with `-p path/to/problem.json`)
 
 When you have your own design of experiments you can store these in x and y.csv (space delimited). The Sobol, Morris and LHS (Latin Hypercube Sampling) files can be used when you have samples and results from a specific sampling technique which can be used for different Sensitivity analysis algorithms. The GSA report application can generate the `x_` version of these files (the input). Using the input files you can then evaluate the data points and store the target values `y` in the csv file with the same name convention. If you only provide an x.csv and y.csv file, a machine learning algorithm will be used to interpolate the remaining samples to generate the appropriate design of experiments required for the sensitivity analysis.
 
-A python example to read the `x_*.csv` files  and produce the correspondig `y_*.csv` files using your own objective function is provided in the `examples` directory.
+A python example to read the `x_*.csv` files  and produce the correspondig `y_*.csv` files using your own objective function is provided in the next section.
 
 ### Common use cases
 There are three main steps in using the GSA report application, first to generate designs of experiments (the input files), second to evaluate these design of experiments and store them as `y_*.csv` files (using your own logic / simulators / real world experiments), and last but not least to load the data and perform the sensitivity analysis.
