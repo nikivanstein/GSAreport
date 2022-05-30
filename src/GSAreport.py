@@ -182,7 +182,7 @@ class SAReport():
             explainer = shap.Explainer(self.regr, feature_names=self.problem['names'])
             shap_values = explainer(self.X)
             shap.plots.beeswarm(shap_values, max_display=self.top, show=False)
-            loc = f"{self.output_dir}/images/shap.png"
+            loc = f"{self.output_dir}/images/{self.tag}shap.png"
             pl.gcf().axes[-1].set_aspect('auto')
             pl.gcf().axes[-1].set_box_aspect(50) 
             pl.tight_layout()
@@ -304,6 +304,7 @@ class SAReport():
         html_template = html_template.replace("#DELTA_SCRIPT1#", lhs_scripts[1])
         html_template = html_template.replace("#DELTA_SCRIPT2#", lhs_scripts[2])
         html_template = html_template.replace("#PAWN_SCRIPT#", lhs_scripts[3])
+        html_template = html_template.replace("#TAG#", self.tag)
         with open(f'{self.output_dir}/{self.tag}-{self.name}-report.html', 'w') as f:
             f.write(html_template)
         #webbrowser.open('file://' + os.path.realpath('template/report.html'))
@@ -419,7 +420,7 @@ class SAReport():
             for i in range(g.num_vertices()):
                 g.vp['sensitivity'][i] = (scale * g.vp['sensitivity'][i] )
 
-            filename = f"{self.output_dir}/images/sobol.png"
+            filename = f"{self.output_dir}/images/{self.tag}sobol.png"
             state = graph_tool.inference.minimize_nested_blockmodel_dl(g)
             draw.draw_hierarchy(state,
                                 vertex_text=g.vp['param'],
@@ -440,7 +441,7 @@ class SAReport():
                                 inline=inline,
                                 output=filename
                                 )
-            filename = f"{self.output_dir}/images/sobol_full.png"
+            filename = f"{self.output_dir}/images/{self.tag}sobol_full.png"
             draw.draw_hierarchy(state,
                                 vertex_text=g.vp['param'],
                                 vertex_text_position="centered",
