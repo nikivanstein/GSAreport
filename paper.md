@@ -1,5 +1,5 @@
 ---
-title: 'GSAreport: An easy to use Global Sensitivity Reporting tool'
+title: 'GSAreport: Easy to Use Global Sensitivity Reporting'
 tags:
   - Python
   - global sensitivity analysis
