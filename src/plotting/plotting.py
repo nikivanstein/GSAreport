@@ -107,7 +107,7 @@ def make_plot(dataframe=pd.DataFrame(), highlight=[],
                  }
     
     # Switch to bar chart if dataframe shrinks below 5 parameters
-    if len(df) <= 5:
+    if len(df) < 5:
         # tools enabled for bokeh figure
         p = df.plot_bokeh.bar(x="Parameter", stacked=stacked, alpha=0.6, show_figure=False)
         

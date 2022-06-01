@@ -193,8 +193,8 @@
 
                     <div class="row">
 
-                        <!-- Area Chart -->
-                        <div class="col-xl-12 col-lg-12 col-print-12">
+                        <!-- Morris Chart -->
+                        <div class="col-xl-8 col-lg-7 col-print-7">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div
@@ -221,6 +221,22 @@
                                 
                             </div>
                         </div>
+                        <!-- Shap  plot -->
+                        <div class="col-xl-4 col-lg-5 col-print-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">SHAP</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    A summary plot of the SHAP values across the whole dataset. 
+                                    * Note that the shap values are calculated using the trained Random Forest model and not using the real data set, as this is computationally more efficient.
+                                </div>
+                                <img src="images/#TAG#shap.png" style="max-width:100%;" alt="SOBOL network plot"/>
+                            </div>
+                        </div>
 
                         
                     </div>
@@ -228,7 +244,7 @@
                     
                     <div class="row">
 
-                        <!-- Area Chart -->
+                        <!-- Sobol Charts -->
                         <div class="col-xl-8 col-lg-7 col-print-7">
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
@@ -253,7 +269,7 @@
                             </div>
                         </div>
 
-                        <!-- Pie Chart -->
+                        <!-- Sobol network plot -->
                         <div class="col-xl-4 col-lg-5 col-print-5" #SOBOL_NETWORK_SUPPORT#>
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
@@ -267,9 +283,9 @@
                                     A visualisation of both first and second order sensitivities using Sobol analysis.
                                     The size of each node is the total sensitivity, the blue halo is the confidence and the edges between the nodes display the second order sensitivities.
                                 </div>
-                                <img src="images/sobol.png" style="max-width:100%;" alt="SOBOL network plot"/>
+                                <img src="images/#TAG#sobol.png" style="max-width:100%;" alt="SOBOL network plot"/>
                                 <div class="card-body">
-                                    <a href="images/sobol_full.png" class="card-link">View full resolution</a>
+                                    <a href="images/#TAG#sobol_full.png" class="card-link">View full resolution</a>
                                 </div>
                                 
                             </div>
