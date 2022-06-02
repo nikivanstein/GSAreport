@@ -73,7 +73,7 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow = copy.deepcopy(start_data)
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
-    newrow['Algorithm'] = "Sobool"
+    newrow['Algorithm'] = "Sobol"
     df = df.append(newrow, ignore_index=True)
     
 
