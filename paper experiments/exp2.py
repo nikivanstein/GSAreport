@@ -23,6 +23,8 @@ import pandas as pd
 # Import seaborn
 import seaborn as sns
 import copy
+from joblib import Parallel, delayed
+from pandas.util import hash_pandas_object
 
 # Apply the default theme
 sns.set_theme()
@@ -36,7 +38,12 @@ def all_equal(iterable):
     g = groupby(iterable)
     return next(g, True) and not next(g, False)
 
-def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
+def runExperiment(dim, effective_dim, sample_size, rep):
+    seed = rep
+    f = testFunction(dim, inf, 0.1, seed)
+    df = pd.DataFrame(columns =['Algorithm','dim','Effective dim', 'Samples', 'Seed', 'Spearman', 'Time'])
+    fun = f.predict
+    ground_truth = f.ground_truth
     problem = {
     'num_vars': dim,
     'names': ['X'+str(x) for x in range(dim)],
@@ -260,12 +267,16 @@ warnings.filterwarnings('ignore')
 
 x_samples = [16,32,64,128,256,512,1024,2048,4096,8192]#
 informative_dims  = {2: [2], 5:[4], 10:[6], 20:[10], 100:[16,26], 1000:[42,300], 10000:[68,3000]}
-df = pd.DataFrame(columns =['Algorithm','dim','Effective dim', 'Samples', 'Seed', 'Spearman', 'Time'])
+main_df = pd.DataFrame(columns =['Algorithm','dim','Effective dim', 'Samples', 'Seed', 'Spearman', 'Time'])
 for dim in tqdm([2,5,10,20,100,1000,10000], position=1, leave=False): #
     inf_dims = informative_dims[dim]
     for inf in inf_dims:
         for sample_size in tqdm(x_samples, position=2, leave=False):
-            for rep in np.arange(10):
-                f = testFunction(dim, inf, 0.1)
-                df = runExperiment(dim, inf, f.predict, sample_size, f.ground_truth, rep, df)
-    df.to_pickle("exp2_df") 
+            #loop = asyncio.get_event_loop()                                              # Have a new event loop
+            #looper = asyncio.gather(*[runExperiment(dim, inf, sample_size, i) for i in range(10)])         # Run the loop                      
+            #results = loop.run_until_complete(looper)  
+            results = Parallel(n_jobs=10)(delayed(runExperiment)(dim, inf, sample_size, i) for i in range(10))
+            for r in results:
+                #dfr = pd.read_json(r)
+                main_df = pd.concat([main_df, r])
+    main_df.to_pickle("exp2_maindf")

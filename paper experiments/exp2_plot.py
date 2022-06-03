@@ -7,6 +7,7 @@ import seaborn as sns
 from matplotlib.transforms import TransformedBbox
 from matplotlib.colors import LogNorm, Normalize
 
+
 def annotate_yranges(groups, ax=None):
     """
     Annotate a group of consecutive yticklabels with a group name.
@@ -90,7 +91,7 @@ def _get_text_object_bbox(text_obj, ax):
 
 # Apply the default theme
 sns.set_theme()
-df = pd.read_pickle("exp2_df")
+df = pd.read_pickle("exp2_maindf")
 
 
 grouped_df = df.groupby(["Algorithm","dim","Effective dim", "Samples"], as_index=False)
