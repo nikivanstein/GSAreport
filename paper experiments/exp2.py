@@ -42,8 +42,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     'names': ['X'+str(x) for x in range(dim)],
     'bounds': [[0.0, 1.0]] * dim
     }
-    start_data = { 'dim':dim, 'Effective dim':effective_dim, 'Samples': sample_size, 'Seed': seed}
+    start_data = { 'dim':dim, 'Effective dim':effective_dim, 'Samples': sample_size, 'Seed': seed, 'ground_truth': ground_truth}
     np.random.seed(seed)
+
+    ground_truth_rank = np.argsort(ground_truth.flatten())[::-1][:effective_dim]
 
     X_morris = sample(problem, N=sample_size, num_levels=4, optimal_trajectories=None)
     z_morris =  np.asarray(list(map(fun, X_morris)))
@@ -60,6 +62,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow = copy.deepcopy(start_data)
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
+    mu_star_rank = np.argsort(mu_star_fixed)[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(mu_star_rank, ground_truth_rank)
+    newrow['Tau'] = tau
+    newrow['Prediction'] = res_morris["mu_star"]
     newrow['Algorithm'] = "Morris"
     df = df.append(newrow, ignore_index=True)
 
@@ -74,6 +80,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "Sobol"
+    newrow['Prediction'] = res_sobol["S1"]
+    ranking = np.argsort(np.asarray(res_sobol["S1"]))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
     
 
@@ -92,12 +102,17 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
         newrow['Spearman'] = res
         newrow['Time'] = end_time - start_time
         newrow['Algorithm'] = "Fast"
+        newrow['Prediction'] = res_fast["S1"]
+        ranking = np.argsort(np.asarray(res_fast["S1"]))[::-1][:effective_dim]
+        tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+        newrow['Tau'] = tau
         df = df.append(newrow, ignore_index=True)
     else:
         newrow = copy.deepcopy(start_data)
         newrow['Spearman'] = 0
         newrow['Time'] = 0
         newrow['Algorithm'] = "Fast"
+        newrow['Tau'] = 0
         df = df.append(newrow, ignore_index=True)
 
     #rbd #delta
@@ -114,6 +129,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "RBD-Fast"
+    newrow['Prediction'] = res_rbd["S1"]
+    ranking = np.argsort(np.asarray(res_rbd["S1"]))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
     
     start_time = time.perf_counter()
@@ -124,6 +143,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "Delta"
+    newrow['Prediction'] = res_delta["S1"]
+    ranking = np.argsort(np.asarray(res_delta["S1"]))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
 
     #dgsm
@@ -132,11 +155,15 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     start_time = time.perf_counter()
     res_dgsm = dgsm.analyze(problem, X_dgsm, z_dgsm, print_to_console=False)
     end_time = time.perf_counter()
-    res, _ = stats.spearmanr(np.asarray(res_dgsm["vi"]), ground_truth)
+    res, _ = stats.spearmanr(np.asarray(res_dgsm["dgsm"]), ground_truth)
     newrow = copy.deepcopy(start_data)
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "DGSM"
+    newrow['Prediction'] = res_dgsm["dgsm"]
+    ranking = np.argsort(np.asarray(res_dgsm["dgsm"]))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
 
     #pawn
@@ -148,6 +175,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "PAWN"
+    newrow['Prediction'] = res_pawn["median"]
+    ranking = np.argsort(np.asarray(res_pawn["median"]))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
 
     #Pearson Correlation
@@ -162,6 +193,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "Pearson"
+    newrow['Prediction'] = prs
+    ranking = np.argsort(np.abs(prs))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
 
     #Random forest
@@ -175,6 +210,10 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "RF"
+    newrow['Prediction'] = importances
+    ranking = np.argsort(np.asarray(importances))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
     
     #linear model
@@ -187,8 +226,11 @@ def runExperiment(dim, effective_dim, fun, sample_size, ground_truth, seed, df):
     newrow['Spearman'] = res
     newrow['Time'] = end_time - start_time
     newrow['Algorithm'] = "Linear"
+    newrow['Prediction'] = coefs
+    ranking = np.argsort(np.abs(np.asarray(coefs)))[::-1][:effective_dim]
+    tau, _ = stats.kendalltau(ranking, ground_truth_rank)
+    newrow['Tau'] = tau
     df = df.append(newrow, ignore_index=True)
-
     return df
   
 from sklearn.utils import check_random_state

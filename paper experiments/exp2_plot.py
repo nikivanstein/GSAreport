@@ -5,7 +5,7 @@ import pandas as pd
 # Import seaborn
 import seaborn as sns
 from matplotlib.transforms import TransformedBbox
-
+from matplotlib.colors import LogNorm, Normalize
 
 def annotate_yranges(groups, ax=None):
     """
@@ -93,20 +93,20 @@ sns.set_theme()
 df = pd.read_pickle("exp2_df")
 
 
-x = df.explode('Spearman').reset_index()
 grouped_df = df.groupby(["Algorithm","dim","Effective dim", "Samples"], as_index=False)
 df_mean = grouped_df.mean()#.groupby('Seed').mean()
 
-
-plotdf = df_mean.pivot(index=["Effective dim","dim","Algorithm"], columns='Samples', values='Spearman')
+plt.figure(figsize=(8,12))
+plotdf = df_mean.pivot(index=["Algorithm","dim","Effective dim"], columns='Samples', values='Tau')
 #sns.set(rc = {'figure.figsize':(8,12)})
 sns.heatmap(plotdf, cmap="RdYlGn", xticklabels=1, yticklabels=1, vmin=-1, vmax=1)
 plt.tight_layout()
-plt.savefig("spearman-per-samplesize.png")
+plt.savefig("tau-per-samplesize.png")
 plt.clf()
 
-plotdf = df_mean.pivot(index=["Effective dim","dim","Algorithm"], columns='Samples', values='Time')
-sns.heatmap(plotdf, cmap="coolwarm")
+plt.figure(figsize=(8,12))
+plotdf = df_mean.pivot(index=["Algorithm","dim","Effective dim"], columns='Samples', values='Time')
+sns.heatmap(plotdf, cmap="coolwarm", xticklabels=1, yticklabels=1, norm=LogNorm())
 plt.tight_layout()
 plt.savefig("time-per-samplesize.png")
 plt.clf()
@@ -114,15 +114,16 @@ plt.clf()
 grouped_df = df.groupby(["Algorithm","dim","Effective dim"], as_index=False)
 df_mean2 = grouped_df.mean()#.groupby('Seed').mean()
 
-plotdf = df_mean2.pivot(index="Algorithm", columns='dim', values='Spearman')
-#sns.set(rc = {'figure.figsize':(6,6)})
+plt.figure(figsize=(6,6))
+plotdf = df_mean2.pivot(index="Algorithm", columns=["Effective dim",'dim'], values='Tau')
 sns.heatmap(plotdf, cmap="RdYlGn", xticklabels=1, yticklabels=1, vmin=-1, vmax=1)
 plt.tight_layout()
-plt.savefig("spearman-per-dim.png")
+plt.savefig("tau-per-dim.png")
 plt.clf()
 
-plotdf = df_mean2.pivot(index="Algorithm", columns='dim', values='Time')
-sns.heatmap(plotdf, cmap="coolwarm")
+plt.figure(figsize=(6,6))
+plotdf = df_mean2.pivot(index="Algorithm", columns=["Effective dim",'dim'], values='Time')
+sns.heatmap(plotdf, cmap="coolwarm", xticklabels=1, yticklabels=1,norm=LogNorm())
 plt.tight_layout()
 plt.savefig("time-per-dim.png")
 plt.clf()
