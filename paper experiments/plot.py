@@ -24,10 +24,12 @@ def plotSensitivity(f, d):
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
 
     x_samples = np.load(f"samples{filename}.npy")
+    print(x_samples)
     sens = np.load(f"sens{filename}.npy")
     conf = np.load(f"conf{filename}.npy")
 
     avg_sens = np.mean(sens, axis=1)
+    avg_samples = np.mean(x_samples, axis=1)
     avg_conf = np.mean(conf, axis=1)
     std_sens = np.std(sens, axis=1)
 
@@ -49,10 +51,10 @@ def plotSensitivity(f, d):
                 i_correct = 1
                 continue
             ind = i - i_correct
-            axes[int(ind/3),ind%3].fill_between(x_samples, (avg_sens[:,i,j]-std_sens[:,i,j]), (avg_sens[:,i,j]+std_sens[:,i,j]), color=colors[j], alpha=0.2 )
-            axes[int(ind/3),ind%3].fill_between(x_samples, (avg_sens[:,i,j]-avg_conf[:,i,j]), (avg_sens[:,i,j]+avg_conf[:,i,j]), color=colors[j], alpha=0.1 )
-            axes[int(ind/3),ind%3].plot(x_samples,avg_sens[:,i,j],color=colors[j], linestyle=LINE_STYLES[j%NUM_STYLES] , label = 'X'+str(j))
-            axes[int(ind/3),ind%3].set_xticks(x_samples)
+            axes[int(ind/3),ind%3].fill_between(avg_samples[:,i,j], (avg_sens[:,i,j]-std_sens[:,i,j]), (avg_sens[:,i,j]+std_sens[:,i,j]), color=colors[j], alpha=0.2 )
+            axes[int(ind/3),ind%3].fill_between(avg_samples[:,i,j], (avg_sens[:,i,j]-avg_conf[:,i,j]), (avg_sens[:,i,j]+avg_conf[:,i,j]), color=colors[j], alpha=0.1 )
+            axes[int(ind/3),ind%3].plot(avg_samples[:,i,j],avg_sens[:,i,j],color=colors[j], linestyle=LINE_STYLES[j%NUM_STYLES] , label = 'X'+str(j))
+            axes[int(ind/3),ind%3].set_xticks([128,256,512,1024,2048,4096,8192,16384,32768])
             axes[int(ind/3),ind%3].set_xscale('log', base=2)
             axes[int(ind/3),ind%3].set_ylim([0.0,1.0])
             axes[int(ind/3),ind%3].set_title(labels[i])
@@ -78,6 +80,6 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-#for dim in [2,5,10,20,100]:
-#    for f in tqdm(fIDs, position=0):
-#        plotSensitivity(f,dim)
+for dim in [2,5,10,20,100]:
+    for f in tqdm(fIDs, position=0):
+        plotSensitivity(f,dim)
