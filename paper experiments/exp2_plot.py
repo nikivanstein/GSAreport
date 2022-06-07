@@ -93,6 +93,7 @@ def _get_text_object_bbox(text_obj, ax):
 sns.set_theme()
 df = pd.read_pickle("exp2_maindf")
 
+print(df[["Samples_real","Samples"]])
 
 grouped_df = df.groupby(["Algorithm","dim","Effective dim", "Samples"], as_index=False)
 df_mean = grouped_df.mean()#.groupby('Seed').mean()
