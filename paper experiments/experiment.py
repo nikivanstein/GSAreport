@@ -268,5 +268,5 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-for dim in tqdm([2,5,10,20,100],  position=0):
+for dim in tqdm([2,4,8,16,32,64],  position=0):
     results = Parallel(n_jobs=len(fIDs))(delayed(runSensitivityExperiment)(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") for f in fIDs)
