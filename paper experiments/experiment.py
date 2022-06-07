@@ -14,7 +14,7 @@ from SALib.plotting.morris import horizontal_bar_plot, covariance_plot, sample_h
 from scipy.stats import pearsonr
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
-
+from joblib import Parallel, delayed
 from tqdm import tqdm
 
 # Import seaborn
@@ -126,11 +126,11 @@ def runSensitivityExperiment(dim, f, title, filename):
     conf_results = []
     all_sample_results = []
     
-    for sample_size in tqdm(x_samples,position=1, leave=False):
+    for sample_size in tqdm(x_samples, position=f):
         rep_results = []
         rep_conf_results = []
         rep_sample_results = []
-        for rep in tqdm(np.arange(10),position=2, leave=False):
+        for rep in np.arange(10):
             np.random.seed(rep)
             alg_results = []
             alg_conf_results = []
@@ -268,6 +268,5 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-for dim in [2,5,10,20,100]:
-    for f in tqdm(fIDs, position=0):
-        runSensitivityExperiment(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") #maybe add repetitions
+for dim in tqdm([2,5,10,20,100],  position=0):
+    results = Parallel(n_jobs=len(fIDs))(delayed(runSensitivityExperiment)(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") for f in fIDs)
