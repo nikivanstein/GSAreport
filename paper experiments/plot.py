@@ -77,7 +77,7 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-plotSensitivity(2,8)
-#for dim in [2,5,10,20,100]:
-#    for f in tqdm(fIDs, position=0):
-#        plotSensitivity(f,dim)
+
+for dim in [2,4,8,16,32,64]:
+    for f in tqdm(fIDs, position=0):
+        plotSensitivity(f,dim)
