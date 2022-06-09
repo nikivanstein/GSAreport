@@ -160,7 +160,7 @@ def runSensitivityExperiment(dim, f, title, filename):
 
             #Sobol
             if (sample_size_per_dim > 0):
-                X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=False)
+                X_sobol = saltelli.sample(problem, N=sample_size_per_dim, calc_second_order=False)
                 z_sobol =  np.asarray(list(map(fun, X_sobol)))
                 res_sobol = sobol.analyze(problem, z_sobol, print_to_console=False,seed=rep, calc_second_order=False)
                 alg_results.append( np.asarray(res_sobol["S1"]))
@@ -203,7 +203,7 @@ def runSensitivityExperiment(dim, f, title, filename):
 
             #dgsm
             if (sample_size_per_dim > 0):
-                X_dgsm = finite_diff.sample(problem, N=sample_size)
+                X_dgsm = finite_diff.sample(problem, N=sample_size_per_dim)
                 z_dgsm =  np.asarray(list(map(fun, X_dgsm)))
                 res_dgsm = dgsm.analyze(problem, X_dgsm, z_dgsm, print_to_console=False)
                 sample_results.append(len(X_dgsm))
