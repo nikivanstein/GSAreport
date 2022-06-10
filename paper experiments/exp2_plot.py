@@ -92,9 +92,12 @@ def _get_text_object_bbox(text_obj, ax):
 # Apply the default theme
 sns.set_theme()
 df = pd.read_pickle("exp2_maindf")
+df['Time'] = df['Time'].astype(float)
+print(df['Time'])
 
 grouped_df = df.groupby(["Algorithm","dim","Effective dim", "Samples"], as_index=False)
-df_mean = grouped_df.mean()#.groupby('Seed').mean()
+df_mean = grouped_df.mean()
+print(df_mean.columns)
 print(df_mean[["Algorithm","Samples_real","Samples"]].values)
 
 plt.figure(figsize=(8,12))
@@ -104,7 +107,7 @@ sns.heatmap(plotdf, cmap="RdYlGn", xticklabels=1, yticklabels=1, vmin=-1, vmax=1
 plt.tight_layout()
 plt.savefig("tau-per-samplesize.png")
 plt.clf()
-
+print(df_mean)
 plt.figure(figsize=(8,12))
 plotdf = df_mean.pivot(index=["Algorithm","dim","Effective dim"], columns='Samples', values='Time')
 sns.heatmap(plotdf, cmap="coolwarm", xticklabels=1, yticklabels=1, norm=LogNorm())
