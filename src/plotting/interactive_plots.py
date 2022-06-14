@@ -156,12 +156,12 @@ def interactive_covariance_plot(df, top=10):
 
     hover = HoverTool(tooltips=[
             ('','@desc'),
-            ('σ', "@x"),
-            ('μ*', "@y"),
+            ('μ*', "@x"),
+            ('σ', "@y"),
         ])
     p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover, "save", "pan"],
-        x_axis_label="σ",
-        y_axis_label="μ*")
+        x_axis_label="μ*",
+        y_axis_label="σ")
 
     source = ColumnDataSource(data=dict(x=df['mu_star'].values, y=df['sigma'].values, desc=df['index'].values))
     p.circle('x', 'y', size=6, color="#c6dbef", source=source)
