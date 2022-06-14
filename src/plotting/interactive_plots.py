@@ -22,7 +22,7 @@ from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import show
 from bokeh.io import curdoc
 from ipywidgets import BoundedFloatText, IntText, Checkbox, SelectMultiple
-from bokeh.models import Whisker
+from bokeh.models import Whisker, LabelSet
 from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
 from bokeh.transform import factor_cmap
@@ -64,6 +64,7 @@ def plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", to
     
     source = ColumnDataSource(data=dict(groups=df['index'], color=color_list, counts=df[base_col], muconf=df[error_col], sigma=df['sigma'], upper=upper, lower=lower))
     p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white', color='color')
+
 
     p.add_layout(
         Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
@@ -170,8 +171,11 @@ def interactive_covariance_plot(df, top=10):
     dftop = df.iloc[:top]
     sourceTop = ColumnDataSource(data=dict(x=dftop['mu_star'].values, y=dftop['sigma'].values, desc=dftop['index'].values))
     p.circle('x', 'y', size=8, color="#2171b5", source=sourceTop)
-    
 
+    #labels = LabelSet(x='x', y='y', text='desc',
+    #          x_offset=0, y_offset=0, source=sourceTop, render_mode='canvas')
+    
+    #p.add_layout(labels)
     x_axis_bounds = np.array([0, max(dftop['mu_star'].values)+0.002])
     p.line(x_axis_bounds, x_axis_bounds, legend_label="σ / μ* = 1.0", line_width=2, color="black")
     p.line(x_axis_bounds, 0.5*x_axis_bounds, legend_label="σ / μ* = 0.5", line_width=1, color="orange")

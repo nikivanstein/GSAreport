@@ -59,6 +59,7 @@ from sklearn.model_selection import cross_val_score
 import shutil
 import textwrap
 import json
+import pandas as pd
 from datetime import datetime
 
 class SAReport():
@@ -76,11 +77,12 @@ class SAReport():
             x_morris.csv, y_morris.csv and 
             x_sobol.csv, y_sobol.csv.  
             At least one of these file pairs should be present.
-        model_samples (int): The number of samples to generated using the Random Forest model.
+        model_samples (int): The number of samples (*dim) generated using the Random Forest model.
+        num_levels (int): The number of levels for the Morris method (default to 4).
         seed (int): random seed.
     """
 
-    def __init__(self, problem, top=20, name="SA experiment", output_dir="output/", data_dir="data/", model_samples=1000, seed=42):
+    def __init__(self, problem, top=20, name="SA experiment", output_dir="output/", data_dir="data/", model_samples=1000, num_levels=4, seed=42):
         if top > problem['num_vars']:
             top = problem['num_vars']
         self.problem = problem
@@ -90,12 +92,13 @@ class SAReport():
         self.lhs = False
         self.sobol = False
         self.morris = False
+        self.num_levels = num_levels
         self.output_dir = output_dir
         self.data_dir = data_dir
         now = datetime.now()
         self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.tag = now.strftime("%Y-%m-%dT%H-%M")
-        self.model_samples = model_samples
+        self.model_samples = model_samples * problem['num_vars']
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
@@ -109,7 +112,8 @@ class SAReport():
         """Generate samples for the different SA techniques.
 
         Args:
-            sample_size (int): The number of samples to generate for each design of experiments.
+            sample_size (int): The number of base samples (per dimension) to generate for each design of experiments.
+                Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+2) are generated.
 
         Returns:
             list: A list containing the 3 design of experiments (3 times sample_size samples).
@@ -120,7 +124,7 @@ class SAReport():
                 $ report = SAReport(problem, "Test problem")
                 $ lhs,morris,sobol = report.generateSamples(500)
         """
-        self.x_lhs = latin.sample(self.problem, sample_size, seed=self.seed)
+        self.x_lhs = latin.sample(self.problem, sample_size * problem['num_vars'], seed=self.seed)
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
         self.x_sobol = saltelli.sample(self.problem, sample_size)
         return (self.x_lhs, self.x_morris, self.x_sobol)
@@ -212,14 +216,22 @@ class SAReport():
     def analyse(self):
         '''Perform the SA analysis steps and generate the report.
         '''
-
+        if (self.model):
+            importances = self.regr.feature_importances_
+            feature_rank = np.argsort(importances)[::-1]
+            surface_script, surface_div = self._surface_plot(feature_rank[0], feature_rank[1])
+            rf_script, rf_div = self._model_plot()
+        else:
+            surface_div = ""
+            surface_script = ""
+            rf_script, rf_div = "", ""
         if (self.lhs):
             lhs_scripts, lhs_divs = self._lhs_methods()
         else:
             lhs_scripts = ["", "","", ""]
             lhs_divs = ["", "","", ""]
         if (self.morris):
-            morris_scripts, morris_divs, df = self._morris_plt(num_levels=4)
+            morris_scripts, morris_divs, df = self._morris_plt()
         else:
             morris_scripts = ["", ""]
             morris_divs = ["", ""]
@@ -228,11 +240,7 @@ class SAReport():
         else:
             sobol_scripts = ["", ""]
             sobol_divs = ["", ""]
-        if (self.model):
-            surface_script, surface_div = self._surface_plot(df.index[0], df.index[1])
-        else:
-            surface_div = ""
-            surface_script = ""
+        
 
         #copy js/css/images template files
         src = os.path.join('template','includes')
@@ -263,6 +271,9 @@ class SAReport():
 
         html_template = html_template.replace("#SURFACE#", surface_div)
         html_template = html_template.replace("#SURFACETEXT#", surface_text)
+
+        html_template = html_template.replace("#RF_DIV#", rf_div)
+        html_template = html_template.replace("#RF_SCRIPT#", rf_script)
         
         html_template = html_template.replace("#SURFACE_SCRIPT#", surface_script)
 
@@ -350,13 +361,33 @@ class SAReport():
 
         return ([script1,script2,script3,script4], [div1,div2,div3,div4])
         
+    def _model_plot(self):
+        #Generate the random forest feature importance plot
 
-    def _morris_plt(self, num_levels=4):
+        importances = self.regr.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in self.regr.estimators_], axis=0)
+
+        ranks = np.argsort(importances)[::-1]
+        top_importances = importances[ranks[:self.top]]
+        top_std = std[ranks[:self.top]]
+        feature_names = np.array(self.problem['names'])[ranks[:self.top]]
+        dftop = pd.DataFrame(data={'S1':top_importances, 'std':top_std, 'index':feature_names})
+        plot_width = max(400,20*self.top)
+        plot_height = 150
+        if (self.top < 10):
+            plot_height = 100
+        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="RF feature importances")
+        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="std", label_x="Importance", label_y="Std.")
+        p.sizing_mode = "scale_width"
+        return components(p)
+
+    def _morris_plt(self):
+        #FIX sigma mu on plot -- add labels
         X = self.x_morris
         y =  self.y_morris
         top = self.top
         Si = morris.analyze(problem, X, y, conf_level=0.95,
-                        print_to_console=False, num_levels=num_levels)
+                        print_to_console=False, num_levels=self.num_levels)
         df = Si.to_df()
         df.reset_index(inplace=True)
         df = df.sort_values(by=['mu_star'], ascending=False)
@@ -506,7 +537,7 @@ else:
         }
     fun, opt = bn.instantiate(3, iinstance=1)
     report = SAReport(problem, top=5, name="F3", output_dir=output_dir, data_dir=data_dir, model_samples=5000)
-    X_lhs, X_morris, X_sobol = report.generateSamples(1000)
+    X_lhs, X_morris, X_sobol = report.generateSamples(200)
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
         report.storeSamples()
