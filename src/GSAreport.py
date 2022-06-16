@@ -121,7 +121,7 @@ class SAReport():
             list: A list containing the 3 design of experiments (3 times sample_size samples).
 
         Example:
-            Generate 500 samples per DOE.
+            Generate 500*d samples per DOE.
 
                 $ report = SAReport(problem, "Test problem")
                 $ lhs,morris,sobol = report.generateSamples(500)
@@ -135,7 +135,7 @@ class SAReport():
         """Store the generated samples to csv files in the data dir.
 
         Example:
-            Generate 500 samples per DOE and store them in the data directory.
+            Generate 500*d samples per DOE and store them in the data directory.
 
                 $ report = SAReport(problem, "Test problem")
                 $ report.generateSamples(500)
