@@ -14,7 +14,7 @@ from SALib.plotting.morris import horizontal_bar_plot, covariance_plot, sample_h
 from scipy.stats import pearsonr
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
-
+from joblib import Parallel, delayed
 from tqdm import tqdm
 
 # Import seaborn
@@ -46,10 +46,11 @@ def meanAbsoluteError(sens, f, d):
             file_.write("\n")  # Next line.
         #print(f, d, labels[i], np.mean(absolute_errors))
 
-def storeResults(x_samples, sens, conf, filename):
-    np.save(f"npy/samples{filename}", x_samples)
+def storeResults(x_samples, sens, conf, samples, filename):
+    #np.save(f"npy/samples{filename}", x_samples)
     np.save(f"npy/sens{filename}", sens)
     np.save(f"npy/conf{filename}", conf)
+    np.save(f"npy/samples{filename}", samples)
 
 def plotSensitivity(x_samples, sens, conf, title="Sensitivity scores", filename=""):
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
@@ -120,54 +121,73 @@ def runSensitivityExperiment(dim, f, title, filename):
     'names': ['X'+str(x) for x in range(dim)],
     'bounds': [[-5.0, 5.0]] * dim
     }
-    x_samples = [8,16,32,64,128,256,512,1024,2048,4096,8192] #,128,256,512,1024,2048,4096,8192 #,8192,16384 ,
+    x_samples = [128,256,512,1024,2048,4096,8192,16384,32768]
     results = []
     conf_results = []
+    all_sample_results = []
     
-    for sample_size in tqdm(x_samples,position=1, leave=False):
+    for sample_size in tqdm(x_samples, position=f):
         rep_results = []
         rep_conf_results = []
-        for rep in tqdm(np.arange(10),position=2, leave=False):
+        rep_sample_results = []
+        for rep in np.arange(10):
             np.random.seed(rep)
             alg_results = []
             alg_conf_results = []
-            X_morris = sample(problem, N=sample_size, num_levels=4, optimal_trajectories=None)
-            z_morris =  np.asarray(list(map(fun, X_morris)))
+            sample_results = []
 
-            res_morris = morris.analyze(problem, X_morris, z_morris,
-                                        conf_level=0.95,
-                                        print_to_console=False,
-                                        num_levels=4,
-                                        num_resamples=10,
-                                        seed=rep)
+            sample_size_per_dim = int(sample_size / dim)
+            if (sample_size_per_dim > 0):
+                X_morris = sample(problem, N=sample_size_per_dim, num_levels=4, optimal_trajectories=None)
+                z_morris =  np.asarray(list(map(fun, X_morris)))
 
-            mu_star_fixed = np.asarray(res_morris["mu_star"]) / np.sum(res_morris["mu_star"])
-            mu_star_conf_fixed = np.asarray(res_morris["mu_star_conf"]) / np.sum(res_morris["mu_star"])
+                res_morris = morris.analyze(problem, X_morris, z_morris,
+                                            conf_level=0.95,
+                                            print_to_console=False,
+                                            num_levels=4,
+                                            num_resamples=10,
+                                            seed=rep)
 
-            alg_results.append( mu_star_fixed)
-            alg_conf_results.append( mu_star_conf_fixed)
+                mu_star_fixed = np.asarray(res_morris["mu_star"]) / np.sum(res_morris["mu_star"])
+                mu_star_conf_fixed = np.asarray(res_morris["mu_star_conf"]) / np.sum(res_morris["mu_star"])
+                alg_results.append( mu_star_fixed)
+                alg_conf_results.append( mu_star_conf_fixed)
+                sample_results.append(len(X_morris))
+            else:
+                alg_results.append(np.zeros(dim))
+                alg_conf_results.append(np.zeros(dim))
+                sample_results.append(0)
 
             #Sobol
-            X_sobol = saltelli.sample(problem, N=sample_size, calc_second_order=True)
-            z_sobol =  np.asarray(list(map(fun, X_sobol)))
-            res_sobol = sobol.analyze(problem, z_sobol, print_to_console=False,seed=rep)
-            alg_results.append( np.asarray(res_sobol["S1"]))
-            alg_conf_results.append( np.asarray(res_sobol["S1_conf"]))
+            if (sample_size_per_dim > 0):
+                X_sobol = saltelli.sample(problem, N=sample_size_per_dim, calc_second_order=False)
+                z_sobol =  np.asarray(list(map(fun, X_sobol)))
+                res_sobol = sobol.analyze(problem, z_sobol, print_to_console=False,seed=rep, calc_second_order=False)
+                alg_results.append( np.asarray(res_sobol["S1"]))
+                alg_conf_results.append( np.asarray(res_sobol["S1_conf"]))
+                sample_results.append(len(X_sobol))
+            else:
+                alg_results.append(np.zeros(dim))
+                alg_conf_results.append(np.zeros(dim))
+                sample_results.append(0)
+
             
 
             #Fast
             M = 4
-            while ((4 * M)**2 > sample_size):
+            while ((4 * M)**2 > sample_size_per_dim):
                 M -= 1
             if M > 0:
-                X_fast = fast_sampler.sample(problem, N=sample_size, M=M, seed=rep)
+                X_fast = fast_sampler.sample(problem, N=sample_size_per_dim, M=M, seed=rep)
                 z_fast =  np.asarray(list(map(fun, X_fast)))
                 res_fast = fast.analyze(problem, z_fast, print_to_console=False,seed=rep)
                 alg_results.append( np.asarray(res_fast["S1"]))
                 alg_conf_results.append( np.asarray(res_fast["S1_conf"]))
+                sample_results.append(len(X_fast))
             else:
                 alg_results.append(np.zeros(mu_star_fixed.shape))
                 alg_conf_results.append(np.zeros(mu_star_fixed.shape))
+                sample_results.append(0)
 
             #rbd #delta
             X_latin = latin.sample(problem, N=sample_size)
@@ -176,25 +196,32 @@ def runSensitivityExperiment(dim, f, title, filename):
             res_delta = delta.analyze(problem, X_latin, z_latin, print_to_console=False,seed=rep)
             alg_results.append( np.asarray(res_rbd["S1"]))
             alg_conf_results.append( np.asarray(res_rbd["S1_conf"]))
+            sample_results.append(len(X_latin))
             alg_results.append( np.asarray(res_delta["S1"]))
             alg_conf_results.append( np.asarray(res_delta["S1_conf"]))
+            sample_results.append(len(X_latin))
 
             #dgsm
-            X_dgsm = finite_diff.sample(problem, N=sample_size)
-            z_dgsm =  np.asarray(list(map(fun, X_dgsm)))
-            res_dgsm = dgsm.analyze(problem, X_dgsm, z_dgsm, print_to_console=False)
-            
-            dgsm_fixed = np.asarray(res_dgsm["vi"]) / np.sum(res_dgsm["vi"])
-            alg_results.append( dgsm_fixed)
-            dgsm_conf_fixed = np.asarray(res_dgsm["vi_std"]) / np.sum(res_dgsm["vi"])
-            alg_conf_results.append( dgsm_conf_fixed)
-
+            if (sample_size_per_dim > 0):
+                X_dgsm = finite_diff.sample(problem, N=sample_size_per_dim)
+                z_dgsm =  np.asarray(list(map(fun, X_dgsm)))
+                res_dgsm = dgsm.analyze(problem, X_dgsm, z_dgsm, print_to_console=False)
+                sample_results.append(len(X_dgsm))
+                dgsm_fixed = np.asarray(res_dgsm["vi"]) / np.sum(res_dgsm["vi"])
+                alg_results.append( dgsm_fixed)
+                dgsm_conf_fixed = np.asarray(res_dgsm["vi_std"]) / np.sum(res_dgsm["vi"])
+                alg_conf_results.append( dgsm_conf_fixed)
+            else:
+                alg_results.append(np.zeros(dim))
+                alg_conf_results.append(np.zeros(dim))
+                sample_results.append(0)
 
             #pawn
             res_pawn = pawn.analyze(problem, X_latin, z_latin, S=10, print_to_console=False,seed=rep)
             pawn_fixed = np.asarray(res_pawn["median"])
             alg_results.append(np.array(pawn_fixed))
             alg_conf_results.append(np.zeros(np.array(pawn_fixed).shape))
+            sample_results.append(len(X_latin))
 
             #Pearson Correlation
             prs = []
@@ -203,6 +230,7 @@ def runSensitivityExperiment(dim, f, title, filename):
                 prs.append(pr)
             alg_results.append(np.abs(prs))
             alg_conf_results.append(np.zeros(np.array(prs).shape))
+            sample_results.append(len(X_latin))
 
             #Random forest
             forest = RandomForestRegressor(random_state=rep)
@@ -213,6 +241,7 @@ def runSensitivityExperiment(dim, f, title, filename):
             rf_conf_fixed = np.asarray(std) / np.sum(importances)
             alg_results.append(rf_fixed)
             alg_conf_results.append(rf_conf_fixed)
+            sample_results.append(len(X_latin))
 
             #linear model
             reg = LinearRegression().fit(X_latin, z_latin)
@@ -220,15 +249,18 @@ def runSensitivityExperiment(dim, f, title, filename):
             coefs_fixed = np.abs(np.asarray(coefs)) / np.sum(np.abs(coefs))
             alg_results.append(coefs_fixed)
             alg_conf_results.append(np.zeros(coefs_fixed.shape))
+            sample_results.append(len(X_latin))
 
 
             #combine
             rep_results.append(np.asarray(alg_results))
             rep_conf_results.append(np.asarray(alg_conf_results))
+            rep_sample_results.append(np.asarray(sample_results))
         results.append(np.asarray(rep_results))
         conf_results.append(np.asarray(rep_conf_results))
+        all_sample_results.append(np.asarray(rep_sample_results))
 
-    storeResults(x_samples, np.asarray(results), np.asarray(conf_results), filename)
+    storeResults(x_samples, np.asarray(results), np.asarray(conf_results), np.asarray(all_sample_results), filename)
     #plotSensitivity(x_samples, np.asarray(results), np.asarray(conf_results), title=title, filename=filename)
     meanAbsoluteError(np.asarray(results), f, dim)
 
@@ -236,6 +268,5 @@ from benchmark import bbobbenchmarks as bn
 
 fIDs = bn.nfreeIDs[:]    # for all fcts
 
-for dim in [2,5,10,20,100]:
-    for f in tqdm(fIDs, position=0):
-        runSensitivityExperiment(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") #maybe add repetitions
+for dim in tqdm([2,4,8,16,32,64],  position=0):
+    results = Parallel(n_jobs=len(fIDs))(delayed(runSensitivityExperiment)(dim, f, title=f"Average Sensitivity Scores per Sample Size on F{f} D{dim}", filename=f"f{f}-d{dim}") for f in fIDs)
