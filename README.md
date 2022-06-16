@@ -1,6 +1,8 @@
 <h1><img src="src/gsa-logo.png" width="128" style="float:left;">Global Sensitivity Analysis Reporting</h1>
 
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
 
 Global Sensitivity Analysis is one of the tools to better understand your machine learning models or get an understanding in real-world processes.

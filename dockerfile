@@ -8,6 +8,7 @@ WORKDIR /home/user
 
 #RUN pacman -S sudo
 RUN pacman --noconfirm -S python-pip
+RUN pacman --noconfirm -S gcc
 RUN pacman --noconfirm -S nodejs npm
 RUN pacman --noconfirm -S git
 RUN pacman --noconfirm -S binutils
