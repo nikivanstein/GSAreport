@@ -66,6 +66,16 @@ import shap
 
 class SAReport():
     """SAReport object to generate samples, load samples and generate the sensitivity analysis report.
+    Depending on the number of samples and dimensions of the problem the methods used might differ. 
+    The following methods are included in the report:
+        * Sobol
+        * Morris
+        * Delta
+        * PAWN
+        * Random Forest
+        * TreeSHAP
+    If the number of dimensions exceeds 64, Sobol, Delta and Pawn are excluded because they do not perform well in such high dimensional spaces.
+    If the number of samples per dimension is less than 50, Delta and Pawn are excluded due to their low performancee with small sample sizes.
 
     Args:
         problem (dict): The problem definition.
@@ -91,9 +101,11 @@ class SAReport():
         self.top = top
         self.name = name
         self.seed = seed
-        self.lhs = False
-        self.sobol = False
         self.morris = False
+        self.sobol = False
+        self.delta = False
+        self.pawn = False
+        self.rbd_fast = False
         self.num_levels = num_levels
         self.output_dir = output_dir
         self.data_dir = data_dir
@@ -126,9 +138,15 @@ class SAReport():
                 $ report = SAReport(problem, "Test problem")
                 $ lhs,morris,sobol = report.generateSamples(500)
         """
-        self.x_lhs = latin.sample(self.problem, sample_size * problem['num_vars'], seed=self.seed)
+        if (sample_size > 50 or self.problem['num_vars'] < 64):
+            self.x_lhs = latin.sample(self.problem, sample_size * problem['num_vars'], seed=self.seed)
+        else:
+            self.x_lhs = None
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
-        self.x_sobol = saltelli.sample(self.problem, sample_size)
+        if (self.problem['num_vars'] < 64):
+            self.x_sobol = saltelli.sample(self.problem, sample_size)
+        else:
+            self.x_sobol = None
         return (self.x_lhs, self.x_morris, self.x_sobol)
 
     def storeSamples(self):
@@ -141,9 +159,11 @@ class SAReport():
                 $ report.generateSamples(500)
                 $ report.storeSamples("data")
         """
-        np.savetxt(f"{self.data_dir}/x_lhs.csv", self.x_lhs)
+        if (self.x_lhs is not None):
+            np.savetxt(f"{self.data_dir}/x_lhs.csv", self.x_lhs)
         np.savetxt(f"{self.data_dir}/x_morris.csv", self.x_morris)
-        np.savetxt(f"{self.data_dir}/x_sobol.csv", self.x_sobol)
+        if (self.x_sobol is not None):
+            np.savetxt(f"{self.data_dir}/x_sobol.csv", self.x_sobol)
 
     def trainModel(self, X, y):
         """Train a Random Forest regressor on provided data to generate different samples.
@@ -177,7 +197,15 @@ class SAReport():
             self.y_lhs = self.regr.predict(self.x_lhs)
             self.y_morris = self.regr.predict(self.x_morris)
             self.y_sobol = self.regr.predict(self.x_sobol)
-            self.morris = self.sobol = self.lhs = True
+            
+            self.morris = self.sobol = self.delta = self.pawn = self.rbd_fast = True
+            if self.problem["num_vars"] > 64:
+                self.sobol = False
+                self.delta = False
+                self.pawn = False
+            if len(self.X)/self.problem["num_vars"] < 50:
+                self.delta = False
+                self.pawn = False
 
     def tree_shap(self):
         """Generate the shap values and SHAP summary plot for the tree based model.
@@ -210,7 +238,9 @@ class SAReport():
             if (os.path.exists(f"{dir}/y_lhs.csv") and os.path.exists(f"{dir}/x_lhs.csv")):
                 self.x_lhs = np.loadtxt(f"{dir}/x_lhs.csv")
                 self.y_lhs = np.loadtxt(f"{dir}/y_lhs.csv")
-                self.lhs = True
+                self.pawn = True
+                self.delta = True
+                self.rbd_fast = True
             if (os.path.exists(f"{dir}/y_sobol.csv") and os.path.exists(f"{dir}/x_sobol.csv")):
                 self.x_sobol = np.loadtxt(f"{dir}/x_sobol.csv")
                 self.y_sobol = np.loadtxt(f"{dir}/y_sobol.csv")
@@ -219,10 +249,11 @@ class SAReport():
                 self.x_morris = np.loadtxt(f"{dir}/x_morris.csv")
                 self.y_morris = np.loadtxt(f"{dir}/y_morris.csv")
                 self.morris = True
-            if (self.lhs):
-                self.trainModel(self.x_lhs, self.y_lhs)
-            elif (self.sobol):
+            
+            if (self.sobol):
                 self.trainModel(self.x_sobol, self.y_sobol)
+            elif (self.pawn or self.delta or self.rbd_fast):
+                self.trainModel(self.x_lhs, self.y_lhs)
             elif (self.morris):
                 self.trainModel(self.x_morris, self.y_morris)
             else:
@@ -241,7 +272,7 @@ class SAReport():
             surface_div = ""
             surface_script = ""
             rf_script, rf_div = "", ""
-        if (self.lhs):
+        if (self.pawn or self.delta or self.rbd_fast):
             lhs_scripts, lhs_divs = self._lhs_methods()
         else:
             lhs_scripts = ["", "","", ""]
@@ -282,6 +313,19 @@ class SAReport():
         '''
         surface_text = f'Interactive surface plot of a slice (using a Random Forest model) with {name1} on the X axis and {name2} on the Y axis. All other parameters are set to the center of their range.'
         html_template = file.read()
+        #enable and disable sections
+        
+        if not self.sobol:
+            html_template = html_template.replace("SOBOL_SHOW", "\" style='display:none;'")
+        if not self.morris:
+            html_template = html_template.replace("MORRIS_SHOW", "\" style='display:none;'")
+        if not self.delta:
+            html_template = html_template.replace("DELTA_SHOW", "\" style='display:none;'")
+        if not self.pawn:
+            html_template = html_template.replace("PAWN_SHOW", "\" style='display:none;'")
+        if not self.rbd_fast:
+            html_template = html_template.replace("RBD_FAST_SHOW", "\" style='display:none;'")
+
         html_template = html_template.replace("#EXPERIMENT_REPORT#", report_div)
         html_template = html_template.replace("#NAME#", self.name)
 
@@ -337,44 +381,54 @@ class SAReport():
         plot_height = 200
         if (top < 10):
             plot_height = 100
-        Si = rbd_fast.analyze(self.problem, X, y, print_to_console=False)
-        df = Si.to_df()
-        df.reset_index(inplace=True)
-        df = df.sort_values(by=['S1'], ascending=False)
-        dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="RDB Fast", tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
-        p.sizing_mode = "scale_width"
-        script1, div1 = components(p)
+        if self.rbd_fast:
+            Si = rbd_fast.analyze(self.problem, X, y, print_to_console=False)
+            df = Si.to_df()
+            df.reset_index(inplace=True)
+            df = df.sort_values(by=['S1'], ascending=False)
+            dftop = df.iloc[:top]
+            p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="RDB Fast", tools=plottools)
+            p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
+            p.sizing_mode = "scale_width"
+            script1, div1 = components(p)
+        else:
+            script1 = div1 = ""
         
-        Si = delta.analyze(self.problem, X, y, print_to_console=False)
-        df = Si.to_df()
-        df.reset_index(inplace=True)
-        df = df.sort_values(by=['S1'], ascending=False)
-        dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="S1", tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
-        p.sizing_mode = "scale_width"
-        script2, div2 = components(p)
+        if self.delta:
+            Si = delta.analyze(self.problem, X, y, print_to_console=False)
+            df = Si.to_df()
+            df.reset_index(inplace=True)
+            df = df.sort_values(by=['S1'], ascending=False)
+            dftop = df.iloc[:top]
+            p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, toolbar_location="right", title="S1", tools=plottools)
+            p = ip.plot_errorbar(dftop, p, base_col="S1", error_col="S1_conf", label_x="S1", label_y="S1 conf.")
+            p.sizing_mode = "scale_width"
+            script2, div2 = components(p)
 
-        df = df.sort_values(by=['delta'], ascending=False)
-        dftop = df.iloc[:top]
-        p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, title="Delta",
-                toolbar_location="right",
-                tools=plottools)
-        p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf", label_x="Delta", label_y="Delta conf.")
-        p.sizing_mode = "scale_width"
-        script3, div3 = components(p)
+            df = df.sort_values(by=['delta'], ascending=False)
+            dftop = df.iloc[:top]
+            p = figure(x_range=dftop['index'], plot_height=plot_height, plot_width=plot_width, title="Delta",
+                    toolbar_location="right",
+                    tools=plottools)
+            p = ip.plot_errorbar(dftop, p, base_col="delta", error_col="delta_conf", label_x="Delta", label_y="Delta conf.")
+            p.sizing_mode = "scale_width"
+            script3, div3 = components(p)
+        else:
+            script2 = div2 = ""
+            script3 = div3 = ""
 
-        Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=self.seed)
-        df = Si.to_df()
-        df = df.sort_values(by=['median'], ascending=False)
-        df.reset_index(inplace=True)
-        dftop = df.iloc[:top]
-        #p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="Pawn", tools=plottools)
-        p = ip.plot_pawn(dftop, p)
-        p.sizing_mode = "scale_width"
-        script4, div4 = components(p)
+        if self.pawn:
+            Si = pawn.analyze(problem, X, y, S=10, print_to_console=False, seed=self.seed)
+            df = Si.to_df()
+            df = df.sort_values(by=['median'], ascending=False)
+            df.reset_index(inplace=True)
+            dftop = df.iloc[:top]
+            #p = figure(x_range=dftop['index'], plot_height=200, plot_width=20*top, toolbar_location="right", title="Pawn", tools=plottools)
+            p = ip.plot_pawn(dftop, p)
+            p.sizing_mode = "scale_width"
+            script4, div4 = components(p)
+        else:
+            script4 = div4 = ""
 
         return ([script1,script2,script3,script4], [div1,div2,div3,div4])
         
@@ -546,7 +600,7 @@ if not args.demo:
             pbar.close()
 else:
     from benchmark import bbobbenchmarks as bn
-    dim = 5
+    dim = 32
     problem = {
         'num_vars': dim,
         'names': ['X'+str(x) for x in range(dim)],
@@ -558,12 +612,16 @@ else:
     
     if not os.path.exists(f"{data_dir}/y_lhs.csv"):
         report.storeSamples()
-        y_lhs =  np.asarray(list(map(fun, X_lhs)))
+        if (X_lhs is not None):
+            y_lhs =  np.asarray(list(map(fun, X_lhs)))
         y_morris =  np.asarray(list(map(fun, X_morris)))
-        y_sobol =  np.asarray(list(map(fun, X_sobol)))
-        np.savetxt(f"{data_dir}/y_lhs.csv", y_lhs)
+        if (X_sobol is not None):
+            y_sobol =  np.asarray(list(map(fun, X_sobol)))
+        if (X_lhs is not None):
+            np.savetxt(f"{data_dir}/y_lhs.csv", y_lhs)
         np.savetxt(f"{data_dir}/y_morris.csv", y_morris)
-        np.savetxt(f"{data_dir}/y_sobol.csv", y_sobol)
+        if (X_sobol is not None):
+            np.savetxt(f"{data_dir}/y_sobol.csv", y_sobol)
 
     report.loadData()
     report.analyse()
