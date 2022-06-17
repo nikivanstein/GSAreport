@@ -633,7 +633,19 @@
 <span class="p">)</span>
 </code></pre></div></p>
 <hr />
-<p>SAReport object to generate samples, load samples and generate the sensitivity analysis report.</p>
+<p>SAReport object to generate samples, load samples and generate the sensitivity analysis report.
+Depending on the number of samples and dimensions of the problem the methods used might differ. 
+The following methods are included in the report:</p>
+<ul>
+<li>Sobol</li>
+<li>Morris</li>
+<li>Delta</li>
+<li>PAWN</li>
+<li>Random Forest</li>
+<li>TreeSHAP</li>
+</ul>
+<p>If the number of dimensions exceeds 64, Sobol, Delta and Pawn are excluded because they do not perform well in such high dimensional spaces.
+If the number of samples per dimension is less than 50, Delta and Pawn are excluded due to their low performancee with small sample sizes.</p>
 <p><strong>Args</strong></p>
 <ul>
 <li><strong>problem</strong> (dict) : The problem definition.</li>
