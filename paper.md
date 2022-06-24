@@ -9,6 +9,7 @@ authors:
     orcid: 0000-0002-0013-7969
     affiliation: 1
   - name: Raponi, Elena
+    orcid: 0000-0001-6841-7409
     affiliation: 2
 affiliations:
  - name: LIACS, Leiden University, The Netherlands
