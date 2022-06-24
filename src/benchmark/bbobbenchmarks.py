@@ -213,7 +213,7 @@ def monotoneTFosc(f):
 def defaultboundaryhandling(x, fac):
     """Returns a float penalty for being outside of boundaries [-5, 5]"""
     xoutside = np.maximum(0.0, np.abs(x) - 5) * sign(x)
-    fpen = fac * np.sum(xoutside ** 2, -1)  # penalty
+    fpen = fac * np.sum(xoutside**2, -1)  # penalty
     return fpen
 
 
@@ -684,7 +684,7 @@ class _FSphere(BBOBFunction):
         x = x - self.arrxopt  # cannot be replaced with x -= arrxopt!
 
         # COMPUTATION core
-        ftrue = np.sum(x ** 2, -1)
+        ftrue = np.sum(x**2, -1)
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -813,7 +813,7 @@ class F3(BBOBNfreeFunction):
                 self.xopt = zeros(dim)
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
         if self.lastshape != curshape:
@@ -841,7 +841,7 @@ class F3(BBOBNfreeFunction):
         x = self.arrscales * x
 
         # COMPUTATION core
-        ftrue = 10 * (self.dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x ** 2, -1)
+        ftrue = 10 * (self.dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x**2, -1)
         fval = self.noise(ftrue)  # without noise
 
         # FINALIZE
@@ -869,7 +869,7 @@ class F4(BBOBNfreeFunction):
             self.xopt[: min(dim, self.maxindex) : 2] = abs(
                 self.xopt[: min(dim, self.maxindex) : 2]
             )
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
         if self.lastshape != curshape:
@@ -888,7 +888,7 @@ class F4(BBOBNfreeFunction):
 
         # BOUNDARY HANDLING
         xoutside = np.maximum(0.0, np.abs(x) - 5) * sign(x)
-        fpen = 1e2 * np.sum(xoutside ** 2, -1)  # penalty
+        fpen = 1e2 * np.sum(xoutside**2, -1)  # penalty
         fadd = fadd + fpen  # self.fadd becomes an array
 
         # TRANSFORMATION IN SEARCH SPACE
@@ -902,11 +902,11 @@ class F4(BBOBNfreeFunction):
             tmpx = x[
                 : min(self.dim, self.maxindex) : 2
             ]  # tmpx is a reference to a part of x
-        tmpx[tmpx > 0] = self.alpha ** 0.5 * tmpx[tmpx > 0]  # this modifies x
+        tmpx[tmpx > 0] = self.alpha**0.5 * tmpx[tmpx > 0]  # this modifies x
         x = self.arrscales * x  # scale while assuming that Xopt == 0
 
         # COMPUTATION core
-        ftrue = 10 * (self.dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x ** 2, -1)
+        ftrue = 10 * (self.dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x**2, -1)
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -928,7 +928,7 @@ class F5(BBOBNfreeFunction):
                 self.xopt = zeros(dim)  # TODO: what happens here?
             else:
                 self.xopt = 5 * sign(compute_xopt(self.rseed, dim))
-            self.scales = -sign(self.xopt) * (self.alpha ** 0.5) ** linspace(0, 1, dim)
+            self.scales = -sign(self.xopt) * (self.alpha**0.5) ** linspace(0, 1, dim)
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
         if self.lastshape != curshape:
@@ -979,7 +979,7 @@ class F6(BBOBNfreeFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             # decouple scaling from function definition
             self.linearTF = dot(self.linearTF, self.rotation)
@@ -1005,7 +1005,7 @@ class F6(BBOBNfreeFunction):
         # COMPUTATION core
         idx = (x * self.arrxopt) > 0
         x[idx] = self.alpha * x[idx]
-        ftrue = monotoneTFosc(np.sum(x ** 2, -1)) ** 0.9
+        ftrue = monotoneTFosc(np.sum(x**2, -1)) ** 0.9
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1069,7 +1069,7 @@ class _FStepEllipsoid(BBOBFunction):
         x = dot(x, self.rotation)
 
         # COMPUTATION core
-        ftrue = 0.1 * np.maximum(1e-4 * np.abs(x1), dot(x ** 2, self.scales))
+        ftrue = 0.1 * np.maximum(1e-4 * np.abs(x1), dot(x**2, self.scales))
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1128,7 +1128,7 @@ class _FRosenbrock(BBOBFunction):
                 self.xopt = 0.75 * compute_xopt(
                     self.rseed, dim
                 )  # different from all others
-            self.scales = max(1, dim ** 0.5 / 8.0)
+            self.scales = max(1, dim**0.5 / 8.0)
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
         if self.lastshape != curshape:
@@ -1236,10 +1236,10 @@ class F9(BBOBNfreeFunction):
                 self.xopt = zeros(dim)
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
-            scale = max(1, dim ** 0.5 / 8.0)  # nota: different from scales in F8
+            scale = max(1, dim**0.5 / 8.0)  # nota: different from scales in F8
             self.linearTF = scale * compute_rotation(self.rseed, dim)
             self.xopt = (
-                np.hstack(dot(0.5 * np.ones((1, dim)), self.linearTF.T)) / scale ** 2
+                np.hstack(dot(0.5 * np.ones((1, dim)), self.linearTF.T)) / scale**2
             )
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
@@ -1321,7 +1321,7 @@ class _FEllipsoid(BBOBFunction):
         x = monotoneTFosc(x)
 
         # COMPUTATION core
-        ftrue = dot(x ** 2, self.scales)
+        ftrue = dot(x**2, self.scales)
         try:
             ftrue = np.hstack(ftrue)
         except TypeError:  # argument 2 to map() must support iteration
@@ -1408,9 +1408,9 @@ class F11(BBOBNfreeFunction):
 
         # COMPUTATION core
         try:
-            ftrue = np.sum(x ** 2, -1) + (self.condition - 1.0) * x[:, 0] ** 2
+            ftrue = np.sum(x**2, -1) + (self.condition - 1.0) * x[:, 0] ** 2
         except IndexError:
-            ftrue = np.sum(x ** 2) + (self.condition - 1.0) * x[0] ** 2
+            ftrue = np.sum(x**2) + (self.condition - 1.0) * x[0] ** 2
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1462,11 +1462,11 @@ class F12(BBOBNfreeFunction):
         # COMPUTATION core
         try:
             ftrue = (
-                self.condition * np.sum(x ** 2, -1)
+                self.condition * np.sum(x**2, -1)
                 + (1 - self.condition) * x[:, 0] ** 2
             )
         except IndexError:
-            ftrue = self.condition * np.sum(x ** 2) + (1 - self.condition) * x[0] ** 2
+            ftrue = self.condition * np.sum(x**2) + (1 - self.condition) * x[0] ** 2
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1490,7 +1490,7 @@ class F13(BBOBNfreeFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             self.linearTF = dot(self.linearTF, self.rotation)
 
@@ -1625,7 +1625,7 @@ class F15(BBOBNfreeFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             # decouple scaling from function definition
             self.linearTF = dot(self.linearTF, self.rotation)
@@ -1656,7 +1656,7 @@ class F15(BBOBNfreeFunction):
         x = dot(x, self.linearTF)
 
         # COMPUTATION core
-        ftrue = 10.0 * (dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x ** 2, -1)
+        ftrue = 10.0 * (dim - np.sum(np.cos(2 * np.pi * x), -1)) + np.sum(x**2, -1)
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1679,13 +1679,13 @@ class F16(BBOBNfreeFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (1.0 / self.condition ** 0.5) ** linspace(0, 1, dim)  # CAVE?
+            self.scales = (1.0 / self.condition**0.5) ** linspace(0, 1, dim)  # CAVE?
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             # decouple scaling from function definition
             self.linearTF = dot(self.linearTF, self.rotation)
             K = np.arange(0, 12)
-            self.aK = np.reshape(0.5 ** K, (1, 12))
-            self.bK = np.reshape(3.0 ** K, (1, 12))
+            self.aK = np.reshape(0.5**K, (1, 12))
+            self.bK = np.reshape(3.0**K, (1, 12))
             self.f0 = np.sum(
                 self.aK * np.cos(2 * np.pi * self.bK * 0.5)
             )  # optimal value
@@ -1706,7 +1706,7 @@ class F16(BBOBNfreeFunction):
 
         # BOUNDARY HANDLING
         xoutside = np.maximum(0, np.abs(x) - 5.0) * sign(x)
-        fpen = (10.0 / dim) * np.sum(xoutside ** 2, -1)
+        fpen = (10.0 / dim) * np.sum(xoutside**2, -1)
         fadd = fadd + fpen
 
         # TRANSFORMATION IN SEARCH SPACE
@@ -1772,7 +1772,7 @@ class _FSchaffersF7(BBOBFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
@@ -1805,7 +1805,7 @@ class _FSchaffersF7(BBOBFunction):
             s = x[:, :-1] ** 2 + x[:, 1:] ** 2
         except IndexError:
             s = x[:-1] ** 2 + x[1:] ** 2
-        ftrue = np.mean(s ** 0.25 * (np.sin(50 * s ** 0.1) ** 2 + 1), -1) ** 2
+        ftrue = np.mean(s**0.25 * (np.sin(50 * s**0.1) ** 2 + 1), -1) ** 2
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -1873,14 +1873,14 @@ class _F8F2(BBOBFunction):
     def initwithsize(self, curshape, dim):
         # DIM-dependent initialization
         if self.dim != dim:
-            scale = max(1, dim ** 0.5 / 8.0)
+            scale = max(1, dim**0.5 / 8.0)
             self.linearTF = scale * compute_rotation(self.rseed, dim)
             # if self.zerox:
             #    self.xopt = zeros(dim) # does not work here
             # else:
             # TODO: clean this line
             self.xopt = np.hstack(
-                dot(self.linearTF, 0.5 * np.ones((dim, 1)) / scale ** 2)
+                dot(self.linearTF, 0.5 * np.ones((dim, 1)) / scale**2)
             )
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
@@ -1968,7 +1968,7 @@ class F20(BBOBNfreeFunction):
                 self.xopt = zeros(dim)
             else:
                 self.xopt = 0.5 * sign(unif(dim, self.rseed) - 0.5) * 4.2096874633
-            self.scales = (self.condition ** 0.5) ** np.linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** np.linspace(0, 1, dim)
 
         # DIM- and POPSI-dependent initialisations of DIM*POPSI matrices
         if self.lastshape != curshape:
@@ -1998,7 +1998,7 @@ class F20(BBOBNfreeFunction):
 
         # BOUNDARY HANDLING
         xoutside = np.maximum(0.0, np.abs(x) - 500.0) * sign(x)  # in [-500, 500]
-        fpen = 0.01 * np.sum(xoutside ** 2, -1)
+        fpen = 0.01 * np.sum(xoutside**2, -1)
         fadd = fadd + fpen
 
         # COMPUTATION core
@@ -2092,20 +2092,20 @@ class _FGallagher(BBOBFunction):
         if len(curshape) < 2:  # popsize is 1 in this case
             f = np.zeros(self.nhighpeaks)
             xx = tile(x, (self.nhighpeaks, 1)) - self.xlocal
-            f[:] = self.peakvalues * np.exp(fac * np.sum(self.arrscales * xx ** 2, 1))
+            f[:] = self.peakvalues * np.exp(fac * np.sum(self.arrscales * xx**2, 1))
         elif curshape[0] < 0.5 * self.nhighpeaks:
             f = np.zeros((curshape[0], self.nhighpeaks))
             for k, e in enumerate(x):
                 xx = tile(e, (self.nhighpeaks, 1)) - self.xlocal
                 f[k, :] = self.peakvalues * np.exp(
-                    fac * np.sum(self.arrscales * xx ** 2, 1)
+                    fac * np.sum(self.arrscales * xx**2, 1)
                 )
         else:
             f = np.zeros((curshape[0], self.nhighpeaks))
             for i in range(self.nhighpeaks):
                 xx = x - tile(self.xlocal[i, :], (curshape[0], 1))
                 f[:, i] = self.peakvalues[i] * np.exp(
-                    fac * (dot(xx ** 2, self.arrscales[i, :]))
+                    fac * (dot(xx**2, self.arrscales[i, :]))
                 )
         ftrue = monotoneTFosc(10 - np.max(f, -1)) ** 2
         fval = self.noise(ftrue)
@@ -2122,7 +2122,7 @@ class F21(_FGallagher, BBOBNfreeFunction):
     funId = 21
     nhighpeaks = 101
     fac2 = 1.0
-    highpeakcond = 1000.0 ** 0.5
+    highpeakcond = 1000.0**0.5
 
     def boundaryhandling(self, x):
         return defaultboundaryhandling(x, 1.0)
@@ -2147,7 +2147,7 @@ class F128(_FGallagher, BBOBGaussFunction):  # TODO: check boundary handling
     funId = 128
     nhighpeaks = 101
     fac2 = 1.0
-    highpeakcond = 1000.0 ** 0.5
+    highpeakcond = 1000.0**0.5
     gaussbeta = 1.0
 
 
@@ -2157,7 +2157,7 @@ class F129(_FGallagher, BBOBUniformFunction):
     funId = 129
     nhighpeaks = 101
     fac2 = 1.0
-    highpeakcond = 1000.0 ** 0.5
+    highpeakcond = 1000.0**0.5
     unifalphafac = 1.0
     unifbeta = 1.0
 
@@ -2168,7 +2168,7 @@ class F130(_FGallagher, BBOBCauchyFunction):
     funId = 130
     nhighpeaks = 101
     fac2 = 1.0
-    highpeakcond = 1000.0 ** 0.5
+    highpeakcond = 1000.0**0.5
     cauchyalpha = 1.0
     cauchyp = 0.2
 
@@ -2190,7 +2190,7 @@ class F23(BBOBNfreeFunction):
             else:
                 self.xopt = compute_xopt(self.rseed, dim)
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             # decouple scaling from function definition
             self.linearTF = dot(self.linearTF, self.rotation)
@@ -2211,7 +2211,7 @@ class F23(BBOBNfreeFunction):
 
         # BOUNDARY HANDLING
         xoutside = np.maximum(0, np.abs(x) - 5.0) * sign(x)
-        fpen = np.sum(xoutside ** 2, -1)
+        fpen = np.sum(xoutside**2, -1)
         fadd = fadd + fpen
 
         # TRANSFORMATION IN SEARCH SPACE
@@ -2221,20 +2221,20 @@ class F23(BBOBNfreeFunction):
         # COMPUTATION core
         if len(curshape) < 2:  # popsize is 1 in this case
             arr = dot(np.reshape(x, (dim, 1)), self.arr2k)  # dim times d array
-            ftrue = -10.0 / dim ** 2.0 + 10.0 / dim ** 2.0 * np.prod(
+            ftrue = -10.0 / dim**2.0 + 10.0 / dim**2.0 * np.prod(
                 1
                 + np.arange(1, dim + 1)
-                * np.dot(np.abs(arr - np.round(arr)), self.arr2k.T ** -1.0).T
-            ) ** (10.0 / dim ** 1.2)
+                * np.dot(np.abs(arr - np.round(arr)), self.arr2k.T**-1.0).T
+            ) ** (10.0 / dim**1.2)
         else:
             ftrue = zeros(curshape[0])
             for k, e in enumerate(x):
                 arr = dot(np.reshape(e, (dim, 1)), self.arr2k)  # dim times d array
-                ftrue[k] = -10.0 / dim ** 2.0 + 10.0 / dim ** 2.0 * np.prod(
+                ftrue[k] = -10.0 / dim**2.0 + 10.0 / dim**2.0 * np.prod(
                     1
                     + np.arange(1, dim + 1)
-                    * np.dot(np.abs(arr - np.round(arr)), self.arr2k.T ** -1.0).T
-                ) ** (10.0 / dim ** 1.2)
+                    * np.dot(np.abs(arr - np.round(arr)), self.arr2k.T**-1.0).T
+                ) ** (10.0 / dim**1.2)
         fval = self.noise(ftrue)
 
         # FINALIZE
@@ -2262,7 +2262,7 @@ class F24(BBOBNfreeFunction):
             else:
                 self.xopt = 0.5 * self._mu1 * sign(gauss(dim, self.rseed))
             self.rotation = compute_rotation(self.rseed + 1e6, dim)
-            self.scales = (self.condition ** 0.5) ** linspace(0, 1, dim)
+            self.scales = (self.condition**0.5) ** linspace(0, 1, dim)
             self.linearTF = dot(compute_rotation(self.rseed, dim), diag(self.scales))
             # decouple scaling from function definition
             self.linearTF = dot(self.linearTF, self.rotation)
@@ -2286,7 +2286,7 @@ class F24(BBOBNfreeFunction):
 
         # BOUNDARY HANDLING
         xoutside = np.maximum(0, np.abs(x) - 5.0) * sign(x)
-        fpen = 1e4 * np.sum(xoutside ** 2, -1)
+        fpen = 1e4 * np.sum(xoutside**2, -1)
         fadd = fadd + fpen
 
         # TRANSFORMATION IN SEARCH SPACE
@@ -2297,7 +2297,7 @@ class F24(BBOBNfreeFunction):
             (dim + 20) ** 0.5 - 4.1
         )  # tested up to DIM = 160 p in [0.25,0.33]
         d = 1  # shift [1,3], smaller is more difficult
-        mu2 = -(((self._mu1 ** 2 - d) / s) ** 0.5)
+        mu2 = -(((self._mu1**2 - d) / s) ** 0.5)
         ftrue = np.minimum(
             np.sum((x - self._mu1) ** 2, -1), d * dim + s * np.sum((x - mu2) ** 2, -1)
         )
@@ -2418,7 +2418,7 @@ class _FTemplate(BBOBNfreeFunction):
         x = x - self.arrxopt  # cannot be replaced with x -= arrxopt!
 
         # COMPUTATION core
-        ftrue = np.sum(x ** 2, 1)
+        ftrue = np.sum(x**2, 1)
         fval = self.noise(ftrue)
 
         # FINALIZE

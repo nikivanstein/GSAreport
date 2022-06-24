@@ -314,11 +314,11 @@ class LoggingFunction(object):
                         10 ** (self.idxEvalsTrigger / self.nbptsevals)
                     ):
                         self.idxEvalsTrigger += 1
-                    while self.lasteval.num >= dim * 10 ** self.idxDIMEvalsTrigger:
+                    while self.lasteval.num >= dim * 10**self.idxDIMEvalsTrigger:
                         self.idxDIMEvalsTrigger += 1
                     self.evalsTrigger = min(
                         np.floor(10 ** (self.idxEvalsTrigger / self.nbptsevals)),
-                        dim * 10 ** self.idxDIMEvalsTrigger,
+                        dim * 10**self.idxDIMEvalsTrigger,
                     )
                     if self.lasteval.num < self.nbFirstEvalsToAlwaysWrite:
                         self.evalsTrigger = self.lasteval.num + 1
