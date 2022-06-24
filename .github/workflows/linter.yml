@@ -1,4 +1,4 @@
-name: Lint and isort
+name: Lint
 
 on: [push, pull_request]
 
@@ -14,7 +14,3 @@ jobs:
         run: pip install black==22.3.0
       - name: Run black
         run: black --check --verbose ./src/
-      - uses: jamescurtin/isort-action@master
-        with:
-          sortPaths: "./src/"
-          requirementsFiles: "./src/requirements.txt"
