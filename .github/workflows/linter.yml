@@ -10,10 +10,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - uses: psf/black@22.3.0
-        with:
-          options: "--check --verbose"
-          src: "./src"
+      - name: Install requirements
+        run: pip install -r "./src/requirements.txt"
+      - name: Run black
+        run: black --check --verbose ./src/
       - uses: jamescurtin/isort-action@master
         with:
           sortPaths: "./src/"
