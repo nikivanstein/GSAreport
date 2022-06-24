@@ -16,6 +16,7 @@ visualizations offer better insight into these relative magnitudes.
 
 try:
     import math
+
     import graph_tool.all as gt
     from graph_tool import Graph, draw
     from graph_tool.all import minimize_nested_blockmodel_dl
@@ -23,8 +24,15 @@ except ImportError:
     pass
 
 
-def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
-                edge_cutoff=0.0, edge_width=150, log=False):
+def build_graph(
+    df_list,
+    sens="ST",
+    top=410,
+    min_sens=0.01,
+    edge_cutoff=0.0,
+    edge_width=150,
+    log=False,
+):
     """
     Initializes and constructs a graph where vertices are the parameters
     selected from the first dataframe in 'df_list', subject to the
@@ -51,7 +59,7 @@ def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
                   show as an edge in the graph.
     edge_width  : float, optional
                   A float specifing the edge width to be displayed
-    
+
     log         : bool, optional
                   take the log of all the values
 
@@ -71,12 +79,12 @@ def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
     df2 = df_list[1]
 
     # Make sure sens is ST or S1
-    if sens not in set(['ST', 'S1']):
-        raise ValueError('sens must be ST or S1')
+    if sens not in set(["ST", "S1"]):
+        raise ValueError("sens must be ST or S1")
     # Make sure that there is a second order index dataframe
     try:
         if not df2:
-            raise Exception('Missing second order dataframe!')
+            raise Exception("Missing second order dataframe!")
     except:
         pass
 
@@ -89,24 +97,24 @@ def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
     # initialize a graph
     g = Graph()
 
-    vprop_sens = g.new_vertex_property('double')
-    vprop_conf = g.new_vertex_property('double')
-    vprop_name = g.new_vertex_property('string')
-    eprop_sens = g.new_edge_property('double')
+    vprop_sens = g.new_vertex_property("double")
+    vprop_conf = g.new_vertex_property("double")
+    vprop_name = g.new_vertex_property("string")
+    eprop_sens = g.new_edge_property("double")
 
-    g.vertex_properties['param'] = vprop_name
-    g.vertex_properties['sensitivity'] = vprop_sens
-    g.vertex_properties['confidence'] = vprop_conf
-    g.edge_properties['second_sens'] = eprop_sens
+    g.vertex_properties["param"] = vprop_name
+    g.vertex_properties["sensitivity"] = vprop_sens
+    g.vertex_properties["confidence"] = vprop_conf
+    g.edge_properties["second_sens"] = eprop_sens
 
     # keep a list of all the vertices
     v_list = []
 
     # Add the vertices to the graph
-    for i, param in enumerate(df['Parameter']):
+    for i, param in enumerate(df["Parameter"]):
         v = g.add_vertex()
         vprop_sens[v] = df.loc[i, sens]
-        vprop_conf[v] = 1 + df.loc[i, '%s_conf' % sens] / df.loc[i, sens]
+        vprop_conf[v] = 1 + df.loc[i, "%s_conf" % sens] / df.loc[i, sens]
         if log:
             vprop_sens[v] = math.log10(vprop_sens[v])
             vprop_conf[v] = math.log10(vprop_conf[v])
@@ -116,22 +124,22 @@ def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
 
     # Make two new columns in second order dataframe that point to the vertices
     # connected on each row.
-    df2['vertex1'] = -999
-    df2['vertex2'] = -999
+    df2["vertex1"] = -999
+    df2["vertex2"] = -999
     for vertex in v_list:
         param = g.vp.param[vertex]
-        df2.loc[df2['Parameter_1'] == param, 'vertex1'] = vertex
-        df2.loc[df2['Parameter_2'] == param, 'vertex2'] = vertex
+        df2.loc[df2["Parameter_1"] == param, "vertex1"] = vertex
+        df2.loc[df2["Parameter_2"] == param, "vertex2"] = vertex
 
     # Only allow edges for vertices that we've defined
-    df_edges = df2[(df2['vertex1'] != -999) & (df2['vertex2'] != -999)]
+    df_edges = df2[(df2["vertex1"] != -999) & (df2["vertex2"] != -999)]
     # eliminate edges below a certain cutoff value
-    pruned = df_edges[df_edges['S2'] > edge_cutoff]
+    pruned = df_edges[df_edges["S2"] > edge_cutoff]
     pruned.reset_index(inplace=True)
     # Add the edges for the graph
-    for i, sensitivity in enumerate(pruned['S2']):
-        v1 = pruned.loc[i, 'vertex1']
-        v2 = pruned.loc[i, 'vertex2']
+    for i, sensitivity in enumerate(pruned["S2"]):
+        v1 = pruned.loc[i, "vertex1"]
+        v2 = pruned.loc[i, "vertex2"]
         e = g.add_edge(v1, v2)
         # multiply by a number to make the lines visible on the plot
         eprop_sens[e] = sensitivity if sensitivity > 0 else sensitivity * -1
@@ -143,10 +151,12 @@ def build_graph(df_list, sens='ST', top=410, min_sens=0.01,
     # g.vp.param[g.vertex(77)]
     # g.vp.param[v_list[0]]
 
-    print('Created a graph with %s vertices and %s edges.\nVertices are the '
-          'top %s %s values greater than %s.\nOnly S2 values (edges) '
-          'greater than %s are included.' %
-          (g.num_vertices(), g.num_edges(), top, sens, min_sens, edge_cutoff))
+    print(
+        "Created a graph with %s vertices and %s edges.\nVertices are the "
+        "top %s %s values greater than %s.\nOnly S2 values (edges) "
+        "greater than %s are included."
+        % (g.num_vertices(), g.num_edges(), top, sens, min_sens, edge_cutoff)
+    )
 
     return g
 
@@ -178,28 +188,31 @@ def plot_network_random(g, inline=True, filename=None, scale=300.0):
     graph-tool plot
     """
     for i in range(g.num_vertices()):
-        g.vp['sensitivity'][i] = scale * g.vp['sensitivity'][i]
+        g.vp["sensitivity"][i] = scale * g.vp["sensitivity"][i]
 
-    draw.graph_draw(g,
-                    vertex_text=g.vp['param'],
-                    vertex_font_size=15,
-                    vertex_text_position=-0.1,
-                    vertex_text_color='#000000',
-                    vertex_size=g.vp['sensitivity'],
-                    vertex_color='#006600',
-                    vertex_fill_color='#006600',
-                    vertex_halo=True,
-                    vertex_halo_color='#b3c6ff',
-                    vertex_halo_size=g.vp['confidence'],
-                    edge_color='#002699',
-                    edge_pen_width=g.ep['second_sens'],
-                    output_size=(600, 600),
-                    inline=inline,
-                    output=filename
-                    )
+    draw.graph_draw(
+        g,
+        vertex_text=g.vp["param"],
+        vertex_font_size=15,
+        vertex_text_position=-0.1,
+        vertex_text_color="#000000",
+        vertex_size=g.vp["sensitivity"],
+        vertex_color="#006600",
+        vertex_fill_color="#006600",
+        vertex_halo=True,
+        vertex_halo_color="#b3c6ff",
+        vertex_halo_size=g.vp["confidence"],
+        edge_color="#002699",
+        edge_pen_width=g.ep["second_sens"],
+        output_size=(600, 600),
+        inline=inline,
+        output=filename,
+    )
 
 
-def plot_network_circle(g: Graph, inline=True, filename=None, scale=300.0, output_size=(600, 600)):
+def plot_network_circle(
+    g: Graph, inline=True, filename=None, scale=300.0, output_size=(600, 600)
+):
     """
     Display a plot of the network, g, with the vertices placed around the
     edge of a circle.  Vertices are the model parameters and they are
@@ -227,24 +240,27 @@ def plot_network_circle(g: Graph, inline=True, filename=None, scale=300.0, outpu
     """
 
     for i in range(g.num_vertices()):
-        g.vp['sensitivity'][i] = scale * g.vp['sensitivity'][i]
+        g.vp["sensitivity"][i] = scale * g.vp["sensitivity"][i]
 
-    state = minimize_nested_blockmodel_dl(g, )  # deg_corr=True)
+    state = minimize_nested_blockmodel_dl(
+        g,
+    )  # deg_corr=True)
 
-    gt.draw_hierarchy(state,
-                      vertex_text=g.vp['param'],
-                      vertex_text_position=-.01,
-                      vertex_text_color='black',
-                      vertex_font_size=12,
-                      vertex_size=g.vp['sensitivity'],
-                      vertex_color='#006600',
-                      vertex_fill_color='#006600',
-                      vertex_halo=True,
-                      vertex_halo_color='#b3c6ff',
-                      vertex_halo_size=g.vp['confidence'],
-                      edge_pen_width=g.ep['second_sens'],
-                      # subsample_edges=100,
-                      output_size=output_size,
-                      inline=inline,
-                      output=filename
-                      )
+    gt.draw_hierarchy(
+        state,
+        vertex_text=g.vp["param"],
+        vertex_text_position=-0.01,
+        vertex_text_color="black",
+        vertex_font_size=12,
+        vertex_size=g.vp["sensitivity"],
+        vertex_color="#006600",
+        vertex_fill_color="#006600",
+        vertex_halo=True,
+        vertex_halo_color="#b3c6ff",
+        vertex_halo_size=g.vp["confidence"],
+        edge_pen_width=g.ep["second_sens"],
+        # subsample_edges=100,
+        output_size=output_size,
+        inline=inline,
+        output=filename,
+    )
