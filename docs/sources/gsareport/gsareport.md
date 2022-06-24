@@ -40,7 +40,7 @@ If the number of samples per dimension is less than 50, Delta and Pawn are exclu
     x_morris.csv, y_morris.csv and 
     x_sobol.csv, y_sobol.csv.  
     At least one of these file pairs should be present.
-* **model_samples** (int) : The number of samples to generated using the Random Forest model.
+* **model_samples** (int) : The number of samples per dimension to generate using the Random Forest model.
 * **num_levels** (int): The number of levels for the Morris method (default to 4).
 * **seed** (int) : random seed.
 
