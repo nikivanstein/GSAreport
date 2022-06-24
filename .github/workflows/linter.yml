@@ -10,8 +10,8 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install requirements
-        run: pip install -r "./src/requirements.txt"
+      - name: Install black
+        run: pip install black==22.3.0
       - name: Run black
         run: black --check --verbose ./src/
       - uses: jamescurtin/isort-action@master
