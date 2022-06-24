@@ -57,6 +57,7 @@ nav:
     - References: references.md
   - Class reference: gsareport/gsareport.md
   - Example report: 'https://basvanstein.github.io/GSAreport/example-report/example.html'
+  - License: license.md
 extra:
   version:
     provider: mike

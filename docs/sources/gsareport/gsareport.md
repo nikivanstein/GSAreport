@@ -13,6 +13,18 @@ SAReport(
 
 ---
 SAReport object to generate samples, load samples and generate the sensitivity analysis report.
+Depending on the number of samples and dimensions of the problem the methods used might differ. 
+The following methods are included in the report:
+
+* Sobol
+* Morris
+* Delta
+* PAWN
+* Random Forest
+* TreeSHAP
+
+If the number of dimensions exceeds 64, Sobol, Delta and Pawn are excluded because they do not perform well in such high dimensional spaces.
+If the number of samples per dimension is less than 50, Delta and Pawn are excluded due to their low performancee with small sample sizes.
 
 
 **Args**
@@ -29,6 +41,7 @@ SAReport object to generate samples, load samples and generate the sensitivity a
     x_sobol.csv, y_sobol.csv.  
     At least one of these file pairs should be present.
 * **model_samples** (int) : The number of samples to generated using the Random Forest model.
+* **num_levels** (int): The number of levels for the Morris method (default to 4).
 * **seed** (int) : random seed.
 
 
@@ -50,7 +63,8 @@ Generate samples for the different SA techniques.
 
 **Args**
 
-* **sample_size** (int) : The number of samples to generate for each design of experiments.
+* **sample_size** (int) : The number of base samples (per dimension) to generate for each design of experiments.
+    Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+2) are generated.
 
 
 **Returns**
@@ -60,7 +74,7 @@ Generate samples for the different SA techniques.
 
 **Example**
 
-Generate 500 samples per DOE.
+Generate 500*d samples per DOE.
 
     $ report = SAReport(problem, "Test problem")
     $ lhs,morris,sobol = report.generateSamples(500)
@@ -77,7 +91,7 @@ Store the generated samples to csv files in the data dir.
 
 **Example**
 
-Generate 500 samples per DOE and store them in the data directory.
+Generate 500*d samples per DOE and store them in the data directory.
 
     $ report = SAReport(problem, "Test problem")
     $ report.generateSamples(500)
