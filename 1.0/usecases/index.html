@@ -553,9 +553,10 @@
 <div class="tabbed-block">
 <p><div class="highlight"><pre><span></span><code>docker run --rm <span class="se">\</span>
     -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/data:/data <span class="se">\</span>
-    emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize <span class="m">1000</span>
+    ghcr.io/basvanstein/gsareport:main <span class="se">\</span>
+    -p /data/problem.json -d /data --sample --samplesize <span class="m">1000</span>
 </code></pre></div>
-Here we run a docker image called <code>emeraldit/gsareport</code>, which is the GSAreport program packaged with all the required dependencies. The following line that start with <code>-v</code> creates a volume, sharing the folder <code>data</code> in our current working directory with the docker image (in location <code>/data</code> on the image). That way the program can access the <code>data</code> directory to store the design of experiment files (<code>x_*.csv</code>).</p>
+Here we run a docker image called <code>ghcr.io/basvanstein/gsareport:main</code>, which is the latest GSAreport program packaged with all the required dependencies. The following line that start with <code>-v</code> creates a volume, sharing the folder <code>data</code> in our current working directory with the docker image (in location <code>/data</code> on the image). That way the program can access the <code>data</code> directory to store the design of experiment files (<code>x_*.csv</code>).</p>
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code>python GSAreport.py -p problem.json -d <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/data --sample --samplesize <span class="m">1000</span>
@@ -593,7 +594,8 @@ we can generate the corresponding output files (outside of this software) using 
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code>docker run --rm -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/output:/output <span class="se">\ </span>
     -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/data:/data <span class="se">\</span>
-    emeraldit/gsareport -p /data/problem.json -d /data -o /output
+    ghcr.io/basvanstein/gsareport:main <span class="se">\</span>
+    -p /data/problem.json -d /data -o /output
 </code></pre></div>
 </div>
 <div class="tabbed-block">
