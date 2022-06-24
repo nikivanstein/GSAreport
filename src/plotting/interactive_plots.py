@@ -27,31 +27,55 @@ from bokeh.plotting import figure, ColumnDataSource
 from .plotting import make_plot, make_second_order_heatmap
 from bokeh.transform import factor_cmap
 from bokeh.palettes import GnBu3, OrRd3
-import warnings; warnings.filterwarnings('ignore')
+import warnings
+
+warnings.filterwarnings("ignore")
 from bokeh.models import HoverTool, VBar, FactorRange
 import numpy as np
 import pandas as pd
 
-def plot_errorbar(df, p, base_col="mu_star", error_col="mu_star_conf", label_x="ST", label_y="ST conf"):
-    #plot an errorbar using the figure
+
+def plot_errorbar(
+    df, p, base_col="mu_star", error_col="mu_star_conf", label_x="ST", label_y="ST conf"
+):
+    # plot an errorbar using the figure
     upper = df[base_col] + df[error_col]
     lower = df[base_col] - df[error_col]
 
-    source = ColumnDataSource(data=dict(groups=df['index'], counts=df[base_col], muconf=df[error_col], upper=upper, lower=lower))
-    p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white')
+    source = ColumnDataSource(
+        data=dict(
+            groups=df["index"],
+            counts=df[base_col],
+            muconf=df[error_col],
+            upper=upper,
+            lower=lower,
+        )
+    )
+    p.vbar(x="groups", top="counts", width=0.9, source=source, line_color="white")
 
     p.add_layout(
-        Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
+        Whisker(
+            source=source, base="groups", upper="upper", lower="lower", level="overlay"
+        )
     )
-    p.add_tools(HoverTool(tooltips=[("Parameter", "@groups"), (label_x, "@counts"), (label_y, "@counts")]))
+    p.add_tools(
+        HoverTool(
+            tooltips=[
+                ("Parameter", "@groups"),
+                (label_x, "@counts"),
+                (label_y, "@counts"),
+            ]
+        )
+    )
 
-    #p.xaxis.ticker = df.index
+    # p.xaxis.ticker = df.index
     p.legend.visible = False
     p.toolbar.autohide = True
     return p
 
+
 def plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", top=10):
-    #plot an errorbar using the figure
+    # plot an errorbar using the figure
     upper = df[base_col] + df[error_col]
     lower = df[base_col] - df[error_col]
 
@@ -61,39 +85,78 @@ def plot_errorbar_morris(df, p, base_col="mu_star", error_col="mu_star_conf", to
             color_list.append("#2171b5")
         else:
             color_list.append("#c6dbef")
-    
-    source = ColumnDataSource(data=dict(groups=df['index'], color=color_list, counts=df[base_col], muconf=df[error_col], sigma=df['sigma'], upper=upper, lower=lower))
-    p.vbar(x='groups', top='counts', width=0.9, source=source, line_color='white', color='color')
 
+    source = ColumnDataSource(
+        data=dict(
+            groups=df["index"],
+            color=color_list,
+            counts=df[base_col],
+            muconf=df[error_col],
+            sigma=df["sigma"],
+            upper=upper,
+            lower=lower,
+        )
+    )
+    p.vbar(
+        x="groups",
+        top="counts",
+        width=0.9,
+        source=source,
+        line_color="white",
+        color="color",
+    )
 
     p.add_layout(
-        Whisker(source=source, base="groups", upper="upper", lower="lower", level="overlay")
+        Whisker(
+            source=source, base="groups", upper="upper", lower="lower", level="overlay"
+        )
     )
-    p.add_tools(HoverTool(tooltips=[("", "@groups"), ("μ*", "@counts"), ("μ* conf", "@muconf"), ("σ", "@sigma")]))
+    p.add_tools(
+        HoverTool(
+            tooltips=[
+                ("", "@groups"),
+                ("μ*", "@counts"),
+                ("μ* conf", "@muconf"),
+                ("σ", "@sigma"),
+            ]
+        )
+    )
 
-    #p.xaxis.ticker = df.index
+    # p.xaxis.ticker = df.index
     p.legend.visible = False
     p.toolbar.autohide = True
     return p
 
+
 def plot_pawn(df, p):
-    #plot the pawn analysis
+    # plot the pawn analysis
 
-    #colors = [ "#4292c6", "#2171b5", "#08306b"]
-    #p.vbar_stack(['minimum', 'median', 'maximum'], x="index", source = df, line_color='white', color=colors ,width = 0.5)
+    # colors = [ "#4292c6", "#2171b5", "#08306b"]
+    # p.vbar_stack(['minimum', 'median', 'maximum'], x="index", source = df, line_color='white', color=colors ,width = 0.5)
 
-    parameters = df['index'].values
-    groups = ['min', 'med', 'max']
-    x = [ (param, group) for param in parameters for group in groups ]
-    counts = sum(zip(df['minimum'], df['median'], df['maximum']), ()) # like an hstack
+    parameters = df["index"].values
+    groups = ["min", "med", "max"]
+    x = [(param, group) for param in parameters for group in groups]
+    counts = sum(zip(df["minimum"], df["median"], df["maximum"]), ())  # like an hstack
     source = ColumnDataSource(data=dict(x=x, counts=counts))
 
-    p = figure(x_range=FactorRange(*x), height=200, title="PAWN Analysis",
-           toolbar_location="right", tools="save,reset")
+    p = figure(
+        x_range=FactorRange(*x),
+        height=200,
+        title="PAWN Analysis",
+        toolbar_location="right",
+        tools="save,reset",
+    )
 
-    p.vbar(x='x', top='counts', width=0.9, source=source, line_color="white",
-       # use the palette to colormap based on the the x[1:2] values
-       fill_color=factor_cmap('x', palette=GnBu3, factors=groups, start=1, end=2))
+    p.vbar(
+        x="x",
+        top="counts",
+        width=0.9,
+        source=source,
+        line_color="white",
+        # use the palette to colormap based on the the x[1:2] values
+        fill_color=factor_cmap("x", palette=GnBu3, factors=groups, start=1, end=2),
+    )
 
     p.y_range.start = 0
     p.x_range.range_padding = 0.1
@@ -101,18 +164,21 @@ def plot_pawn(df, p):
     p.xgrid.grid_line_color = None
 
     p.add_tools(HoverTool(tooltips="@x: @counts"))
-    #p.xaxis.ticker = df.index
-    #p.legend.visible = False
+    # p.xaxis.ticker = df.index
+    # p.legend.visible = False
     p.toolbar.autohide = True
     return p
 
+
 from plotting.plotting import TS_CODE, Surface3d
+
+
 def surface3dplot(problem, fun, x_i, y_i):
-    #Plots an interactive 3d plot using fun.
-    x_bound = problem['bounds'][x_i]
-    y_bound = problem['bounds'][y_i]
-    x_name = problem['names'][x_i]
-    y_name = problem['names'][y_i]
+    # Plots an interactive 3d plot using fun.
+    x_bound = problem["bounds"][x_i]
+    y_bound = problem["bounds"][y_i]
+    x_name = problem["names"][x_i]
+    y_name = problem["names"][y_i]
     x = np.linspace(x_bound[0], x_bound[1], 50)
     y = np.linspace(y_bound[0], y_bound[1], 50)
     xx, yy = np.meshgrid(x, y)
@@ -120,9 +186,9 @@ def surface3dplot(problem, fun, x_i, y_i):
     yy = yy.ravel()
 
     X = None
-    #create correct shape
-    for i in range(len(problem['bounds'])):
-        mid = ((problem['bounds'][i][0] + problem['bounds'][i][1])/2)
+    # create correct shape
+    for i in range(len(problem["bounds"])):
+        mid = (problem["bounds"][i][0] + problem["bounds"][i][1]) / 2
         if X is None:
             if i == x_i:
                 X = xx
@@ -132,20 +198,21 @@ def surface3dplot(problem, fun, x_i, y_i):
                 X = np.ones(xx.shape) * mid
         else:
             if i == x_i:
-                X = np.column_stack((X,xx))
+                X = np.column_stack((X, xx))
             elif i == y_i:
-                X = np.column_stack((X,yy))
+                X = np.column_stack((X, yy))
             else:
                 X = np.column_stack((X, np.ones(xx.shape) * mid))
-    z =  fun(X)
-    data = dict(x= xx, y= yy, z= z)
+    z = fun(X)
+    data = dict(x=xx, y=yy, z=z)
     source = ColumnDataSource(data=data)
 
     p = Surface3d(x="x", y="y", z="z", data_source=source, xLabel=x_name, yLabel=y_name)
     return p
 
+
 def interactive_covariance_plot(df, top=10):
-    '''Plots mu* against sigma
+    """Plots mu* against sigma
 
     Parameters
     -----------
@@ -153,40 +220,81 @@ def interactive_covariance_plot(df, top=10):
                              a dataframe with one sensitibity analysis result.
     top                   : integer, optional
                              highlight the top highest mu_star parameters
-    '''
+    """
 
-    hover = HoverTool(tooltips=[
-            ('','@desc'),
-            ('μ*', "@x"),
-            ('σ', "@y"),
-        ])
-    p = figure(plot_height=500, plot_width=500, toolbar_location="right", title="Morris Covariance plot", tools=[hover, "save", "pan"],
+    hover = HoverTool(
+        tooltips=[
+            ("", "@desc"),
+            ("μ*", "@x"),
+            ("σ", "@y"),
+        ]
+    )
+    p = figure(
+        plot_height=500,
+        plot_width=500,
+        toolbar_location="right",
+        title="Morris Covariance plot",
+        tools=[hover, "save", "pan"],
         x_axis_label="μ*",
-        y_axis_label="σ")
+        y_axis_label="σ",
+    )
 
-    source = ColumnDataSource(data=dict(x=df['mu_star'].values, y=df['sigma'].values, desc=df['index'].values))
-    p.circle('x', 'y', size=6, color="#c6dbef", source=source)
+    source = ColumnDataSource(
+        data=dict(x=df["mu_star"].values, y=df["sigma"].values, desc=df["index"].values)
+    )
+    p.circle("x", "y", size=6, color="#c6dbef", source=source)
 
-    #highlight the top x
+    # highlight the top x
     dftop = df.iloc[:top]
-    sourceTop = ColumnDataSource(data=dict(x=dftop['mu_star'].values, y=dftop['sigma'].values, desc=dftop['index'].values))
-    p.circle('x', 'y', size=8, color="#2171b5", source=sourceTop)
+    sourceTop = ColumnDataSource(
+        data=dict(
+            x=dftop["mu_star"].values,
+            y=dftop["sigma"].values,
+            desc=dftop["index"].values,
+        )
+    )
+    p.circle("x", "y", size=8, color="#2171b5", source=sourceTop)
 
-    #labels = LabelSet(x='x', y='y', text='desc',
+    # labels = LabelSet(x='x', y='y', text='desc',
     #          x_offset=0, y_offset=0, source=sourceTop, render_mode='canvas')
-    
-    #p.add_layout(labels)
-    x_axis_bounds = np.array([0, max(dftop['mu_star'].values)+0.002])
-    p.line(x_axis_bounds, x_axis_bounds, legend_label="σ / μ* = 1.0", line_width=2, color="black")
-    p.line(x_axis_bounds, 0.5*x_axis_bounds, legend_label="σ / μ* = 0.5", line_width=1, color="orange")
-    p.line(x_axis_bounds, 0.1*x_axis_bounds, legend_label="σ / μ* = 0.1", line_width=1, color="red")
+
+    # p.add_layout(labels)
+    x_axis_bounds = np.array([0, max(dftop["mu_star"].values) + 0.002])
+    p.line(
+        x_axis_bounds,
+        x_axis_bounds,
+        legend_label="σ / μ* = 1.0",
+        line_width=2,
+        color="black",
+    )
+    p.line(
+        x_axis_bounds,
+        0.5 * x_axis_bounds,
+        legend_label="σ / μ* = 0.5",
+        line_width=1,
+        color="orange",
+    )
+    p.line(
+        x_axis_bounds,
+        0.1 * x_axis_bounds,
+        legend_label="σ / μ* = 0.1",
+        line_width=1,
+        color="red",
+    )
     p.legend.location = "top_left"
     p.toolbar.autohide = True
     return p
 
-def plot_dict(sa_df, min_val=0, top=100, stacked=True,
-                     error_bars=True, log_axis=True,
-                     highlighted_parameters=[]):
+
+def plot_dict(
+    sa_df,
+    min_val=0,
+    top=100,
+    stacked=True,
+    error_bars=True,
+    log_axis=True,
+    highlighted_parameters=[],
+):
     """
     This function calls plotting.make_plot() for one of the sensitivity
     analysis output files and does not use tabs.
@@ -224,20 +332,28 @@ def plot_dict(sa_df, min_val=0, top=100, stacked=True,
         for all the possible outputs.
     """
 
-
-    p = make_plot(sa_df[0],
-                top=top,
-                minvalues=min_val,
-                stacked=stacked,
-                errorbar=error_bars,
-                lgaxis=log_axis,
-                highlight=highlighted_parameters
-                )
+    p = make_plot(
+        sa_df[0],
+        top=top,
+        minvalues=min_val,
+        stacked=stacked,
+        errorbar=error_bars,
+        lgaxis=log_axis,
+        highlight=highlighted_parameters,
+    )
     return p
 
-def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
-                     error_bars=True, log_axis=True,
-                     highlighted_parameters=[]):
+
+def plot_all_outputs(
+    sa_dict,
+    demo=False,
+    min_val=0.01,
+    top=100,
+    stacked=True,
+    error_bars=True,
+    log_axis=True,
+    highlighted_parameters=[],
+):
     """
     This function calls plotting.make_plot() for all the sensitivity
     analysis output files and lets you choose which output to view
@@ -270,7 +386,7 @@ def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
     Returns
     --------
     p : bokeh plot
-        a Bokeh plot generated with plotting.make_plot() 
+        a Bokeh plot generated with plotting.make_plot()
     """
 
     tabs_dictionary = {}
@@ -283,14 +399,15 @@ def plot_all_outputs(sa_dict, demo=False, min_val=0.01, top=100, stacked=True,
             outcomes_array.append(sa_dict[files][0])
 
     for i in range(len(outcomes_array)):
-        p = make_plot(outcomes_array[i],
-                      top=top,
-                      minvalues=min_val,
-                      stacked=stacked,
-                      errorbar=error_bars,
-                      lgaxis=log_axis,
-                      highlight=highlighted_parameters
-                      )
+        p = make_plot(
+            outcomes_array[i],
+            top=top,
+            minvalues=min_val,
+            stacked=stacked,
+            errorbar=error_bars,
+            lgaxis=log_axis,
+            highlight=highlighted_parameters,
+        )
         tabs_dictionary[i] = Panel(child=p, title=list(sa_dict.keys())[i])
 
     tabs = Tabs(tabs=list(tabs_dictionary.values()))
@@ -329,16 +446,16 @@ def plot_all_second_order(sa_dict, top=5, mirror=True, include=[]):
         outcomes_array.append(sa_dict[files][1])
 
     for i in range(len(sa_dict)):
-        p = make_second_order_heatmap(outcomes_array[i],
-                                      top=top,
-                                      mirror=mirror,
-                                      include=include)
+        p = make_second_order_heatmap(
+            outcomes_array[i], top=top, mirror=mirror, include=include
+        )
         tabs_dictionary[i] = Panel(child=p, title=list(sa_dict.keys())[i])
 
     tabs = Tabs(tabs=list(tabs_dictionary.values()))
     p = show(tabs)
 
     return p
+
 
 def plot_second_order(sa_df, top=5, mirror=True, include=[]):
     """
@@ -361,13 +478,11 @@ def plot_second_order(sa_df, top=5, mirror=True, include=[]):
     p : bokeh plot
     """
 
-
-
-    p = make_second_order_heatmap(sa_df[1],
-                                top=top,
-                                mirror=mirror,
-                                include=include)
+    p = make_second_order_heatmap(sa_df[1], top=top, mirror=mirror, include=include)
 
     return p
 
-import warnings; warnings.filterwarnings('ignore')
+
+import warnings
+
+warnings.filterwarnings("ignore")

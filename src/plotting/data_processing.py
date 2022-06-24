@@ -19,7 +19,7 @@ import pandas as pd
 def _map_pretty_names(df, column_names, pretty_names):
     for name in column_names:
         df[name] = df[name].map(pretty_names).fillna(df[name])
-    return df 
+    return df
 
 
 def format_salib_output(salib_output, run_name, pretty_names=None):
@@ -31,9 +31,9 @@ def format_salib_output(salib_output, run_name, pretty_names=None):
     path      : dict
                 salib analyze output
 
-    run_name  : str, 
+    run_name  : str,
                 the name of the simulation
-                
+
     pretty_names: dict, optional
                 a dictionary mapping old names to new names
 
@@ -47,23 +47,25 @@ def format_salib_output(salib_output, run_name, pretty_names=None):
 
     # Make the Parameter Column
     # for i, _ in enumerate(df_list):
-    df_list[0]['Parameter'] = df_list[0].index
+    df_list[0]["Parameter"] = df_list[0].index
     if pretty_names:
-        df_list[0] = _map_pretty_names(df_list[0], ['Parameter'], pretty_names)
+        df_list[0] = _map_pretty_names(df_list[0], ["Parameter"], pretty_names)
     df_list[0].reset_index(inplace=True, drop=True)
 
     # split up the parameters from S2
-    df_list[-1][['Parameter_1', 'Parameter_2']] = df_list[-1].index.to_series().apply(pd.Series)
+    df_list[-1][["Parameter_1", "Parameter_2"]] = (
+        df_list[-1].index.to_series().apply(pd.Series)
+    )
     df_list[-1].reset_index(inplace=True, drop=True)
     if pretty_names:
-        df_list[-1] = _map_pretty_names(df_list[-1], ['Parameter_1', 'Parameter_2'], pretty_names)
+        df_list[-1] = _map_pretty_names(
+            df_list[-1], ["Parameter_1", "Parameter_2"], pretty_names
+        )
 
     return {run_name: df_list}
 
 
-
-
-def read_file(path, numrows=None, drop=False, sep=','):
+def read_file(path, numrows=None, drop=False, sep=","):
     """
     Function reads a file of input parameters or model results
     and returns a pandas dataframe with its contents.
@@ -103,8 +105,9 @@ def read_file(path, numrows=None, drop=False, sep=','):
     return df
 
 
-def get_params(path='./input_parameters.csv',
-               numrows=None, drop=['End_time', 'Oxygen']):
+def get_params(
+    path="./input_parameters.csv", numrows=None, drop=["End_time", "Oxygen"]
+):
     """
     NOTE: This function is specific to our lignin modeling dataset
           and is not needed for the visualization features of savvy
@@ -136,9 +139,11 @@ def get_params(path='./input_parameters.csv',
     return read_file(path, numrows=numrows, drop=drop)
 
 
-def get_results(path='./results.csv',
-                numrows=None, drop=['light_aromatic_C-C',
-                                    'light_aromatic_methoxyl']):
+def get_results(
+    path="./results.csv",
+    numrows=None,
+    drop=["light_aromatic_C-C", "light_aromatic_methoxyl"],
+):
     """
     NOTE: This function is specific to our lignin modeling dataset
           and is not needed for the visualization features of savvy
@@ -167,7 +172,7 @@ def get_results(path='./results.csv',
     return read_file(path, numrows=numrows, drop=drop)
 
 
-def get_sa_data(path='.'):
+def get_sa_data(path="."):
     """
     This function reads and processes all the sensitivity analysis results
     in a specified folder and returns a dictionary with the corresponding
@@ -213,21 +218,22 @@ def get_sa_data(path='.'):
                False.
     """
 
-    filenames = [filename for filename in os.listdir(
-                 path) if filename.startswith('analysis')]
+    filenames = [
+        filename for filename in os.listdir(path) if filename.startswith("analysis")
+    ]
 
     # These two functional groups are not present in the light oil fraction
-    if 'analysis_light_aromatic-C-C.txt' in filenames:
-        filenames.remove('analysis_light_aromatic-C-C.txt')
-    if 'analysis_light_aromatic-methoxyl.txt' in filenames:
-        filenames.remove('analysis_light_aromatic-methoxyl.txt')
+    if "analysis_light_aromatic-C-C.txt" in filenames:
+        filenames.remove("analysis_light_aromatic-C-C.txt")
+    if "analysis_light_aromatic-methoxyl.txt" in filenames:
+        filenames.remove("analysis_light_aromatic-methoxyl.txt")
 
     # Make a dictionary where keys are the different output measures
     # (one for each analysis file) and values are lists of dataframes
     # with the first/total analysis results, and the second order results.
     sens_dfs = {}
     for filename in filenames:
-        name = filename[9:].replace('.txt', '')
+        name = filename[9:].replace(".txt", "")
 
         with open(path + filename) as result:
             contents = []
@@ -236,21 +242,19 @@ def get_sa_data(path='.'):
             for j, line in enumerate(contents[0]):
                 # End this loop when you reach the line that separates
                 # the first/total indices from the second order indices
-                if line.startswith('\n'):
+                if line.startswith("\n"):
                     break
                 # If no second order indices in file
                 else:
                     j = False
             # If there are second order indices in the file
             if j:
-                sens_dfs[name] = [pd.read_csv(path + filename, sep=' ',
-                                              nrows=(j - 1)),
-                                  pd.read_csv(path + filename, sep=' ',
-                                              skiprows=j)
-                                  ]
+                sens_dfs[name] = [
+                    pd.read_csv(path + filename, sep=" ", nrows=(j - 1)),
+                    pd.read_csv(path + filename, sep=" ", skiprows=j),
+                ]
             else:
-                sens_dfs[name] = [pd.read_csv(path + filename, sep=' '),
-                                  False]
+                sens_dfs[name] = [pd.read_csv(path + filename, sep=" "), False]
 
         # Deal with negative values.  All negative values appear to be close
         # to zero already; they are the result of machine precision issues or
@@ -260,28 +264,31 @@ def get_sa_data(path='.'):
         # display of them in a logical way.
         # .
         # adjust confidence interval to account for shifting sensitivity value
-        sens_dfs[name][0].loc[sens_dfs[name][0]['S1'] < 0, 'S1_conf'] = (
-            sens_dfs[name][0]['S1_conf'] + sens_dfs[name][0]['S1'] - 0.0001)
+        sens_dfs[name][0].loc[sens_dfs[name][0]["S1"] < 0, "S1_conf"] = (
+            sens_dfs[name][0]["S1_conf"] + sens_dfs[name][0]["S1"] - 0.0001
+        )
         # set the new sensitivity value = 0.0001
-        sens_dfs[name][0].loc[sens_dfs[name][0]['S1'] < 0, 'S1'] = 0.0001
+        sens_dfs[name][0].loc[sens_dfs[name][0]["S1"] < 0, "S1"] = 0.0001
         # do the same for total and second order indices
-        sens_dfs[name][0].loc[sens_dfs[name][0]['ST'] < 0, 'ST_conf'] = (
-            sens_dfs[name][0]['ST_conf'] + sens_dfs[name][0]['ST'] - 0.0001)
-        sens_dfs[name][0].loc[sens_dfs[name][0]['ST'] < 0, 'ST'] = 0.0001
+        sens_dfs[name][0].loc[sens_dfs[name][0]["ST"] < 0, "ST_conf"] = (
+            sens_dfs[name][0]["ST_conf"] + sens_dfs[name][0]["ST"] - 0.0001
+        )
+        sens_dfs[name][0].loc[sens_dfs[name][0]["ST"] < 0, "ST"] = 0.0001
         if isinstance(sens_dfs[name][1], pd.DataFrame):
-            sens_dfs[name][1].loc[sens_dfs[name][1]['S2'] < 0, 'S2_conf'] = (
-                sens_dfs[name][1]['S2_conf'] + sens_dfs[name][1]['S2'] -
-                0.0001)
-            sens_dfs[name][1].loc[sens_dfs[name][1]['S2'] < 0, 'S2'] = 0.0001
+            sens_dfs[name][1].loc[sens_dfs[name][1]["S2"] < 0, "S2_conf"] = (
+                sens_dfs[name][1]["S2_conf"] + sens_dfs[name][1]["S2"] - 0.0001
+            )
+            sens_dfs[name][1].loc[sens_dfs[name][1]["S2"] < 0, "S2"] = 0.0001
 
         # Change 'rxn' to 'k' for consistency with inputs file
-        sens_dfs[name][0].Parameter = (sens_dfs[name][0].Parameter
-                                       .str.replace('rxn', 'k', case=False))
+        sens_dfs[name][0].Parameter = sens_dfs[name][0].Parameter.str.replace(
+            "rxn", "k", case=False
+        )
 
     return sens_dfs
 
 
-def find_unimportant_params(header='ST', path='.'):
+def find_unimportant_params(header="ST", path="."):
     """
     This function finds which parameters have sensitivities and confidence
     intervals equal to exactly 0.0, which means those parameters have no
@@ -306,16 +313,18 @@ def find_unimportant_params(header='ST', path='.'):
                   a list of the parameters that don't matter for these outputs.
     """
 
-    if header not in set(['ST', 'S1']):
-        raise ValueError('header must be ST or S1')
+    if header not in set(["ST", "S1"]):
+        raise ValueError("header must be ST or S1")
 
     zero_params = []
     sa_dict = get_sa_data(path)
     for key in sa_dict.keys():
         df = sa_dict[key][0]
-        zero_params.append(df[(df[header] == 0.0) &
-                              (df['%s_conf' % header] == 0.0)]
-                           .loc[:, 'Parameter'].values.tolist())
+        zero_params.append(
+            df[(df[header] == 0.0) & (df["%s_conf" % header] == 0.0)]
+            .loc[:, "Parameter"]
+            .values.tolist()
+        )
 
     result = set(zero_params[0])
     for s in zero_params[1:]:
@@ -323,8 +332,12 @@ def find_unimportant_params(header='ST', path='.'):
     unimportant = list(result)
     unimportant.sort()
 
-    print('The following %s parameters have %s==0 for all outputs:\n' % \
-          (len(unimportant), header), unimportant, '\n')
+    print(
+        "The following %s parameters have %s==0 for all outputs:\n"
+        % (len(unimportant), header),
+        unimportant,
+        "\n",
+    )
     return unimportant
 
 
