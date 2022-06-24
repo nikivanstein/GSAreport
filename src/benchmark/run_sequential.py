@@ -1,9 +1,10 @@
-import os, sys
-import numpy as np
-import fgeneric
-import bbobbenchmarks as bn
+import os
+import sys
 from time import time
 
+import bbobbenchmarks as bn
+import fgeneric
+import numpy as np
 
 np.random.seed(42)
 

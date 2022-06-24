@@ -11,10 +11,9 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-
-from bokeh.plotting import figure, ColumnDataSource
-from bokeh.models import HoverTool, VBar
 import pandas_bokeh
+from bokeh.models import HoverTool, VBar
+from bokeh.plotting import ColumnDataSource, figure
 
 
 def make_plot(

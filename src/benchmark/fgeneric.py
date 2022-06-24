@@ -31,12 +31,13 @@ runs doctest, using -v option gives verbosity.
 # 12/02/22: def setfun, the second argument has become optional and attribute
 #           fopt of the first argument is used, if the second is not given
 
-import sys
-import os
+import copy
 import errno
+import os
+import sys
 import warnings
 from pdb import set_trace
-import copy
+
 import numpy as np
 
 deltaftarget = 1e-8

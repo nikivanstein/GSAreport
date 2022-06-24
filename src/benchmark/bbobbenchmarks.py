@@ -81,12 +81,13 @@ Examples:
 # TODO: funId is expected to be a number since it is used as rseed.
 
 import warnings
-from pdb import set_trace
-import numpy as np
 from math import floor as floor
-from numpy import dot, linspace, diag, tile, zeros, sign, resize
-from numpy.random import standard_normal as _randn  # TODO: may bring confusion
+from pdb import set_trace
+
+import numpy as np
+from numpy import diag, dot, linspace, resize, sign, tile, zeros
 from numpy.random import random as _rand  # TODO: may bring confusion
+from numpy.random import standard_normal as _randn  # TODO: may bring confusion
 
 """
 % VAL = BENCHMARKS(X, FUNCID)

@@ -19,34 +19,33 @@ Example:
         $ report.loadData()
         $ report.analyse()
 """
-from cProfile import label
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
 import os
 import os.path
-from SALib.sample import saltelli, latin
-from SALib.analyze import morris, sobol, dgsm, fast, delta, rbd_fast, pawn
-from SALib.util import read_param_file
-from SALib.sample.morris import sample
-from SALib.plotting.morris import (
-    horizontal_bar_plot,
-    covariance_plot,
-    sample_histograms,
-)
-from scipy.stats import pearsonr
-from sklearn.metrics import r2_score
-from sklearn.linear_model import LinearRegression
+import warnings
+from cProfile import label
+
+import numpy as np
+from bokeh.embed import components
+from SALib.analyze import delta, dgsm, fast, morris, pawn, rbd_fast, sobol
 from SALib.plotting.bar import plot as barplot
 from SALib.plotting.hdmr import plot as hdmrplot
+from SALib.plotting.morris import (covariance_plot, horizontal_bar_plot,
+                                   sample_histograms)
+from SALib.sample import latin, saltelli
+from SALib.sample.morris import sample
+from SALib.util import read_param_file
+from scipy.stats import pearsonr
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 from tqdm import tqdm
-from bokeh.embed import components
-import warnings
 
 warnings.filterwarnings("ignore")
 use_graph_tool = False
 try:
-    from graph_tool.all import *
     from graph_tool import draw
+    from graph_tool.all import *
+
     import plotting.network_tools as nt
 
     use_graph_tool = True
@@ -56,20 +55,21 @@ except ModuleNotFoundError:
 except ImportError:
     pass
 
-from bokeh.plotting import output_file, save
-import plotting.data_processing as dp
-import plotting.interactive_plots as ip
-from plotting.plotting import make_plot, make_second_order_heatmap, TS_CODE
-from bokeh.plotting import figure
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score
+import json
 import shutil
 import textwrap
-import json
-import pandas as pd
 from datetime import datetime
+
 import matplotlib.pyplot as pl
+import pandas as pd
 import shap
+from bokeh.plotting import figure, output_file, save
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import cross_val_score
+
+import plotting.data_processing as dp
+import plotting.interactive_plots as ip
+from plotting.plotting import TS_CODE, make_plot, make_second_order_heatmap
 
 
 class SAReport:

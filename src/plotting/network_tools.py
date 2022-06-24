@@ -16,6 +16,7 @@ visualizations offer better insight into these relative magnitudes.
 
 try:
     import math
+
     import graph_tool.all as gt
     from graph_tool import Graph, draw
     from graph_tool.all import minimize_nested_blockmodel_dl

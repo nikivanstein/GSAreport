@@ -1,6 +1,4 @@
-from . import interactive_plots
-from . import plotting
-from . import data_processing
+from . import data_processing, interactive_plots, plotting
 
 try:
     from . import network_tools

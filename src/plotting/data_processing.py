@@ -7,9 +7,7 @@ as any SALib analysis results will be from a sobol analysis.
 Our data files are stored outside this repository because they are too large,
 so users need to specify the path to their data.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import os
 

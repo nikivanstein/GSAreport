@@ -14,25 +14,24 @@ ipywidgets
 collections
 
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
-from bokeh.models.widgets import Panel, Tabs
-from bokeh.plotting import show
-from bokeh.io import curdoc
-from ipywidgets import BoundedFloatText, IntText, Checkbox, SelectMultiple
-from bokeh.models import Whisker, LabelSet
-from bokeh.plotting import figure, ColumnDataSource
-from .plotting import make_plot, make_second_order_heatmap
-from bokeh.transform import factor_cmap
-from bokeh.palettes import GnBu3, OrRd3
 import warnings
 
+from bokeh.io import curdoc
+from bokeh.models import LabelSet, Whisker
+from bokeh.models.widgets import Panel, Tabs
+from bokeh.palettes import GnBu3, OrRd3
+from bokeh.plotting import ColumnDataSource, figure, show
+from bokeh.transform import factor_cmap
+from ipywidgets import BoundedFloatText, Checkbox, IntText, SelectMultiple
+
+from .plotting import make_plot, make_second_order_heatmap
+
 warnings.filterwarnings("ignore")
-from bokeh.models import HoverTool, VBar, FactorRange
 import numpy as np
 import pandas as pd
+from bokeh.models import FactorRange, HoverTool, VBar
 
 
 def plot_errorbar(
