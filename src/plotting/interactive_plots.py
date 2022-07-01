@@ -141,7 +141,8 @@ def plot_pawn(df, p):
 
     p = figure(
         x_range=FactorRange(*x),
-        height=200,
+        height=300,
+        width=400,
         title="PAWN Analysis",
         toolbar_location="right",
         tools="save,reset",

@@ -137,8 +137,8 @@ def make_plot(
         error_color[i] = colors[i]
 
     # Sizing parameters
-    width = 800
-    height = 800
+    width = 400
+    height = 400
     inner_radius = 90
     outer_radius = 300 - 10
 
@@ -567,8 +567,8 @@ def make_second_order_heatmap(df, top=10, name="", mirror=True, include=[]):
         x_range=list(reversed(labels)),
         y_range=labels,
         x_axis_location="above",
-        plot_width=700,
-        plot_height=700,
+        plot_width=400,
+        plot_height=400,
         toolbar_location="right",
         tools=plottools,
     )

@@ -20,7 +20,7 @@ sns.set_theme()
 
 def plotSensitivity(f, d):
     filename=f"f{f}-d{d}"
-    title=f"Average Sensitivity Scores per Sample Size on F{f} D{d}"
+    title=f"Average sensitivity scores per sample size on $f_{f}$ with $n={d}$."
     #print(sens.shape, conf.shape) #3, 10, 5, 2 = sample_sizes, reps, algs, dim
 
     x_samples = np.load(f"npy/samples{filename}.npy")
