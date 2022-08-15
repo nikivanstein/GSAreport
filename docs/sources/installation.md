@@ -3,12 +3,12 @@
 The easiest way to use the GSAreport application is directly using docker. This way you do not need to install any third party software.
 
 1. Install docker (https://docs.docker.com/get-docker/)
-2. Run the image `emeraldit/gsareport` as container with a volume for your data and for the output generated.
+2. Run the image `ghcr.io/basvanstein/gsareport:main` as container with a volume for your data and for the output generated.
 
 Example to show help text:  
 
 ```zsh
-docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
+docker run -v `pwd`/output:/output -v `pwd`/data:/data ghcr.io/basvanstein/gsareport:main -h
 ```
 
 ### Using executables
