@@ -23,12 +23,12 @@ Sensitivity Analysis is a great way of getting a better understanding of how mac
 The easiest way to use the GSAreport application is directly using docker. This way you do not need to install any third party software.
 
 1. Install docker (https://docs.docker.com/get-docker/)
-2. Run the image `emeraldit/gsareport` as container with a volume for your data and for the output generated.
+2. Run the image `ghcr.io/basvanstein/gsareport:main` as container with a volume for your data and for the output generated.
 
 Example to show help text:  
 
 ```zsh
-docker run -v `pwd`/output:/output -v `pwd`/data:/data emeraldit/gsareport -h
+docker run -v `pwd`/output:/output -v `pwd`/data:/data ghcr.io/basvanstein/gsareport:main -h
 ```
 
 ### Using executables
@@ -85,9 +85,9 @@ To generate the samples for evaluation by your own code / simulator you can run 
 ```zsh
 docker run --rm \
     -v `pwd`/data:/data \
-    emeraldit/gsareport -p /data/problem.json -d /data --sample --samplesize 1000
+    ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data --sample --samplesize 1000
 ```
-Here we run a docker image called `emeraldit/gsareport`, which is the GSAreport program packaged with all the required dependencies. The following line that start with `-v` creates a volume, sharing the folder `data` in our current working directory with the docker image (in location `/data` on the image). That way the program can access the `data` directory to store the design of experiment files (`x_*.csv`).
+Here we run a docker image called `ghcr.io/basvanstein/gsareport:main`, which is the GSAreport program packaged with all the required dependencies. The following line that start with `-v` creates a volume, sharing the folder `data` in our current working directory with the docker image (in location `/data` on the image). That way the program can access the `data` directory to store the design of experiment files (`x_*.csv`).
 
 #### Python:
 
@@ -131,7 +131,7 @@ The next and final step is to analyse the just evaluated design of experiments u
 ```zsh
 docker run --rm -v `pwd`/output:/output \ 
     -v `pwd`/data:/data \
-    emeraldit/gsareport -p /data/problem.json -d /data -o /output
+    ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data -o /output
 ```
 Here we give an additional volume to our docker image such that we can access the generated output report in the output directory.
 
