@@ -23,18 +23,17 @@ bibliography: paper.bib
 
 # Summary
 
-`GSAreport` is an application to easily generate reports that describe the global sensitivities of a Machine Learning model, simulator or real-world process input parameters as best as possible. 
-You can use the reporting application to inspect which features are important for a given real world function, simulator or model by just providing an existing data set or generating a design of experiments to be evaluated. Using the dockerized application you can generate a report with just one line of code and no additional dependencies. The report contains a wide variety of variance-, density- and model-based global sensitivity methods that are visualized in an intuitive and interactive manner.
-Global Sensitivity Analysis is a crucial technique in order to better understand your machine learning models or get an understanding of complex high dimensional real-world processes.
+`GSAreport` is an application to easily generate reports that describe the global sensitivities of a machine learning (ML) model, simulator or real-world process input parameters as well as possible. 
+With the reporting application, you can inspect which features are important for a particular target function or model by simply providing an existing data set or generating a design of experiments to be evaluated. With the dockerized application, you can create a report with just one line of code and no additional dependencies. The report includes a wide variety of variance-, density- and model-based global sensitivity methods, which are visualized in an intuitive and interactive way.
+Global sensitivity analysis (GSA) quantifies the importance of model inputs and their interactions with respect to model output. It is crucial to better understand your machine learning models or get an understanding of complex high dimensional real-world processes.
 
 # Statement of need
 
-`GSAreport` is a Dockerized and packaged Python application to easily generate sensitivity analysis (SA) reports.
+`GSAreport` is a Dockerized and packaged Python application to easily generate GSA reports.
 The API for `GSAreport` was designed to provide a class-based and user-friendly interface to easily utilize many different
-and somewhat complex to implement SA methods and sampling techniques.
+and somewhat complex to implement GSA methods and sampling techniques.
 
-`GSAreport` was designed to be used by both Machine Learning researchers as well as by domain experts in industry to validate
-and inspect different machine learning models and simulators and to get better insights in their complex industrial processes.
+`GSAreport` was designed to be used by both ML researchers as well as by domain experts in industry to validate and inspect different machine learning models and simulators and gain better insights into their complex industrial processes.
 
 # References
 
