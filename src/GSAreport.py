@@ -625,7 +625,7 @@ class SAReport:
                 vertex_text=g.vp["param"],
                 vertex_text_position="centered",
                 layout="radial",
-                hide=2,
+                hide=0,
                 # vertex_text_color='black',
                 vertex_font_size=12,
                 vertex_size=g.vp["sensitivity"],
@@ -646,7 +646,7 @@ class SAReport:
                 vertex_text=g.vp["param"],
                 vertex_text_position="centered",
                 layout="radial",
-                hide=2,
+                hide=0,
                 # vertex_text_color='black',
                 vertex_font_size=12,
                 vertex_size=g.vp["sensitivity"],
@@ -768,18 +768,19 @@ if not args.demo:
             pbar.close()
 else:
     from benchmark import bbobbenchmarks as bn
-
-    dim = 32
+    dim = 20
     problem = {
         "num_vars": dim,
         "names": ["X" + str(x) for x in range(dim)],
         "bounds": [[-5.0, 5.0]] * dim,
     }
-    fun, opt = bn.instantiate(3, iinstance=1)
+    with open('problem.json', 'w') as outfile:
+        json.dump(problem, outfile)
+    fun, opt = bn.instantiate(5, iinstance=1)
     report = SAReport(
         problem,
-        top=5,
-        name="F3",
+        top=10,
+        name="F5",
         output_dir=output_dir,
         data_dir=data_dir,
         model_samples=5000,

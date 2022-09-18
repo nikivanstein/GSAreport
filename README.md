@@ -3,6 +3,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
+
 GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
 
 Global Sensitivity Analysis is one of the tools to better understand your machine learning models or get an understanding in real-world processes.
@@ -70,6 +72,8 @@ Once you have the problem definition (specify it with `-p path/to/problem.json`)
 - x_sobol.csv, y_sobol.csv
 - x_morris.csv, y_morris.csv
 - x_lhs.csv, y_lhs.csv
+
+Sample csv files can be found in the `/data/` directory of this repository. Sample files can also be generated with the `--demo` parameter.
 
 When you have your own design of experiments you can store these in x and y.csv (space delimited). The Sobol, Morris and LHS (Latin Hypercube Sampling) files can be used when you have samples and results from a specific sampling technique which can be used for different Sensitivity analysis algorithms. The GSA report application can generate the `x_` version of these files (the input). Using the input files you can then evaluate the data points and store the target values `y` in the csv file with the same name convention. If you only provide an x.csv and y.csv file, a machine learning algorithm will be used to interpolate the remaining samples to generate the appropriate design of experiments required for the sensitivity analysis.
 
