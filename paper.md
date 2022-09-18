@@ -35,6 +35,8 @@ and somewhat complex to implement GSA methods and sampling techniques.
 
 `GSAreport` was designed to be used by both ML researchers as well as by domain experts in industry to validate and inspect different machine learning models and simulators and gain better insights into their complex industrial processes.
 
+`GSAreport` unifies methods of the SHAP and SALib packages in one easy to use application with an interactive graphical report. Each method in the original SALib package requires a different sampling scheme and different sample size, in GSAreport we streamline this to allow for any arbitrary sample scheme and size. In addition we use empirically found rules of thumb to automatically select GSA methods that work well for a given sample size and dimensionality.
+
 # References
 
 The following open source software libraries are used (and extended) within `GSAreport`.
