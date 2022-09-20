@@ -52,7 +52,7 @@ The following open source software libraries are used (and extended) within `GSA
 - SALib [SALibHerman2017], a sensitivity analysis library for Python containing different SA methods and sampling schemes.  
 - SHAP [shapNIPS2017_7062], a local SA method for explainable AI.
 
-A related toolbox originally implemented for Matlab and also available for Python and R is the SAFE toolbox [pianosi2015matlab].
+A related toolbox (similar to SALib) originally implemented for Matlab and also available for Python and R is the SAFE toolbox [pianosi2015matlab].
 
 # Acknowledgements
 
