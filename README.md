@@ -175,3 +175,19 @@ This tool uses Savvy [1] and SALib [2].
 [1] Blake Hough, ., Chris Fu, ., & Swapil Paliwal, . (2016). savvy: visualize high dimensionality sensitivity analysis data. Updated with full sensitivity analysis from ligpy model. (v2.0). Zenodo. https://doi.org/10.5281/zenodo.53099  
 [2] Herman, J. and Usher, W. (2017) SALib: An open-source Python library for sensitivity analysis. Journal of Open Source Software, 2(9). doi:10.21105/joss.00097
 
+## Cite our paper
+
+Use the following bibtex to cite our paper when you use GSAreport.
+
+```
+@ARTICLE{9903639,  
+  author={Van Stein, Bas and Raponi, Elena and Sadeghi, Zahra and Bouman, Niek and Van Ham, Roeland C.H.J. and Bäck, Thomas},  
+  journal={IEEE Access},  
+  title={A Comparison of Global Sensitivity Analysis Methods for Explainable AI with an Application in Genomic Prediction},   
+  year={2022},  
+  volume={},  
+  number={},  
+  pages={1-1},  
+  doi={10.1109/ACCESS.2022.3210175}
+}
+```
