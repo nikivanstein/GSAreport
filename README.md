@@ -85,7 +85,7 @@ Run
 
 ```zsh
 cd src
-pytest
+python -m pytest
 ```
 
 To execute the automated tests to verify the installation.

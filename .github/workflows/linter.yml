@@ -19,4 +19,4 @@ jobs:
       - name: Run pytest
         run: |
           cd src
-          pytest
+          python -m pytest
