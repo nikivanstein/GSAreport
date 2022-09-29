@@ -169,7 +169,7 @@ def plot_pawn(df, p):
     return p
 
 
-from plotting.plotting import TS_CODE, Surface3d
+from .plotting import TS_CODE, Surface3d
 
 
 def surface3dplot(problem, fun, x_i, y_i):

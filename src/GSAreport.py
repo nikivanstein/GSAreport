@@ -70,9 +70,9 @@ from bokeh.plotting import figure, output_file, save
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 
-import plotting.data_processing as dp
-import plotting.interactive_plots as ip
-from plotting.plotting import TS_CODE, make_plot, make_second_order_heatmap
+from .plotting import data_processing as dp
+from .plotting import interactive_plots as ip
+from .plotting.plotting import TS_CODE, make_plot, make_second_order_heatmap
 
 
 class SAReport:
@@ -161,7 +161,7 @@ class SAReport:
         """
         if sample_size > 50 or self.problem["num_vars"] < 64:
             self.x_lhs = latin.sample(
-                self.problem, sample_size * problem["num_vars"], seed=self.seed
+                self.problem, sample_size * self.problem["num_vars"], seed=self.seed
             )
         else:
             self.x_lhs = None
@@ -663,142 +663,142 @@ class SAReport:
             )
         return ([script1, script2], [div1, div2])
 
+if __name__ == "__main__":
+    import argparse
 
-import argparse
+    parser = argparse.ArgumentParser(
+        prog="GSAreport",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(
+            """\
+            Generate a global sensitivity analysis report for a given data set or function.
+            Common uses cases:
+            --------------------------------
+            Generate samples for evaluation by a real world function / simulator
+                > python GSAreport.py -p problem.json -d data_dir --sample --samplesize 1000
+            Analyse the samples with their output stored in the data folder
+                > python GSAreport.py -p problem.json -d data_dir -o output_dir
+            Analyse a real-world data set and use a Random Forest model to interpolate (data_dir contains x.csv and y.csv)
+                > python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
+            """
+        ),
+    )
+    parser.add_argument(
+        "--problem",
+        "-p",
+        default="problem.json",
+        type=str,
+        help="File path to the problem definition in json format.",
+    )
+    parser.add_argument(
+        "--data",
+        "-d",
+        type=str,
+        default="/data/",
+        help="Directory where the intermediate data is stored. (defaults to /data)",
+    )  # will be accesible under args.data
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        default="/output/",
+        help="Directory where the output report is stored. (defaults to /output/)",
+    )  # will be accesible under args.output
+    parser.add_argument(
+        "--name",
+        type=str,
+        default="SA",
+        help="Name of the experiment, will be used in the report output.",
+    )
+    parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="The number of important features to focus on, default is 10.",
+    )
+    parser.add_argument(
+        "--sample",
+        action="store_true",
+        help="When you use this flag, only the samples are generated to be used in the analyse phase.",
+    )
+    parser.add_argument(
+        "--samplesize", "-n", type=int, help="Number of samples to generate.", default=1000
+    )
+    parser.add_argument(
+        "--modelsize", type=int, help="Number of samples for the model.", default=1000
+    )
+    parser.add_argument(
+        "--demo",
+        help="Demo mode, uses a BBOB function as test function.",
+        action="store_true",
+    )
+    args = parser.parse_args()
 
-parser = argparse.ArgumentParser(
-    prog="GSAreport",
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    description=textwrap.dedent(
-        """\
-        Generate a global sensitivity analysis report for a given data set or function.
-        Common uses cases:
-        --------------------------------
-        Generate samples for evaluation by a real world function / simulator
-            > python GSAreport.py -p problem.json -d data_dir --sample --samplesize 1000
-        Analyse the samples with their output stored in the data folder
-            > python GSAreport.py -p problem.json -d data_dir -o output_dir
-        Analyse a real-world data set and use a Random Forest model to interpolate (data_dir contains x.csv and y.csv)
-            > python GSAreport.py -p problem.json -d data_dir -o output_dir --samplesize 10000
-        """
-    ),
-)
-parser.add_argument(
-    "--problem",
-    "-p",
-    default="problem.json",
-    type=str,
-    help="File path to the problem definition in json format.",
-)
-parser.add_argument(
-    "--data",
-    "-d",
-    type=str,
-    default="/data/",
-    help="Directory where the intermediate data is stored. (defaults to /data)",
-)  # will be accesible under args.data
-parser.add_argument(
-    "--output",
-    "-o",
-    type=str,
-    default="/output/",
-    help="Directory where the output report is stored. (defaults to /output/)",
-)  # will be accesible under args.output
-parser.add_argument(
-    "--name",
-    type=str,
-    default="SA",
-    help="Name of the experiment, will be used in the report output.",
-)
-parser.add_argument(
-    "--top",
-    type=int,
-    default=10,
-    help="The number of important features to focus on, default is 10.",
-)
-parser.add_argument(
-    "--sample",
-    action="store_true",
-    help="When you use this flag, only the samples are generated to be used in the analyse phase.",
-)
-parser.add_argument(
-    "--samplesize", "-n", type=int, help="Number of samples to generate.", default=1000
-)
-parser.add_argument(
-    "--modelsize", type=int, help="Number of samples for the model.", default=1000
-)
-parser.add_argument(
-    "--demo",
-    help="Demo mode, uses a BBOB function as test function.",
-    action="store_true",
-)
-args = parser.parse_args()
+    output_dir = args.output
+    data_dir = args.data
+    top = args.top
 
-output_dir = args.output
-data_dir = args.data
-top = args.top
-
-problem = {}
-if not args.demo:
-    with open(args.problem) as json_file:
-        problem = json.load(json_file)
-        print("loaded problem definition")
-    with tqdm(total=100) as pbar:
+    problem = {}
+    if not args.demo:
+        with open(args.problem) as json_file:
+            problem = json.load(json_file)
+            print("loaded problem definition")
+        with tqdm(total=100) as pbar:
+            report = SAReport(
+                problem,
+                top=top,
+                name=args.name,
+                output_dir=output_dir,
+                data_dir=data_dir,
+                model_samples=args.modelsize,
+            )
+            pbar.update(10)
+            if args.sample:
+                # generate only samples
+                report.generateSamples(args.samplesize)
+                pbar.update(40)
+                report.storeSamples()
+                pbar.update(40)
+                pbar.close()
+            else:
+                report.loadData()
+                pbar.update(50)
+                report.analyse()
+                pbar.update(40)
+                pbar.close()
+    else:
+        from benchmark import bbobbenchmarks as bn
+        dim = 20
+        problem = {
+            "num_vars": dim,
+            "names": ["X" + str(x) for x in range(dim)],
+            "bounds": [[-5.0, 5.0]] * dim,
+        }
+        with open('problem.json', 'w') as outfile:
+            json.dump(problem, outfile)
+        fun, opt = bn.instantiate(5, iinstance=1)
         report = SAReport(
             problem,
-            top=top,
-            name=args.name,
+            top=10,
+            name="F5",
             output_dir=output_dir,
             data_dir=data_dir,
-            model_samples=args.modelsize,
+            model_samples=5000,
         )
-        pbar.update(10)
-        if args.sample:
-            # generate only samples
-            report.generateSamples(args.samplesize)
-            pbar.update(40)
+        X_lhs, X_morris, X_sobol = report.generateSamples(200)
+
+        if not os.path.exists(f"{data_dir}/y_lhs.csv"):
             report.storeSamples()
-            pbar.update(40)
-            pbar.close()
-        else:
-            report.loadData()
-            pbar.update(50)
-            report.analyse()
-            pbar.update(40)
-            pbar.close()
-else:
-    from benchmark import bbobbenchmarks as bn
-    dim = 20
-    problem = {
-        "num_vars": dim,
-        "names": ["X" + str(x) for x in range(dim)],
-        "bounds": [[-5.0, 5.0]] * dim,
-    }
-    with open('problem.json', 'w') as outfile:
-        json.dump(problem, outfile)
-    fun, opt = bn.instantiate(5, iinstance=1)
-    report = SAReport(
-        problem,
-        top=10,
-        name="F5",
-        output_dir=output_dir,
-        data_dir=data_dir,
-        model_samples=5000,
-    )
-    X_lhs, X_morris, X_sobol = report.generateSamples(200)
+            if X_lhs is not None:
+                y_lhs = np.asarray(list(map(fun, X_lhs)))
+            y_morris = np.asarray(list(map(fun, X_morris)))
+            if X_sobol is not None:
+                y_sobol = np.asarray(list(map(fun, X_sobol)))
+            if X_lhs is not None:
+                np.savetxt(f"{data_dir}/y_lhs.csv", y_lhs)
+            np.savetxt(f"{data_dir}/y_morris.csv", y_morris)
+            if X_sobol is not None:
+                np.savetxt(f"{data_dir}/y_sobol.csv", y_sobol)
 
-    if not os.path.exists(f"{data_dir}/y_lhs.csv"):
-        report.storeSamples()
-        if X_lhs is not None:
-            y_lhs = np.asarray(list(map(fun, X_lhs)))
-        y_morris = np.asarray(list(map(fun, X_morris)))
-        if X_sobol is not None:
-            y_sobol = np.asarray(list(map(fun, X_sobol)))
-        if X_lhs is not None:
-            np.savetxt(f"{data_dir}/y_lhs.csv", y_lhs)
-        np.savetxt(f"{data_dir}/y_morris.csv", y_morris)
-        if X_sobol is not None:
-            np.savetxt(f"{data_dir}/y_sobol.csv", y_sobol)
-
-    report.loadData()
-    report.analyse()
+        report.loadData()
+        report.analyse()
