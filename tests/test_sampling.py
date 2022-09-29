@@ -20,7 +20,7 @@ def test_generate_samples():
         data_dir="../data",
         model_samples=500,
     )
-    X_lhs, X_morris, X_sobol = report.generateSamples(100)
-    assert len(X_lhs) == 100*problem['num_vars'], "Unexpected number of samples for LHS"
-    assert len(X_morris) == 100*(problem['num_vars']+1), "Unexpected number of samples for Morris"
-    assert len(X_sobol) == 100*(problem['num_vars']+2), "Unexpected number of samples for Sobol"
+    X_lhs, X_morris, X_sobol = report.generateSamples(128)
+    assert len(X_lhs) == 128*problem['num_vars'], f"Unexpected number of samples for LHS {len(X_lhs)}"
+    assert len(X_morris) == 128*(problem['num_vars']+1), f"Unexpected number of samples for Morris {len(X_morris)}"
+    assert len(X_sobol) == 128*(2*problem['num_vars']+2), f"Unexpected number of samples for Sobol {len(X_sobol)} != {128*(2*problem['num_vars']+2)}"
