@@ -29,8 +29,11 @@ from bokeh.embed import components
 from SALib.analyze import delta, dgsm, fast, morris, pawn, rbd_fast, sobol
 from SALib.plotting.bar import plot as barplot
 from SALib.plotting.hdmr import plot as hdmrplot
-from SALib.plotting.morris import (covariance_plot, horizontal_bar_plot,
-                                   sample_histograms)
+from SALib.plotting.morris import (
+    covariance_plot,
+    horizontal_bar_plot,
+    sample_histograms,
+)
 from SALib.sample import latin, saltelli
 from SALib.sample.morris import sample
 from SALib.util import read_param_file
