@@ -100,7 +100,7 @@ class SAReport:
             x_morris.csv, y_morris.csv and
             x_sobol.csv, y_sobol.csv.
             At least one of these file pairs should be present.
-        model_samples (int): The number of samples (*dim) generated using the Random Forest model.
+        model_samples (int): The number of samples (per dim) generated using the Random Forest model.
         num_levels (int): The number of levels for the Morris method (default to 4).
         seed (int): random seed.
     """
@@ -133,7 +133,7 @@ class SAReport:
         now = datetime.now()
         self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.tag = now.strftime("%Y-%m-%dT%H-%M")
-        self.model_samples = model_samples * problem["num_vars"]
+        self.model_samples = model_samples
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
