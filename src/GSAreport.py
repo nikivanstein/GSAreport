@@ -70,9 +70,9 @@ from bokeh.plotting import figure, output_file, save
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 
-from .plotting import data_processing as dp
-from .plotting import interactive_plots as ip
-from .plotting.plotting import TS_CODE, make_plot, make_second_order_heatmap
+from plotting import data_processing as dp
+from plotting import interactive_plots as ip
+from plotting.plotting import TS_CODE, make_plot, make_second_order_heatmap
 
 
 class SAReport:
@@ -211,7 +211,6 @@ class SAReport:
         self.regr.fit(X, y)
         self.X = X
         self.model = True
-        self.tree_shap()
         return self.model_score
 
     def sampleUsingModel(self):
@@ -299,6 +298,7 @@ class SAReport:
                 feature_rank[0], feature_rank[1]
             )
             rf_script, rf_div = self._model_plot()
+            self.tree_shap()
         else:
             surface_div = ""
             surface_script = ""
@@ -499,7 +499,7 @@ class SAReport:
 
         if self.pawn:
             Si = pawn.analyze(
-                problem, X, y, S=10, print_to_console=False, seed=self.seed
+                self.problem, X, y, S=10, print_to_console=False, seed=self.seed
             )
             df = Si.to_df()
             df = df.sort_values(by=["median"], ascending=False)
@@ -557,7 +557,7 @@ class SAReport:
         y = self.y_morris
         top = self.top
         Si = morris.analyze(
-            problem,
+            self.problem,
             X,
             y,
             conf_level=0.95,
@@ -599,7 +599,7 @@ class SAReport:
         top = self.top
 
         sa = sobol.analyze(
-            problem, y, print_to_console=False, seed=self.seed, calc_second_order=True
+            self.problem, y, print_to_console=False, seed=self.seed, calc_second_order=True
         )
         sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
 

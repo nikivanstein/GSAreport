@@ -7,14 +7,14 @@ report = None
 problem = {}
 
 def test_generate_samples():
-    with open("data/problem.json") as json_file:
+    with open("../data/problem.json") as json_file:
         problem = json.load(json_file)
     fun, opt = bn.instantiate(5, iinstance=1)
     report = GSAreport.SAReport(
         problem,
         top=10,
         name="F5",
-        output_dir="output",
+        output_dir="../output",
         data_dir="../data",
         model_samples=500,
     )
@@ -25,15 +25,15 @@ def test_generate_samples():
 
 
 def test_generate_samples_with_model():
-    with open("data/problem.json") as json_file:
+    with open("../data/problem.json") as json_file:
         problem = json.load(json_file)
     fun, opt = bn.instantiate(5, iinstance=1)
     report = GSAreport.SAReport(
         problem,
         top=10,
         name="F5",
-        output_dir="output",
-        data_dir="data",
+        output_dir="../output",
+        data_dir="../data",
         model_samples=128,
     )
     report.loadData()

@@ -79,6 +79,17 @@ When you have your own design of experiments you can store these in x and y.csv 
 
 A python example to read the `x_*.csv` files  and produce the correspondig `y_*.csv` files using your own objective function is provided in the next section.
 
+## Testing the Installation
+
+Run 
+
+```zsh
+cd src
+pytest
+```
+
+To execute the automated tests to verify the installation.
+
 ### Common use cases using Docker
 There are three main steps in using the GSA report application, first to generate designs of experiments (the input files), second to evaluate these design of experiments and store them as `y_*.csv` files (using your own logic / simulators / real world experiments), and last but not least to load the data and perform the sensitivity analysis.
 
