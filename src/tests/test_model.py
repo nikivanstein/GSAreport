@@ -1,11 +1,14 @@
-import pytest
-from src import GSAreport
 import json
+
 import numpy as np
+import pytest
+
+from src import GSAreport
 from src.benchmark import bbobbenchmarks as bn
 
 report = None
 problem = {}
+
 
 def test_train_model():
     with open("../data/problem.json") as json_file:

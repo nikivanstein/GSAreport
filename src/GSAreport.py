@@ -29,11 +29,8 @@ from bokeh.embed import components
 from SALib.analyze import delta, dgsm, fast, morris, pawn, rbd_fast, sobol
 from SALib.plotting.bar import plot as barplot
 from SALib.plotting.hdmr import plot as hdmrplot
-from SALib.plotting.morris import (
-    covariance_plot,
-    horizontal_bar_plot,
-    sample_histograms,
-)
+from SALib.plotting.morris import (covariance_plot, horizontal_bar_plot,
+                                   sample_histograms)
 from SALib.sample import latin, saltelli
 from SALib.sample.morris import sample
 from SALib.util import read_param_file
@@ -599,7 +596,11 @@ class SAReport:
         top = self.top
 
         sa = sobol.analyze(
-            self.problem, y, print_to_console=False, seed=self.seed, calc_second_order=True
+            self.problem,
+            y,
+            print_to_console=False,
+            seed=self.seed,
+            calc_second_order=True,
         )
         sa_dict = dp.format_salib_output(sa, "problem", pretty_names=None)
 
@@ -663,6 +664,7 @@ class SAReport:
             )
         return ([script1, script2], [div1, div2])
 
+
 if __name__ == "__main__":
     import argparse
 
@@ -722,7 +724,11 @@ if __name__ == "__main__":
         help="When you use this flag, only the samples are generated to be used in the analyse phase.",
     )
     parser.add_argument(
-        "--samplesize", "-n", type=int, help="Number of samples to generate.", default=1000
+        "--samplesize",
+        "-n",
+        type=int,
+        help="Number of samples to generate.",
+        default=1000,
     )
     parser.add_argument(
         "--modelsize", type=int, help="Number of samples for the model.", default=1000
@@ -768,13 +774,14 @@ if __name__ == "__main__":
                 pbar.close()
     else:
         from benchmark import bbobbenchmarks as bn
+
         dim = 20
         problem = {
             "num_vars": dim,
             "names": ["X" + str(x) for x in range(dim)],
             "bounds": [[-5.0, 5.0]] * dim,
         }
-        with open('problem.json', 'w') as outfile:
+        with open("problem.json", "w") as outfile:
             json.dump(problem, outfile)
         fun, opt = bn.instantiate(5, iinstance=1)
         report = SAReport(

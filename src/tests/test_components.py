@@ -1,6 +1,8 @@
-import pytest
-from src import GSAreport
 import json
+
+import pytest
+
+from src import GSAreport
 from src.benchmark import bbobbenchmarks as bn
 
 
