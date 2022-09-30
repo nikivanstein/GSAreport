@@ -8,7 +8,7 @@ The easiest way to use the GSAreport application is directly using docker. This 
 Example to show help text:  
 
 ```zsh
-docker run -v `pwd`/output:/output -v `pwd`/data:/data ghcr.io/basvanstein/gsareport:main -h
+docker run -v "$(pwd)"/output:/output -v "$(pwd)"/data:/data ghcr.io/basvanstein/gsareport:main -h
 ```
 
 ### Using executables
