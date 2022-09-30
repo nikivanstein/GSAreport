@@ -1,7 +1,7 @@
 <h1><img src="src/gsa-logo.png" width="128" style="float:left;">Global Sensitivity Analysis Reporting</h1>
 
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/445445786.svg)](https://zenodo.org/badge/latestdoi/445445786)
 
 [See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
 
