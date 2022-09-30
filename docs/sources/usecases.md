@@ -31,23 +31,21 @@ To generate the samples for evaluation by your own code / simulator you can run 
 
 === "Docker"
     ```zsh
-    docker run --rm \
-        -v `pwd`/data:/data \
-        ghcr.io/basvanstein/gsareport:main \
-        -p /data/problem.json -d /data --sample --samplesize 1000
+    docker run --rm -v "$(pwd)"/data:/data \ 
+    ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data --sample --samplesize 1000
     ```
-    Here we run a docker image called `ghcr.io/basvanstein/gsareport:main`, which is the latest GSAreport program packaged with all the required dependencies. The following line that start with `-v` creates a volume, sharing the folder `data` in our current working directory with the docker image (in location `/data` on the image). That way the program can access the `data` directory to store the design of experiment files (`x_*.csv`).
+    Here we run a docker image called `ghcr.io/basvanstein/gsareport:main`, which is the latest GSAreport program packaged with all the required dependencies. The following line that start with `-v` creates a volume, sharing the folder `data` in our current working directory (`"$(pwd)"` on linux and `$pwd` on windows PowerShell) with the docker image (in location `/data` on the image). That way the program can access the `data` directory to store the design of experiment files (`x_*.csv`).
 === "Python"
     ```zsh
-    python GSAreport.py -p problem.json -d `pwd`/data --sample --samplesize 1000
+    python GSAreport.py -p problem.json -d "$(pwd)"/data --sample --samplesize 1000
     ```
 === "Executable"
     ```zsh
-    ./GSAreport -p problem.json -d `pwd`/data --sample --samplesize 1000
+    ./GSAreport -p problem.json -d "$(pwd)"/data --sample --samplesize 1000
     ```
 
 We give the following parameters to the program, `-p` to specify where to find the `problem.json` file (in the shared volume), `-d` to specify where to find the data, `--sample` to tell the program to generate the samples and `--samplesize 1000` to specify that we want designs of experiments with 1000 samples.  
-After running this step we will have 3 .csv files in our `pwd`/data folder (X_sobol.csv, X_lhs.csv and X_morris.csv). Using these 3 files
+After running this step we will have 3 .csv files in our `"$(pwd)"/data` folder (X_sobol.csv, X_lhs.csv and X_morris.csv). Using these 3 files
 we can generate the corresponding output files (outside of this software) using any tool. In this example we run a small python script that uses a test function from the SALib package as the problem to analyse.
 
 ```python
@@ -73,10 +71,8 @@ The next and final step is to analyse the just evaluated design of experiments u
 
 === "Docker"
     ```zsh
-    docker run --rm -v `pwd`/output:/output \ 
-        -v `pwd`/data:/data \
-        ghcr.io/basvanstein/gsareport:main \
-        -p /data/problem.json -d /data -o /output
+    docker run --rm -v "$(pwd)"/output:/output -v "$(pwd)"/data:/data \
+        ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data -o /output
     ```
 === "Python"
     ```zsh
