@@ -54,6 +54,8 @@ The following open source software libraries are used (and extended) within `GSA
 
 A related toolbox (similar to SALib) originally implemented for Matlab and also available for Python and R is the SAFE toolbox [pianosi2015matlab].
 
+The `GSAreport` application was used in the scientific research of the paper "A Comparison of Global Sensitivity Analysis Methods for Explainable AI With an Application in Genomic Prediction" [9903639].
+
 # Acknowledgements
 
 This work is partly funded by the Dutch Research Council (NWO) as part of the XAIPre project (with project number 19455).
