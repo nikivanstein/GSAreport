@@ -49,12 +49,12 @@ The GSAreport application is different from using SALib directly in a number of 
 
 The following open source software libraries are used (and extended) within `GSAreport`.
 
-- SALib [SALibHerman2017], a sensitivity analysis library for Python containing different SA methods and sampling schemes.  
-- SHAP [shapNIPS2017_7062], a local SA method for explainable AI.
+- SALib [@Herman:2017], a sensitivity analysis library for Python containing different SA methods and sampling schemes.  
+- SHAP [@Lundberg:2017], a local SA method for explainable AI.
 
-A related toolbox (similar to SALib) originally implemented for Matlab and also available for Python and R is the SAFE toolbox [pianosi2015matlab].
+A related toolbox (similar to SALib) originally implemented for Matlab and also available for Python and R is the SAFE toolbox [@Pianosi:2015].
 
-The `GSAreport` application was used in the scientific research of the paper "A Comparison of Global Sensitivity Analysis Methods for Explainable AI With an Application in Genomic Prediction" [9903639].
+The `GSAreport` application was used in the scientific research of the paper [@Stein:2022].
 
 # Acknowledgements
 
