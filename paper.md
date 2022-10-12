@@ -45,7 +45,7 @@ The GSAreport application is different from using SALib directly in a number of 
 
 `GSAreport` bundles the GSA methods in a readable report with interactive plots showing both first and second order sensitivities, including explanations and references to the different methods. The application is meant for making GSA methods as easy as possible to use and to advice the end-users about which methods work well under which conditions.
 
-# References
+# Related software
 
 The following open source software libraries are used (and extended) within `GSAreport`.
 
@@ -60,3 +60,4 @@ The `GSAreport` application was used in the scientific research of the paper [@S
 
 This work is partly funded by the Dutch Research Council (NWO) as part of the XAIPre project (with project number 19455).
 
+# References
