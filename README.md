@@ -3,7 +3,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/445445786.svg)](https://zenodo.org/badge/latestdoi/445445786)
 
-[See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
+* [See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
+* [How to install](https://basvanstein.github.io/GSAreport/1.0.1/installation/)
+* [Quickstart and common usecases](https://basvanstein.github.io/GSAreport/1.0.1/usecases/)
 
 GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
 
@@ -23,12 +25,9 @@ Sensitivity Analysis is a great way of getting a better understanding of how mac
 <figure>
 <p><img alt="Report example" src="https://basvanstein.github.io/GSAreport/1.0.1/example.png">
   </p>
-<figcaption>For a full example report see [here](https://basvanstein.github.io/GSAreport/example-report/example.html).</figcaption>
+<figcaption>For a full example report see<a href="https://basvanstein.github.io/GSAreport/example-report/example.html">here</a>.</figcaption>
 </figure>
 
-
-* [How to install](https://basvanstein.github.io/GSAreport/1.0.1/installation/)
-* [Quickstart and common usecases](https://basvanstein.github.io/GSAreport/1.0.1/usecases/)
 
 ### Downloading and setting up the source code
 You can also use the python package by installing the dependencies on your own system.
