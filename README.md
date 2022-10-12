@@ -19,28 +19,19 @@ According to Wikipedia, sensitivity analysis is "the study of how the uncertaint
 Sensitivity Analysis is a great way of getting a better understanding of how machine learning models work (Explainable AI), what parameters are of importance in real-world applications and processes and what interactions parameters have with other parameters.  
 **GSAreport** makes it easy to run a wide set of SA techniques and generates a nice and visually attractive report to inspect the results of these techniques. By using Docker no additional software needs to be installed and no coding experience is required.
 
-## Installation
 
-### Using Docker (Recommended)
-The easiest way to use the GSAreport application is directly using docker. This way you do not need to install any third party software.
+<figure>
+<p><img alt="Report example" src="https://basvanstein.github.io/GSAreport/1.0.1/example.png">
+  </p>
+<figcaption>For a full example report see [here](https://basvanstein.github.io/GSAreport/example-report/example.html).</figcaption>
+</figure>
 
-1. Install docker (https://docs.docker.com/get-docker/)
-2. Run the image `ghcr.io/basvanstein/gsareport:main` as container with a volume for your data and for the output generated.
 
-Example to show help text:  
+* [How to install](https://basvanstein.github.io/GSAreport/1.0.1/installation/)
+* [Quickstart and common usecases](https://basvanstein.github.io/GSAreport/1.0.1/usecases/)
 
-```zsh
-docker run -v "$(pwd)"/output:/output -v "$(pwd)"/data:/data ghcr.io/basvanstein/gsareport:main -h
-```
-
-### Using executables
-If you cannot or do not want to install Docker, you can also use the pre-compiled executables from the Releases section.
-The executables do not contain graph-tool support and will not generate a sobol network plot, all other functionality is included. 
-
-You can use the executables from the command line with the same console parameters as explained below in the section <a href="#Howtouse">How to use</a>.
-
-### Using python source
-You can also use the package by installing the dependencies to your own system.
+### Downloading and setting up the source code
+You can also use the python package by installing the dependencies on your own system.
 
 1. Install graph-tool (https://graph-tool.skewed.de/)
 2. Install python 3.7+
@@ -90,81 +81,6 @@ python -m pytest
 
 To execute the automated tests to verify the installation.
 
-### Common use cases using Docker
-There are three main steps in using the GSA report application, first to generate designs of experiments (the input files), second to evaluate these design of experiments and store them as `y_*.csv` files (using your own logic / simulators / real world experiments), and last but not least to load the data and perform the sensitivity analysis.
-
-To generate the samples for evaluation by your own code / simulator you can run the following docker command:
-
-#### Docker:
-
-```zsh
-docker run --rm \
-    -v "$(pwd)"/data:/data \
-    ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data --sample --samplesize 1000
-```
-Here we run a docker image called `ghcr.io/basvanstein/gsareport:main`, which is the GSAreport program packaged with all the required dependencies. The following line that start with `-v` creates a volume, sharing the folder `data` in our current working directory with the docker image (in location `/data` on the image). That way the program can access the `data` directory to store the design of experiment files (`x_*.csv`).
-
-#### Python:
-
-```zsh
-python GSAreport.py -p problem.json -d `pwd`/data --sample --samplesize 1000
-```
-
-#### Executable:
-
-```zsh
-./GSAreport -p problem.json -d `pwd`/data --sample --samplesize 1000
-```
-
-We give the following parameters to the program, `-p` to specify where to find the `problem.json` file (in the shared volume), `-d` to specify where to find the data, `--sample` to tell the program to generate the samples and `--samplesize 1000` to specify that we want designs of experiments with 1000 samples.  
-After running this step we will have 3 .csv files in our `pwd`/data folder (X_sobol.csv, X_lhs.csv and X_morris.csv). Using these 3 files
-we can generate the corresponding output files (outside of this software) using any tool. In this example we run a small python script that uses a test function from the SALib package as the problem to analyse.
-
-```python
-import numpy as np
-from SALib.test_functions import Ishigami
-
-#First we load the data
-data_dir = "data"
-X_sobol = np.loadtxt(f"{data_dir}/x_sobol.csv")
-X_morris = np.loadtxt(f"{data_dir}/x_morris.csv")
-X_lhs = np.loadtxt(f"{data_dir}/x_lhs.csv")
-#generate the y values
-y_sobol = Ishigami.evaluate(X_sobol)
-y_morris = Ishigami.evaluate(X_morris)
-y_lhs = Ishigami.evaluate(X_lhs)
-#store the results in files
-np.savetxt(f"{data_dir}/y_lhs.csv", y_lhs)
-np.savetxt(f"{data_dir}/y_morris.csv", y_morris)
-np.savetxt(f"{data_dir}/y_sobol.csv", y_sobol)
-```
-
-The next and final step is to analyse the just evaluated design of experiments using the SA methods and generate the report.
-
-#### Docker:
-
-```zsh
-docker run --rm -v "$(pwd)"/output:/output -v "$(pwd)"/data:/data \
-    ghcr.io/basvanstein/gsareport:main -p /data/problem.json -d /data -o /output
-```
-Here we give an additional volume to our docker image such that we can access the generated output report in the output directory.
-
-
-#### Python:
-
-```zsh
-python GSAreport.py -p problem.json -d data_dir -o output_dir
-```
-
-#### Executable:
-
-```zsh
-./GSAreport -p problem.json -d data_dir -o output_dir
-```
-
-We ommit the `--sample` instruction here such that it will load the data and start the analysis.
-
-
 ## Building binaries (for developers)
 If you want to build the executables yourself you can use the following commands. We use pyinstaller to package the executables.
 Make sure you have pyinstaller installed using `pip install pyinstaller`.
@@ -182,7 +98,7 @@ To generate a new version of the documentation run `mike deploy --push --update-
 ## References
 This tool uses Savvy [1] and SALib [2].
 
-[1] Blake Hough, ., Chris Fu, ., & Swapil Paliwal, . (2016). savvy: visualize high dimensionality sensitivity analysis data. Updated with full sensitivity analysis from ligpy model. (v2.0). Zenodo. https://doi.org/10.5281/zenodo.53099  
+[1] Hough, B., Fu, C. and Paliwal, S. (2016). savvy: visualize high dimensionality sensitivity analysis data. Updated with full sensitivity analysis from ligpy model. (v2.0). Zenodo. https://doi.org/10.5281/zenodo.53099  
 [2] Herman, J. and Usher, W. (2017) SALib: An open-source Python library for sensitivity analysis. Journal of Open Source Software, 2(9). doi:10.21105/joss.00097
 
 ## Cite our paper
@@ -191,13 +107,13 @@ Use the following bibtex to cite our paper when you use GSAreport.
 
 ```
 @ARTICLE{9903639,  
-  author={Van Stein, Bas and Raponi, Elena and Sadeghi, Zahra and Bouman, Niek and Van Ham, Roeland C.H.J. and Bäck, Thomas},  
-  journal={IEEE Access},  
-  title={A Comparison of Global Sensitivity Analysis Methods for Explainable AI with an Application in Genomic Prediction},   
-  year={2022},  
-  volume={},  
-  number={},  
-  pages={1-1},  
-  doi={10.1109/ACCESS.2022.3210175}
+    author={Stein, Bas Van and Raponi, Elena and Sadeghi, Zahra and Bouman, Niek and Van Ham, Roeland C. H. J. and Bäck, Thomas},  
+    journal={IEEE Access},   
+    title={A Comparison of Global Sensitivity Analysis Methods for Explainable AI With an Application in Genomic Prediction},   
+    year={2022},  
+    volume={10},  
+    number={},  
+    pages={103364-103381},  
+    doi={10.1109/ACCESS.2022.3210175}
 }
 ```
