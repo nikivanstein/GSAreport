@@ -1,11 +1,14 @@
 <h1><img src="src/gsa-logo.png" width="128" style="float:left;">Global Sensitivity Analysis Reporting</h1>
 
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/445445786.svg)](https://zenodo.org/badge/latestdoi/445445786)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/445445786.svg)](https://zenodo.org/badge/latestdoi/445445786) [![DOI](https://joss.theoj.org/papers/10.21105/joss.04721/status.svg)](https://doi.org/10.21105/joss.04721)
 
 * [See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
 * [How to install](https://basvanstein.github.io/GSAreport/1.0.1/installation/)
 * [Quickstart and common usecases](https://basvanstein.github.io/GSAreport/1.0.1/usecases/)
+* [Runnable demo on Code Ocean](https://codeocean.com/capsule/1242287/tree)
+* [Scientific paper](https://ieeexplore.ieee.org/document/9903639)
+
 
 GSAreport is an application to easily generate reports that describe the global sensitivities of your input parameters as best as possible. You can use the reporting application to inspect which features are important for a given real world function / simulator or model. Using the dockerized application you can generate a report with just one line of code and no additional dependencies (except for Docker of course).
 
