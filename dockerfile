@@ -1,7 +1,7 @@
 #Docker file for GSAreport tool name:emeraldit/gsareport
 #docker run -v `pwd`/output:/output emeraldit/gsareport
 #docker run -it -w /home/user -v `pwd`/src:/home/user tiagopeixoto/graph-tool bash
-FROM tiagopeixoto/graph-tool:release-2.58
+FROM tiagopeixoto/graph-tool:release-2.57
 
 COPY src /home/user
 WORKDIR /home/user
