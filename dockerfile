@@ -1,7 +1,7 @@
 #Docker file for GSAreport tool name:emeraldit/gsareport
 #docker run -v `pwd`/output:/output emeraldit/gsareport
 #docker run -it -w /home/user -v `pwd`/src:/home/user tiagopeixoto/graph-tool bash
-FROM tiagopeixoto/graph-tool:latest
+FROM tiagopeixoto/graph-tool:release-2.56
 
 COPY src /home/user
 WORKDIR /home/user
@@ -16,7 +16,7 @@ RUN pacman --noconfirm -S binutils
 #upgrade pip
 RUN python -m venv /home/user/venv
 #RUN pip install --upgrade pip
-RUN /home/user/venv/bin/pip install -r requirements.txt
-RUN /home/user/venv/bin/pip install pyinstaller
+RUN pip install -r requirements.txt
+RUN pip install pyinstaller
 
-ENTRYPOINT ["/home/user/venv/bin/python","./GSAreport.py"]
+ENTRYPOINT ["python","./GSAreport.py"]
