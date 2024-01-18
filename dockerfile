@@ -14,8 +14,9 @@ RUN pacman --noconfirm -S git
 RUN pacman --noconfirm -S binutils
 
 #upgrade pip
+RUN python -m venv /home/user/venv
 #RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN pip install pyinstaller
+RUN /home/user/venv/bin/pip install -r requirements.txt
+RUN /home/user/venv/bin/pip install pyinstaller
 
-ENTRYPOINT ["python","./GSAreport.py"]
+ENTRYPOINT ["/home/user/venv/bin/python","./GSAreport.py"]
