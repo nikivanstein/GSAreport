@@ -205,7 +205,7 @@ class SAReport:
                 $ r2 = report.trainModel(X,y)
         """
         self.regr = RandomForestRegressor(
-            max_depth=2, random_state=self.seed, n_estimators=100
+            max_depth=5, random_state=self.seed, n_estimators=100
         )
         self.model_score = cross_val_score(self.regr, X, y, cv=3)
         self.regr.fit(X, y)
