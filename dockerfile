@@ -14,7 +14,7 @@ RUN pacman --noconfirm -S git
 RUN pacman --noconfirm -S binutils
 
 #upgrade pip
-RUN pip install --upgrade pip
+#RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN pip install pyinstaller
 
