@@ -3,9 +3,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/445445786.svg)](https://zenodo.org/badge/latestdoi/445445786) [![DOI](https://joss.theoj.org/papers/10.21105/joss.04721/status.svg)](https://doi.org/10.21105/joss.04721)
 
-* [See here the full documentation and how to contribute](https://basvanstein.github.io/GSAreport/)
-* [How to install](https://basvanstein.github.io/GSAreport/1.0.1/installation/)
-* [Quickstart and common usecases](https://basvanstein.github.io/GSAreport/1.0.1/usecases/)
+* [See here the full documentation and how to contribute](https://nikivanstein.github.io/GSAreport/)
+* [How to install](https://nikivanstein.github.io/GSAreport/1.0.1/installation/)
+* [Quickstart and common usecases](https://nikivanstein.github.io/GSAreport/1.0.1/usecases/)
 * [Runnable demo on Code Ocean](https://codeocean.com/capsule/1242287/tree)
 * [Scientific paper](https://ieeexplore.ieee.org/document/9903639)
 
@@ -26,9 +26,9 @@ Sensitivity Analysis is a great way of getting a better understanding of how mac
 
 
 <figure>
-<p><img alt="Report example" src="https://basvanstein.github.io/GSAreport/1.0.1/example.png">
+<p><img alt="Report example" src="https://nikivanstein.github.io/GSAreport/1.0.1/example.png">
   </p>
-<figcaption>For a full example report see<a href="https://basvanstein.github.io/GSAreport/example-report/example.html">here</a>.</figcaption>
+<figcaption>For a full example report see<a href="https://nikivanstein.github.io/GSAreport/example-report/example.html">here</a>.</figcaption>
 </figure>
 
 
