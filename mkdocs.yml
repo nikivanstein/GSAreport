@@ -3,10 +3,10 @@ site_name: GSA Report
 
 # Repository
 repo_name: GSAreport
-repo_url: https://github.com/Basvanstein/GSAreport
+repo_url: https://github.com/nikivanstein/GSAreport
 edit_uri: ""
 # Copyright
-copyright: Bas van Stein
+copyright: Niki van Stein
 
 docs_dir: "docs/sources"
 
@@ -56,7 +56,7 @@ nav:
     - How to contribute: contributing.md
     - References: references.md
   - Class reference: gsareport/gsareport.md
-  - Example report: 'https://basvanstein.github.io/GSAreport/example-report/example.html'
+  - Example report: 'https://nikivanstein.github.io/GSAreport/example-report/example.html'
   - License: license.md
 extra:
   version:

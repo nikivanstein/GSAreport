@@ -2,10 +2,10 @@ site_name: GSA Report
 
 
 # Repository
-repo_name: XAI
-repo: https://github.com/Basvanstein/XAI/
+repo_name: GSAreport
+repo: https://github.com/nikivanstein/GSAreport/
 # Copyright
-copyright: Bas van Stein
+copyright: Niki van Stein
 
 #This specifies the autogeneration portion
 pages:

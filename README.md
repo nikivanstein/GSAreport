@@ -109,7 +109,7 @@ Use the following bibtex to cite our paper when you use GSAreport.
 
 ```
 @ARTICLE{9903639,  
-    author={Stein, Bas Van and Raponi, Elena and Sadeghi, Zahra and Bouman, Niek and Van Ham, Roeland C. H. J. and Bäck, Thomas},  
+    author={Stein, Niki van and Raponi, Elena and Sadeghi, Zahra and Bouman, Niek and Van Ham, Roeland C. H. J. and Bäck, Thomas},  
     journal={IEEE Access},   
     title={A Comparison of Global Sensitivity Analysis Methods for Explainable AI With an Application in Genomic Prediction},   
     year={2022},  
