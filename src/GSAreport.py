@@ -148,7 +148,7 @@ class SAReport:
 
         Args:
             sample_size (int): The number of base samples (per dimension) to generate for each design of experiments.
-                Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+2) are generated.
+                Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+1) are generated.
 
         Returns:
             list: A list containing the 3 design of experiments (3 times sample_size samples).

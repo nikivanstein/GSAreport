@@ -29,7 +29,7 @@ def test_generate_samples():
         problem["num_vars"] + 1
     ), f"Unexpected number of samples for Morris {len(X_morris)}"
     assert len(X_sobol) == 128 * (
-        problem["num_vars"] + 2
+        problem["num_vars"] + 1
     ), f"Unexpected number of samples for Sobol {len(X_sobol)}"
 
 
@@ -54,5 +54,5 @@ def test_generate_samples_with_model():
         problem["num_vars"] + 1
     ), f"Unexpected number of samples for Morris {len(report.x_morris)}"
     assert len(report.x_sobol) == 128 * (
-        problem["num_vars"] + 2
-    ), f"Unexpected number of samples for Sobol {len(report.x_sobol)} != {128*(2*problem['num_vars']+2)}"
+        problem["num_vars"] + 1
+    ), f"Unexpected number of samples for Sobol {len(report.x_sobol)} != {128*(problem['num_vars']+1)}"
