@@ -134,7 +134,7 @@ class SAReport:
         self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.tag = now.strftime("%Y-%m-%dT%H-%M")
         self.model_samples = model_samples
-        if not os.path.exists(output_dir):
+        if not os.path.exists(output_dir) and output_dir != "":
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
@@ -148,7 +148,7 @@ class SAReport:
 
         Args:
             sample_size (int): The number of base samples (per dimension) to generate for each design of experiments.
-                Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+2) are generated.
+                Note that for Morris sample_size * (dim+1) and for Sobol sample_size * (dim+1) are generated.
 
         Returns:
             list: A list containing the 3 design of experiments (3 times sample_size samples).
@@ -167,7 +167,7 @@ class SAReport:
             self.x_lhs = None
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
         if self.problem["num_vars"] < 64:
-            self.x_sobol = saltelli.sample(self.problem, sample_size)
+            self.x_sobol = saltelli.sample(self.problem, sample_size // 2)
         else:
             self.x_sobol = None
         return (self.x_lhs, self.x_morris, self.x_sobol)
@@ -746,6 +746,9 @@ if __name__ == "__main__":
     output_dir = args.output
     data_dir = args.data
     top = args.top
+
+    if args.sample:
+        output_dir = ""
 
     problem = {}
     if not args.demo:

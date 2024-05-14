@@ -7,7 +7,7 @@ WORKDIR /home/user
 RUN apt-get update
 RUN apt-get install -y python3-graph-tool
 RUN apt-get install -y libcairo2-dev pkg-config python3-dev
-
+RUN apt-get install -y nodejs
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --break-system-packages

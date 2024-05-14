@@ -31,7 +31,6 @@ Sensitivity Analysis is a great way of getting a better understanding of how mac
 <figcaption>For a full example report see<a href="https://nikivanstein.github.io/GSAreport/example-report/example.html">here</a>.</figcaption>
 </figure>
 
-
 ### Downloading and setting up the source code
 You can also use the python package by installing the dependencies on your own system.
 
@@ -95,7 +94,7 @@ pyinstaller --distpath dist/darwin/ GSAreport.spec
 
 We provide binaries for Linux and Mac-OS in the releases section.
 
-To generate a new version of the documentation run `mike deploy --push --update-aliases <version> latest`
+To generate a new version of the documentation run `mike deploy --push --update-aliases 1.3.0 latest`
 
 ## References
 This tool uses Savvy [1] and SALib [2].
