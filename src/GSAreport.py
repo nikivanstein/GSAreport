@@ -167,7 +167,7 @@ class SAReport:
             self.x_lhs = None
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
         if self.problem["num_vars"] < 64:
-            self.x_sobol = saltelli.sample(self.problem, sample_size / 2)
+            self.x_sobol = saltelli.sample(self.problem, sample_size // 2)
         else:
             self.x_sobol = None
         return (self.x_lhs, self.x_morris, self.x_sobol)
