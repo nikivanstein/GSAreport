@@ -134,7 +134,7 @@ class SAReport:
         self.start_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.tag = now.strftime("%Y-%m-%dT%H-%M")
         self.model_samples = model_samples
-        if not os.path.exists(output_dir):
+        if not os.path.exists(output_dir) and output_dir != "":
             os.makedirs(output_dir)
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
@@ -167,7 +167,7 @@ class SAReport:
             self.x_lhs = None
         self.x_morris = sample(self.problem, sample_size, seed=self.seed)
         if self.problem["num_vars"] < 64:
-            self.x_sobol = saltelli.sample(self.problem, sample_size)
+            self.x_sobol = saltelli.sample(self.problem, sample_size / 2)
         else:
             self.x_sobol = None
         return (self.x_lhs, self.x_morris, self.x_sobol)
@@ -746,6 +746,9 @@ if __name__ == "__main__":
     output_dir = args.output
     data_dir = args.data
     top = args.top
+
+    if args.sample:
+        output_dir = ""
 
     problem = {}
     if not args.demo:

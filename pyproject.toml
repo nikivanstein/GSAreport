@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "GSAreport"
-version = "1.2.0"
+version = "1.3.0"
 description = "Global Sensitivity Reporting"
 readme = "README.md"
 authors = [{ name = "Niki van Stein", email = "n.van.stein@liacs.leidenuniv.nl" }]
